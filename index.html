@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星盘宇宙</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="container">
+        <canvas id="star-canvas"></canvas>
+        
+        <div id="ui-overlay">
+        </div>
+        
+        <div id="loading">
+            <div class="loader">星盘加载中...</div>
+        </div>
+    </div>
+
+    <!-- 确保Three.js正确加载 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="js/starSystem.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
