@@ -22,7 +22,7 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
-        cosmic: "bg-gradient-to-r from-purple-600 to-indigo-600 text-white hover:from-purple-700 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all duration-300",
+        cosmic: "bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-200 ease-out",
         "cosmic-outline": "border border-purple-500 text-purple-400 hover:bg-purple-500/10 hover:text-purple-300",
       },
       size: {

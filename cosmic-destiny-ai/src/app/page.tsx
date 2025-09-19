@@ -34,10 +34,7 @@ export default function Home() {
         </div>
 
         {/* Hero Content */}
-        <div className="relative z-10 text-center text-white px-4">
-          <h1 className="text-6xl md:text-8xl font-bold mb-6 text-glow animate-fade-in">
-            Cosmic Destiny AI
-          </h1>
+        <div className="relative z-10 text-center text-white px-4 mt-128">
           <p className="text-xl md:text-2xl mb-8 text-gray-300 animate-fade-up">
             Discover Your Destiny Through the Wisdom of the Stars
           </p>
@@ -46,10 +43,13 @@ export default function Home() {
               variant="cosmic"
               size="lg"
               onClick={() => setShowForm(true)}
-              className="animate-float"
+              className="group relative overflow-hidden"
             >
-              <Sparkles className="w-5 h-5 mr-2" />
-              Chart My Cosmos
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="relative flex items-center">
+                <Sparkles className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform duration-200" />
+                <span className="font-semibold">Chart My Cosmos</span>
+              </div>
             </Button>
           </div>
         </div>
