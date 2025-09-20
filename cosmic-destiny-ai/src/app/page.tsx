@@ -47,22 +47,35 @@ export default function Home() {
   }
 
   const handleBirthFormSubmit = async (data: BirthData) => {
-    // User is already logged in at this point, create test report and redirect to generation
     setShowForm(false)
     
-    // Create test report ID
-    const testReportId = 'test-report-' + Date.now()
-    
-    // Store birth data in localStorage for the generate page
-    localStorage.setItem('birthData', JSON.stringify({
-      birthDate: data.birthDate,
-      birthTime: data.birthTime,
-      timeZone: data.timeZone,
-      gender: data.gender
-    }))
-    
-    // Redirect directly to report generation
-    window.location.href = `/generate/${testReportId}`
+    try {
+      // Call API to generate report
+      const response = await fetch('/api/reports/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          birthDate: data.birthDate,
+          birthTime: data.birthTime,
+          timeZone: data.timeZone,
+          gender: data.gender
+        })
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to generate report')
+      }
+
+      // Redirect to report page
+      window.location.href = `/report/${result.reportId}`
+    } catch (error) {
+      console.error('Error generating report:', error)
+      alert('生成报告失败，请稍后重试')
+    }
   }
 
   const scrollToContent = () => {

@@ -51,14 +51,14 @@ export default function Dashboard() {
 
   const fetchReports = async () => {
     try {
-      const { data, error } = await supabase
-        .from('user_reports')
-        .select('*')
-        .eq('user_id', user!.id)
-        .order('created_at', { ascending: false })
+      const response = await fetch('/api/reports')
+      const result = await response.json()
 
-      if (error) throw error
-      setReports(data || [])
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to fetch reports')
+      }
+
+      setReports(result.reports || [])
     } catch (error) {
       console.error('Error fetching reports:', error)
     } finally {
@@ -68,37 +68,31 @@ export default function Dashboard() {
 
   const handleBirthFormSubmit = async (birthData: any) => {
     try {
-      console.log('Creating report with data:', birthData)
-      console.log('User ID:', user!.id)
+      // Call API to generate report
+      const response = await fetch('/api/reports/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          birthDate: birthData.birthDate,
+          birthTime: birthData.birthTime,
+          timeZone: birthData.timeZone,
+          gender: birthData.gender
+        })
+      })
 
-      // Check if user already has a report
-      if (reports.length > 0) {
-        console.log('Redirecting to existing report:', reports[0].id)
-        // Redirect to existing report
-        router.push(`/report/${reports[0].id}`)
-        return
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to generate report')
       }
 
-      // For testing purposes, skip database and go directly to generation
-      const testReportId = 'test-report-' + Date.now()
-      console.log('Using test report ID:', testReportId)
-
-      // Store birth data in localStorage for the generate page
-      localStorage.setItem('birthData', JSON.stringify({
-        birthDate: birthData.birthDate,
-        birthTime: birthData.birthTime,
-        timeZone: birthData.timeZone,
-        gender: birthData.gender
-      }))
-
-      // Redirect directly to report generation with test ID
-      setTimeout(() => {
-        console.log('Redirecting to test generation page...')
-        router.push(`/generate/${testReportId}`)
-      }, 500)
+      // Redirect to report page
+      router.push(`/report/${result.reportId}`)
     } catch (error) {
       console.error('Error creating report:', error)
-      alert('Error creating report. Please check the console for details.')
+      alert('生成报告失败，请稍后重试')
     } finally {
       setShowForm(false)
     }
