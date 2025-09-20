@@ -26,6 +26,19 @@ export default function Dashboard() {
   const supabase = createClient()
 
   useEffect(() => {
+    // Listen for open birth form event from navigation
+    const handleOpenBirthForm = () => {
+      setShowForm(true)
+    }
+
+    window.addEventListener('openBirthForm', handleOpenBirthForm)
+
+    return () => {
+      window.removeEventListener('openBirthForm', handleOpenBirthForm)
+    }
+  }, [])
+
+  useEffect(() => {
     if (!authLoading && !user) {
       router.push('/auth')
       return
@@ -55,33 +68,37 @@ export default function Dashboard() {
 
   const handleBirthFormSubmit = async (birthData: any) => {
     try {
+      console.log('Creating report with data:', birthData)
+      console.log('User ID:', user!.id)
+
       // Check if user already has a report
       if (reports.length > 0) {
+        console.log('Redirecting to existing report:', reports[0].id)
         // Redirect to existing report
         router.push(`/report/${reports[0].id}`)
         return
       }
 
-      // Create new report
-      const { data, error } = await supabase
-        .from('user_reports')
-        .insert([{
-          user_id: user!.id,
-          birth_date: birthData.birthDate,
-          birth_time: birthData.birthTime,
-          timezone: birthData.timeZone,
-          gender: birthData.gender,
-          is_paid: false
-        }])
-        .select()
-        .single()
+      // For testing purposes, skip database and go directly to generation
+      const testReportId = 'test-report-' + Date.now()
+      console.log('Using test report ID:', testReportId)
 
-      if (error) throw error
+      // Store birth data in localStorage for the generate page
+      localStorage.setItem('birthData', JSON.stringify({
+        birthDate: birthData.birthDate,
+        birthTime: birthData.birthTime,
+        timeZone: birthData.timeZone,
+        gender: birthData.gender
+      }))
 
-      // Redirect to report generation
-      router.push(`/generate/${data.id}`)
+      // Redirect directly to report generation with test ID
+      setTimeout(() => {
+        console.log('Redirecting to test generation page...')
+        router.push(`/generate/${testReportId}`)
+      }, 500)
     } catch (error) {
       console.error('Error creating report:', error)
+      alert('Error creating report. Please check the console for details.')
     } finally {
       setShowForm(false)
     }

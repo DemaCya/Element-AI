@@ -1,17 +1,22 @@
 'use client'
 
-import React, { useState } from 'react'
-import { Menu, X, User, LogIn } from 'lucide-react'
+import React, { useState, useEffect, useRef } from 'react'
+import { Menu, X, User, LogIn, FileText, History, LogOut, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import InfoPanel from './InfoPanel'
 import Logo from './Logo'
 import AuthModal from './auth/AuthModal'
+import { useUser } from '@/contexts/UserContext'
 
 interface NavigationProps {
   user?: {
     id: string
     email: string
+    profile?: {
+      fullName?: string
+    }
   } | null
 }
 
@@ -19,6 +24,25 @@ export default function Navigation({ user }: NavigationProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [activePanel, setActivePanel] = useState<'about' | 'philosophy' | null>(null)
   const [showAuthModal, setShowAuthModal] = useState(false)
+  const [showUserDropdown, setShowUserDropdown] = useState(false)
+  const [showLogoutModal, setShowLogoutModal] = useState(false)
+  const router = useRouter()
+  const { signOut } = useUser()
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowUserDropdown(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
 
   return (
     <>
@@ -45,12 +69,74 @@ export default function Navigation({ user }: NavigationProps) {
                 Philosophy
               </button>
               {user ? (
-                <Link href="/dashboard">
-                  <Button variant="cosmic-outline" size="sm">
-                    <User className="w-4 h-4 mr-2" />
-                    Dashboard
+                <div className="relative" ref={dropdownRef}>
+                  <Button
+                    variant="cosmic-outline"
+                    size="sm"
+                    onClick={() => setShowUserDropdown(!showUserDropdown)}
+                    className="flex items-center gap-2"
+                  >
+                    <User className="w-4 h-4" />
+                    <span>{user.profile?.fullName || user.email}</span>
+                    <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${showUserDropdown ? 'rotate-180' : ''}`} />
                   </Button>
-                </Link>
+
+                  {/* User Dropdown */}
+                  {showUserDropdown && (
+                    <div className="absolute right-0 mt-2 w-56 bg-slate-800/95 backdrop-blur-sm rounded-lg border border-purple-500/30 shadow-2xl overflow-hidden">
+                      <div className="p-2">
+                        <Link
+                          href="/dashboard"
+                          onClick={() => setShowUserDropdown(false)}
+                          className="flex items-center gap-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                        >
+                          <User className="w-4 h-4" />
+                          <span>Dashboard</span>
+                        </Link>
+
+                        <button
+                          onClick={() => {
+                            setShowUserDropdown(false)
+                            // Navigate to dashboard and open birth form
+                            router.push('/dashboard')
+                            setTimeout(() => {
+                              const event = new CustomEvent('openBirthForm')
+                              window.dispatchEvent(event)
+                            }, 100)
+                          }}
+                          className="flex items-center gap-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors w-full text-left"
+                        >
+                          <FileText className="w-4 h-4" />
+                          <span>Switch Account</span>
+                        </button>
+
+                        <button
+                          onClick={() => {
+                            setShowUserDropdown(false)
+                            router.push('/dashboard')
+                          }}
+                          className="flex items-center gap-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors w-full text-left"
+                        >
+                          <History className="w-4 h-4" />
+                          <span>View History</span>
+                        </button>
+
+                        <div className="border-t border-purple-500/20 my-2"></div>
+
+                        <button
+                          onClick={() => {
+                            setShowUserDropdown(false)
+                            setShowLogoutModal(true)
+                          }}
+                          className="flex items-center gap-3 px-3 py-2 text-red-400 hover:text-red-300 hover:bg-red-400/10 rounded-lg transition-colors w-full text-left"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          <span>Logout</span>
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
               ) : (
                 <Button
                   variant="cosmic"
@@ -116,12 +202,25 @@ export default function Navigation({ user }: NavigationProps) {
                   Philosophy
                 </button>
                 {user ? (
-                  <Link href="/dashboard" onClick={() => setIsMenuOpen(false)}>
-                    <Button variant="cosmic-outline" className="w-full">
-                      <User className="w-4 h-4 mr-2" />
-                      Dashboard
+                  <>
+                    <Link href="/dashboard" onClick={() => setIsMenuOpen(false)}>
+                      <Button variant="cosmic-outline" className="w-full">
+                        <User className="w-4 h-4 mr-2" />
+                        Dashboard
+                      </Button>
+                    </Link>
+
+                    <Button
+                      variant="outline"
+                      className="w-full border-red-400 text-red-400 hover:bg-red-400/10 mt-2"
+                      onClick={() => {
+                        setShowLogoutModal(true)
+                      }}
+                    >
+                      <LogOut className="w-4 h-4 mr-2" />
+                      Logout
                     </Button>
-                  </Link>
+                  </>
                 ) : (
                   <Button
                     variant="cosmic"
@@ -150,13 +249,52 @@ export default function Navigation({ user }: NavigationProps) {
         onClose={() => setActivePanel(null)}
       />
 
+      {/* Logout Confirmation Modal */}
+      {showLogoutModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="bg-slate-800/95 backdrop-blur-sm rounded-xl border border-purple-500/30 p-6 max-w-md w-full mx-4 shadow-2xl">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                <LogOut className="w-8 h-8 text-red-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-white mb-2">Confirm Logout</h3>
+              <p className="text-gray-400 mb-6">Are you sure you want to logout of your account?</p>
+
+              <div className="flex gap-3 justify-center">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowLogoutModal(false)}
+                  className="border-gray-600 text-gray-300 hover:bg-gray-700"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="cosmic"
+                  onClick={async () => {
+                    setShowLogoutModal(false)
+                    setIsMenuOpen(false)
+                    await signOut()
+                    window.location.reload()
+                  }}
+                  className="bg-red-600 hover:bg-red-700"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Logout
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Auth Modal */}
       <AuthModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
         onSuccess={() => {
           setShowAuthModal(false)
-          // You can add additional success handling here
+          // Force refresh to update navigation with user info
+          window.location.reload()
         }}
       />
     </>

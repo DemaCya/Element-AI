@@ -35,18 +35,22 @@ export default function Home() {
     }
   ]
 
-  const handleBirthFormSubmit = async (data: BirthData) => {
-    // If user is logged in, redirect to dashboard to create report
+  const handleChartMyCosmos = () => {
+    // Check if user is logged in
     if (user) {
-      setShowForm(false)
-      // For now, redirect to dashboard where they can create a report
-      alert('Redirecting to dashboard to create your report...')
-      // In a real implementation, we would create the report and redirect to generation
+      // If logged in, show the birth form
+      setShowForm(true)
     } else {
-      // Show auth modal for new users
-      setShowForm(false)
+      // If not logged in, show auth modal first
       setShowAuthModal(true)
     }
+  }
+
+  const handleBirthFormSubmit = async (data: BirthData) => {
+    // User is already logged in at this point, redirect to dashboard to create report
+    setShowForm(false)
+    // Redirect to dashboard where they can create their report
+    window.location.href = '/dashboard'
   }
 
   const scrollToContent = () => {
@@ -72,7 +76,7 @@ export default function Home() {
             <Button
               variant="cosmic"
               size="lg"
-              onClick={() => setShowForm(true)}
+              onClick={handleChartMyCosmos}
               className="group relative overflow-hidden"
             >
               <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -173,8 +177,8 @@ export default function Home() {
           onClose={() => setShowAuthModal(false)}
           onSuccess={() => {
             setShowAuthModal(false)
-            // Redirect to dashboard after successful login
-            window.location.href = '/dashboard'
+            // Force page refresh to update navigation with user info
+            window.location.reload()
           }}
         />
       )}

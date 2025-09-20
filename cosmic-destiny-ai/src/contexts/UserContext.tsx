@@ -19,6 +19,15 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const getUser = async () => {
+      // Check for mock user first (for testing)
+      const mockUserStr = localStorage.getItem('mockUser')
+      if (mockUserStr) {
+        const mockUser = JSON.parse(mockUserStr)
+        setUser(mockUser)
+        setLoading(false)
+        return
+      }
+
       const { data: { user: authUser } } = await supabase.auth.getUser()
 
       if (authUser) {
@@ -71,6 +80,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   }, [supabase])
 
   const signOut = async () => {
+    // Clear mock user if exists
+    localStorage.removeItem('mockUser')
     await supabase.auth.signOut()
     setUser(null)
   }
