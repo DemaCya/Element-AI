@@ -74,6 +74,75 @@ export default function ReportPage({ params }: { params: { id: string } }) {
 
   const fetchReport = async () => {
     try {
+      // Check if it's a test report (starts with 'test-report-')
+      if (params.id.startsWith('test-report-')) {
+        // For test reports, get data from localStorage and create mock report
+        const birthDataStr = localStorage.getItem('birthData')
+        if (birthDataStr) {
+          const birthData = JSON.parse(birthDataStr)
+          const mockReport: CosmicReport = {
+            id: params.id,
+            birth_date: birthData.birthDate,
+            birth_time: birthData.birthTime || undefined,
+            timezone: birthData.timeZone,
+            gender: birthData.gender,
+            is_paid: false,
+            created_at: new Date().toISOString(),
+            report_data: {
+              personality: {
+                overview: "Based on your cosmic chart, you possess a unique blend of traits that make you naturally intuitive and creative. Your birth alignment suggests a strong connection to both earthly wisdom and celestial guidance.",
+                strengths: [
+                  "Natural leadership abilities",
+                  "Strong intuitive sense",
+                  "Creative problem-solving",
+                  "Emotional intelligence",
+                  "Adaptability"
+                ],
+                challenges: [
+                  "Tendency to overthink",
+                  "Perfectionist tendencies",
+                  "Need for validation",
+                  "Difficulty with routine",
+                  "Sensitivity to criticism"
+                ]
+              },
+              career: {
+                bestPaths: [
+                  "Creative industries (art, music, writing)",
+                  "Leadership roles",
+                  "Consulting and advisory",
+                  "Technology and innovation",
+                  "Healthcare and wellness"
+                ],
+                timing: "The next 6 months are particularly favorable for career changes. Consider making moves in late spring or early summer."
+              },
+              relationships: {
+                compatibility: "You're most compatible with earth and water signs, who can provide the stability and emotional depth you seek.",
+                advice: "Focus on open communication and don't be afraid to show vulnerability. Your authentic self is your greatest asset in relationships."
+              },
+              lifePath: {
+                purpose: "Your life path involves being a bridge between different worlds - helping others connect with their higher purpose while staying grounded in reality.",
+                challenges: "Learning to balance your idealistic nature with practical considerations will be key to your success."
+              },
+              health: {
+                considerations: [
+                  "Pay attention to stress levels",
+                  "Regular exercise helps maintain balance",
+                  "Meditation and mindfulness practices",
+                  "Adequate sleep is crucial",
+                  "Consider herbal remedies for anxiety"
+                ],
+                advice: "Your sensitive nature means you need extra care for your mental and emotional well-being. Regular self-care isn't optional - it's essential."
+              }
+            }
+          }
+          setReport(mockReport)
+          setLoading(false)
+          return
+        }
+      }
+
+      // For real reports, query the database
       const { data, error } = await supabase
         .from('user_reports')
         .select('*')
@@ -228,7 +297,7 @@ export default function ReportPage({ params }: { params: { id: string } }) {
                 <h2 className="text-2xl font-bold text-white">Personality Overview</h2>
               </div>
               <p className="text-gray-200 leading-relaxed mb-6">
-                {reportData.personality.overview}
+                {reportData.personality?.overview || 'Personality analysis not available'}
               </p>
 
               <div className="grid md:grid-cols-2 gap-6">

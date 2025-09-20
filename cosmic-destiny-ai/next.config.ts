@@ -51,11 +51,7 @@ const nextConfig: NextConfig = {
   // Redirects for SEO
   async redirects() {
     return [
-      {
-        source: '/dashboard',
-        destination: '/dashboard/reports',
-        permanent: true,
-      },
+      // Removed problematic dashboard redirect
     ]
   },
 };

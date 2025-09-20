@@ -47,10 +47,22 @@ export default function Home() {
   }
 
   const handleBirthFormSubmit = async (data: BirthData) => {
-    // User is already logged in at this point, redirect to dashboard to create report
+    // User is already logged in at this point, create test report and redirect to generation
     setShowForm(false)
-    // Redirect to dashboard where they can create their report
-    window.location.href = '/dashboard'
+    
+    // Create test report ID
+    const testReportId = 'test-report-' + Date.now()
+    
+    // Store birth data in localStorage for the generate page
+    localStorage.setItem('birthData', JSON.stringify({
+      birthDate: data.birthDate,
+      birthTime: data.birthTime,
+      timeZone: data.timeZone,
+      gender: data.gender
+    }))
+    
+    // Redirect directly to report generation
+    window.location.href = `/generate/${testReportId}`
   }
 
   const scrollToContent = () => {
