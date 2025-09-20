@@ -28,7 +28,7 @@ export default function Logo({ className = '', showText = true }: LogoProps) {
 
       {/* Logo Text */}
       {showText && (
-        <span className="text-xl font-bold text-glow">
+        <span className="text-xl font-bold text-glow bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent">
           Cosmic Destiny AI
         </span>
       )}

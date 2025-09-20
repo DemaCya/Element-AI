@@ -92,12 +92,12 @@ export default function InfoPanel({ activePanel, onClose }: InfoPanelProps) {
         <div className="h-full flex flex-col">
           {/* Header */}
           <div className="flex items-center justify-between p-6 border-b border-purple-500/20">
-            <h2 className="text-2xl font-bold text-glow">{content.title}</h2>
+            <h2 className="text-2xl font-bold text-glow bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent">{content.title}</h2>
             <button
               onClick={onClose}
               className="p-2 hover:bg-purple-500/10 rounded-lg transition-colors"
             >
-              <X className="w-6 h-6 text-gray-400 hover:text-white" />
+              <X className="w-6 h-6 text-gray-300 hover:text-white" />
             </button>
           </div>
 
@@ -109,13 +109,13 @@ export default function InfoPanel({ activePanel, onClose }: InfoPanelProps) {
                 <div key={index} className="group">
                   <div className="flex items-start gap-4">
                     <div className="flex-shrink-0 w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center group-hover:bg-purple-500/30 transition-colors">
-                      <Icon className="w-6 h-6 text-purple-400" />
+                      <Icon className="w-6 h-6 text-purple-200" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-xl font-semibold text-white mb-3 group-hover:text-purple-300 transition-colors">
+                      <h3 className="text-xl font-semibold text-white mb-3 group-hover:text-purple-100 transition-colors">
                         {section.title}
                       </h3>
-                      <p className="text-gray-300 leading-relaxed">
+                      <p className="text-white leading-relaxed">
                         {section.content}
                       </p>
                     </div>
@@ -130,8 +130,8 @@ export default function InfoPanel({ activePanel, onClose }: InfoPanelProps) {
 
           {/* Footer */}
           <div className="p-6 border-t border-purple-500/20 bg-purple-500/5">
-            <p className="text-sm text-gray-400 text-center">
-              Cosmic Destiny AI • Where Ancient Wisdom Meets Modern Technology
+            <p className="text-sm text-gray-300 text-center">
+              <span className="bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent font-semibold">Cosmic Destiny AI</span> • Where Ancient Wisdom Meets Modern Technology
             </p>
           </div>
         </div>
