@@ -25,6 +25,7 @@ import {
 
 interface CosmicReport {
   id: string
+  name?: string
   birth_date: string
   birth_time?: string
   timezone: string
@@ -72,6 +73,32 @@ export default function ReportPage({ params }: { params: { id: string } }) {
     fetchReport()
   }, [user, authLoading, router, params.id])
 
+  const handleUpgrade = async () => {
+    try {
+      // TODO: 这里应该先处理支付流程
+      // 现在为了测试，直接调用升级API
+      
+      const response = await fetch(`/api/reports/${params.id}/upgrade`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Failed to upgrade report')
+      }
+
+      // 刷新页面显示完整报告
+      fetchReport()
+    } catch (error) {
+      console.error('Error upgrading report:', error)
+      alert('Failed to upgrade report. Please try again.')
+    }
+  }
+
   const fetchReport = async () => {
     try {
       // Fetch report from API
@@ -90,13 +117,14 @@ export default function ReportPage({ params }: { params: { id: string } }) {
       const reportData = result.report
       const cosmicReport: CosmicReport = {
         id: reportData.id,
+        name: reportData.name,
         birth_date: reportData.birth_date,
         birth_time: reportData.birth_time || undefined,
         timezone: reportData.timezone,
         gender: reportData.gender,
         is_paid: reportData.is_paid,
         created_at: reportData.created_at,
-        report_data: reportData.full_report
+        report_data: reportData.is_paid ? reportData.full_report : reportData.preview_report
       }
 
       setReport(cosmicReport)
@@ -123,51 +151,24 @@ export default function ReportPage({ params }: { params: { id: string } }) {
     return null // Will redirect
   }
 
-  const mockReportData = {
-    personality: {
-      overview: "You possess a unique cosmic signature that blends creative fire with analytical earth. Your birth chart reveals a natural-born leader with exceptional communication abilities and a deep connection to both material success and spiritual growth.",
-      strengths: [
-        "Natural leadership and charisma",
-        "Exceptional communication skills",
-        "Strong intuition and emotional intelligence",
-        "Ability to balance logic with creativity",
-        "Adaptability in changing circumstances"
-      ],
-      challenges: [
-        "Sometimes take on too much responsibility",
-        "Can be overly perfectionist",
-        "Tendency to prioritize others' needs over your own"
-      ]
-    },
-    career: {
-      bestPaths: [
-        "Entrepreneurship and business leadership",
-        "Creative industries (arts, media, design)",
-        "Technology innovation and digital strategy",
-        "Teaching, coaching, or mentoring roles",
-        "Public speaking or communication-focused careers"
-      ],
-      timing: "The current cosmic alignment (2024-2025) is particularly favorable for career advancement. Jupiter's influence suggests expansion and new opportunities, while Saturn provides the discipline needed for long-term success."
-    },
-    relationships: {
-      compatibility: "You are most compatible with individuals who have strong water and earth elements in their charts. Look for partners who are emotionally intelligent, grounded, and supportive of your ambitions.",
-      advice: "Your relationships thrive when you maintain a balance between independence and connection. Practice vulnerability and allow yourself to receive support as readily as you give it."
-    },
-    lifePath: {
-      purpose: "Your soul's journey involves bridging different worlds - whether that's connecting people, ideas, or communities. You are here to use your communication gifts to uplift others and create meaningful change.",
-      challenges: "Your key life lessons involve learning to delegate, trusting others to share your burdens, and recognizing that asking for help is a sign of strength, not weakness."
-    },
-    health: {
-      considerations: [
-        "High energy levels need regular physical outlets",
-        "Stress management is crucial for your sensitive system",
-        "Benefit from both structured exercise and creative movement"
-      ],
-      advice: "Maintain balance between intense activity and rest. Your body responds well to routines that include both cardiovascular exercise and mindfulness practices."
-    }
+  // 解析报告内容，将Markdown格式转换为可显示的内容
+  const parseReportContent = (content: string) => {
+    if (!content) return ''
+    
+    return content
+      .replace(/^# (.*$)/gim, '<h1 class="text-3xl font-bold text-white mb-6 border-b border-purple-500/30 pb-2">$1</h1>')
+      .replace(/^## (.*$)/gim, '<h2 class="text-2xl font-bold text-purple-300 mb-4 mt-8">$1</h2>')
+      .replace(/^### (.*$)/gim, '<h3 class="text-xl font-semibold text-purple-200 mb-3 mt-6">$1</h3>')
+      .replace(/^\- (.*$)/gim, '<li class="flex items-start gap-2 text-gray-300 mb-2"><div class="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div><span>$1</span></li>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong class="text-purple-200 font-semibold">$1</strong>')
+      .replace(/\n\n/g, '</p><p class="text-gray-200 leading-relaxed mb-4">')
+      .replace(/^(?!<[h|l])/gm, '<p class="text-gray-200 leading-relaxed mb-4">')
+      .replace(/<p class="text-gray-200 leading-relaxed mb-4"><\/p>/g, '')
   }
 
-  const reportData = report.report_data || mockReportData
+  // 检查报告数据格式
+  const isNewFormat = typeof report.report_data === 'string'
+  const reportData = isNewFormat ? null : report.report_data
 
   return (
     <div className="cosmic-bg min-h-screen">
@@ -204,7 +205,7 @@ export default function ReportPage({ params }: { params: { id: string } }) {
             <div className="flex items-center justify-center gap-2 mb-4">
               <Sparkles className="w-8 h-8 text-purple-400" />
               <h1 className="text-4xl font-bold text-glow bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent">
-                Your Cosmic Destiny Report
+                {report.name || 'Your Cosmic Destiny Report'}
               </h1>
               <Sparkles className="w-8 h-8 text-purple-400" />
             </div>
@@ -233,44 +234,97 @@ export default function ReportPage({ params }: { params: { id: string } }) {
 
           {/* Report Content */}
           <div className="space-y-8">
-            {/* Personality Overview */}
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-8 border border-purple-500/20">
-              <div className="flex items-center gap-3 mb-6">
-                <Star className="w-6 h-6 text-purple-400" />
-                <h2 className="text-2xl font-bold text-white">Personality Overview</h2>
-              </div>
-              <p className="text-gray-200 leading-relaxed mb-6">
-                {reportData.personality?.overview || 'Personality analysis not available'}
-              </p>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <h3 className="text-lg font-semibold text-purple-300 mb-3">Your Strengths</h3>
-                  <ul className="space-y-2">
-                    {reportData.personality.strengths.map((strength, index) => (
-                      <li key={index} className="flex items-center gap-2 text-gray-300">
-                        <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                        {strength}
-                      </li>
-                    ))}
-                  </ul>
+            {!report.is_paid ? (
+              // 未付费：显示预览内容和升级提示
+              <>
+                <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-8 border border-purple-500/20">
+                  <div className="prose prose-invert max-w-none">
+                    <div 
+                      dangerouslySetInnerHTML={{ 
+                        __html: parseReportContent(report.report_data as string) 
+                      }}
+                    />
+                  </div>
                 </div>
-
-                <div>
-                  <h3 className="text-lg font-semibold text-purple-300 mb-3">Growth Opportunities</h3>
-                  <ul className="space-y-2">
-                    {reportData.personality.challenges.map((challenge, index) => (
-                      <li key={index} className="flex items-center gap-2 text-gray-300">
-                        <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                        {challenge}
-                      </li>
-                    ))}
-                  </ul>
+                
+                {/* 升级提示卡片 */}
+                <div className="bg-gradient-to-r from-purple-900/50 via-pink-900/50 to-purple-900/50 backdrop-blur-sm rounded-lg p-8 border border-purple-500/30">
+                  <div className="text-center">
+                    <Sparkles className="w-12 h-12 text-purple-400 mx-auto mb-4" />
+                    <h3 className="text-2xl font-bold text-white mb-4">
+                      解锁您的完整命理报告
+                    </h3>
+                    <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
+                      预览仅展示了您命理分析的一小部分。完整报告包含深度人格分析、详细职业规划、
+                      全面感情指导、人生使命解读和个性化健康养生方案，总计超过3000字的专属内容。
+                    </p>
+                    <Button
+                      onClick={handleUpgrade}
+                      className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-3 text-lg"
+                    >
+                      <Zap className="w-5 h-5 mr-2" />
+                      立即解锁完整报告
+                    </Button>
+                    <p className="text-sm text-gray-400 mt-4">
+                      一次付费，终身查看
+                    </p>
+                  </div>
+                </div>
+              </>
+            ) : isNewFormat ? (
+              // 新格式：显示完整的报告内容
+              <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-8 border border-purple-500/20">
+                <div className="prose prose-invert max-w-none">
+                  <div 
+                    dangerouslySetInnerHTML={{ 
+                      __html: parseReportContent(report.report_data as string) 
+                    }}
+                  />
                 </div>
               </div>
-            </div>
+            ) : (
+              // 旧格式：分段显示（向后兼容）
+              <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-8 border border-purple-500/20">
+                <div className="flex items-center gap-3 mb-6">
+                  <Star className="w-6 h-6 text-purple-400" />
+                  <h2 className="text-2xl font-bold text-white">Personality Overview</h2>
+                </div>
+                <p className="text-gray-200 leading-relaxed mb-6">
+                  {reportData?.personality?.overview || 'Personality analysis not available'}
+                </p>
 
-            {/* Career Guidance */}
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <h3 className="text-lg font-semibold text-purple-300 mb-3">Your Strengths</h3>
+                    <ul className="space-y-2">
+                      {reportData?.personality?.strengths?.map((strength, index) => (
+                        <li key={index} className="flex items-center gap-2 text-gray-300">
+                          <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+                          {strength}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold text-purple-300 mb-3">Growth Opportunities</h3>
+                    <ul className="space-y-2">
+                      {reportData?.personality?.challenges?.map((challenge, index) => (
+                        <li key={index} className="flex items-center gap-2 text-gray-300">
+                          <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+                          {challenge}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 旧格式的其他部分（向后兼容） */}
+            {!isNewFormat && (
+              <>
+                {/* Career Guidance */}
             <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-8 border border-purple-500/20">
               <div className="flex items-center gap-3 mb-6">
                 <Briefcase className="w-6 h-6 text-purple-400" />
@@ -280,7 +334,7 @@ export default function ReportPage({ params }: { params: { id: string } }) {
               <div className="mb-6">
                 <h3 className="text-lg font-semibold text-purple-300 mb-3">Best Career Paths</h3>
                 <div className="flex flex-wrap gap-2">
-                  {reportData.career.bestPaths.map((path, index) => (
+                  {reportData?.career?.bestPaths?.map((path, index) => (
                     <span key={index} className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm">
                       {path}
                     </span>
@@ -291,7 +345,7 @@ export default function ReportPage({ params }: { params: { id: string } }) {
               <div>
                 <h3 className="text-lg font-semibold text-purple-300 mb-3">Cosmic Timing</h3>
                 <p className="text-gray-200 leading-relaxed">
-                  {reportData.career.timing}
+                  {reportData?.career?.timing}
                 </p>
               </div>
             </div>
@@ -307,14 +361,14 @@ export default function ReportPage({ params }: { params: { id: string } }) {
                 <div>
                   <h3 className="text-lg font-semibold text-purple-300 mb-3">Compatibility</h3>
                   <p className="text-gray-200 leading-relaxed">
-                    {reportData.relationships.compatibility}
+                    {reportData?.relationships?.compatibility}
                   </p>
                 </div>
 
                 <div>
                   <h3 className="text-lg font-semibold text-purple-300 mb-3">Relationship Advice</h3>
                   <p className="text-gray-200 leading-relaxed">
-                    {reportData.relationships.advice}
+                    {reportData?.relationships?.advice}
                   </p>
                 </div>
               </div>
@@ -331,14 +385,14 @@ export default function ReportPage({ params }: { params: { id: string } }) {
                 <div>
                   <h3 className="text-lg font-semibold text-purple-300 mb-3">Soul's Purpose</h3>
                   <p className="text-gray-200 leading-relaxed">
-                    {reportData.lifePath.purpose}
+                    {reportData?.lifePath?.purpose}
                   </p>
                 </div>
 
                 <div>
                   <h3 className="text-lg font-semibold text-purple-300 mb-3">Life Lessons</h3>
                   <p className="text-gray-200 leading-relaxed">
-                    {reportData.lifePath.challenges}
+                    {reportData?.lifePath?.challenges}
                   </p>
                 </div>
               </div>
@@ -355,7 +409,7 @@ export default function ReportPage({ params }: { params: { id: string } }) {
                 <div>
                   <h3 className="text-lg font-semibold text-purple-300 mb-3">Considerations</h3>
                   <ul className="space-y-2">
-                    {reportData.health.considerations.map((item, index) => (
+                    {reportData?.health?.considerations?.map((item, index) => (
                       <li key={index} className="flex items-center gap-2 text-gray-300">
                         <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
                         {item}
@@ -367,11 +421,13 @@ export default function ReportPage({ params }: { params: { id: string } }) {
                 <div>
                   <h3 className="text-lg font-semibold text-purple-300 mb-3">Wellness Advice</h3>
                   <p className="text-gray-200 leading-relaxed">
-                    {reportData.health.advice}
+                    {reportData?.health?.advice}
                   </p>
                 </div>
               </div>
             </div>
+              </>
+            )}
           </div>
 
           {/* Report Footer */}

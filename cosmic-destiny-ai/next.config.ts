@@ -1,5 +1,8 @@
 import type { NextConfig } from "next";
 
+// 确保使用UTC时区，与腾讯云开发环境保持一致
+process.env.TZ = 'UTC';
+
 const nextConfig: NextConfig = {
   // Performance optimizations
   compress: true,
@@ -36,13 +39,28 @@ const nextConfig: NextConfig = {
             value: 'nosniff',
           },
           {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
+          },
+          {
             key: 'Referrer-Policy',
-            value: 'origin-when-cross-origin',
+            value: 'strict-origin-when-cross-origin',
           },
           {
             key: 'Permissions-Policy',
             value: 'camera=(), microphone=(), geolocation=()',
           },
+          // Production only headers
+          ...(process.env.NODE_ENV === 'production' ? [
+            {
+              key: 'Strict-Transport-Security',
+              value: 'max-age=31536000; includeSubDomains',
+            },
+            {
+              key: 'Content-Security-Policy',
+              value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.supabase.co; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://generativelanguage.googleapis.com;",
+            },
+          ] : []),
         ],
       },
     ]

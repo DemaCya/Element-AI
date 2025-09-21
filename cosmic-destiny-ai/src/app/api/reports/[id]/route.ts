@@ -14,6 +14,26 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // 检查是否是测试报告ID
+    if (params.id.startsWith('test-')) {
+      console.log('🧪 [Testing Mode] 获取测试报告:', params.id)
+      
+      // 从内存中获取测试报告
+      const testReport = typeof global !== 'undefined' 
+        ? (global as any).testReports?.[params.id]
+        : null
+      
+      if (testReport && testReport.user_id === user.id) {
+        return NextResponse.json({ 
+          success: true, 
+          report: testReport,
+          isTestMode: true
+        })
+      } else {
+        return NextResponse.json({ error: 'Test report not found or unauthorized' }, { status: 404 })
+      }
+    }
+
     // 获取报告数据
     const { data: report, error: dbError } = await supabase
       .from('user_reports')
@@ -24,6 +44,16 @@ export async function GET(
 
     if (dbError) {
       console.error('Database error:', dbError)
+      
+      // 如果是表不存在的错误，返回特定的错误信息
+      if (dbError.code === 'PGRST205' || dbError.message?.includes('user_reports')) {
+        return NextResponse.json({ 
+          error: 'Database table not found', 
+          message: '数据库表尚未创建。请参考文档创建必要的数据库表。',
+          code: 'TABLE_NOT_FOUND'
+        }, { status: 503 })
+      }
+      
       return NextResponse.json({ error: 'Report not found' }, { status: 404 })
     }
 

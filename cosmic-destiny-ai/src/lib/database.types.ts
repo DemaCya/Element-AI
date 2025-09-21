@@ -31,42 +31,48 @@ export interface Database {
         Row: {
           id: string
           user_id: string
+          name?: string
           birth_date: string
           birth_time?: string
-          birth_location: string
+          timezone: string
           gender: string
           bazi_data: any
           full_report: any
           preview_report: any
           is_paid: boolean
+          is_time_known_input: boolean
           created_at: string
           updated_at: string
         }
         Insert: {
           id?: string
           user_id: string
+          name?: string
           birth_date: string
           birth_time?: string
-          birth_location: string
+          timezone: string
           gender: string
           bazi_data?: any
           full_report?: any
           preview_report?: any
           is_paid?: boolean
+          is_time_known_input?: boolean
           created_at?: string
           updated_at?: string
         }
         Update: {
           id?: string
           user_id?: string
+          name?: string
           birth_date?: string
           birth_time?: string
-          birth_location?: string
+          timezone?: string
           gender?: string
           bazi_data?: any
           full_report?: any
           preview_report?: any
           is_paid?: boolean
+          is_time_known_input?: boolean
           created_at?: string
           updated_at?: string
         }

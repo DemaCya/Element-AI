@@ -11,6 +11,7 @@ import { Calendar, FileText, CreditCard, User, LogOut, Sparkles } from 'lucide-r
 
 interface UserReport {
   id: string
+  name?: string
   birth_date: string
   timezone: string
   is_paid: boolean
@@ -68,6 +69,7 @@ export default function Dashboard() {
 
   const handleBirthFormSubmit = async (birthData: any) => {
     try {
+      console.log("调用了handleBirthFormSubmit")
       // Call API to generate report
       const response = await fetch('/api/reports/generate', {
         method: 'POST',
@@ -78,7 +80,9 @@ export default function Dashboard() {
           birthDate: birthData.birthDate,
           birthTime: birthData.birthTime,
           timeZone: birthData.timeZone,
-          gender: birthData.gender
+          gender: birthData.gender,
+          isTimeKnownInput: birthData.isTimeKnownInput,
+          reportName: birthData.reportName
         })
       })
 
@@ -189,7 +193,7 @@ export default function Dashboard() {
                           <div className="flex items-center gap-2 mb-2">
                             <Calendar className="w-4 h-4 text-purple-400" />
                             <span className="text-white font-medium">
-                              {new Date(report.birth_date).toLocaleDateString()}
+                              {report.name || `命理报告 - ${new Date(report.birth_date).toLocaleDateString()}`}
                             </span>
                             {report.is_paid && (
                               <span className="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">

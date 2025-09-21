@@ -46,10 +46,12 @@ export default function Home() {
     }
   }
 
-  const handleBirthFormSubmit = async (data: BirthData) => {
+  const handleBirthFormSubmit = async (data: BirthData & { reportName?: string }) => {
     setShowForm(false)
     
     try {
+      console.log("调用了handleBirthFormSubmit")
+      console.log("data.isTimeKnownInput:",data.isTimeKnownInput)
       // Call API to generate report
       const response = await fetch('/api/reports/generate', {
         method: 'POST',
@@ -60,7 +62,10 @@ export default function Home() {
           birthDate: data.birthDate,
           birthTime: data.birthTime,
           timeZone: data.timeZone,
-          gender: data.gender
+          gender: data.gender,
+          isTimeKnownInput: data.isTimeKnownInput,
+          reportType: 'preview', // 生成预览报告
+          reportName: data.reportName
         })
       })
 

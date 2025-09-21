@@ -372,11 +372,13 @@ const ModernTimePicker: React.FC<ModernTimePickerProps> = ({ value, onChange, la
 }
 
 export default function BirthForm({ onSubmit, onClose, isLoading }: BirthFormProps) {
-  const [formData, setFormData] = useState<BirthData>({
+  const [formData, setFormData] = useState<BirthData & { reportName?: string }>({
     birthDate: '',
     birthTime: '',
-    timeZone: 'UTC',
-    gender: 'other'
+    timeZone: '',
+    gender: 'male',
+    isTimeKnownInput: false,
+    reportName: ''
   })
   const [showAllTimeZones, setShowAllTimeZones] = useState(false)
   const [isVisible, setIsVisible] = useState(false)
@@ -388,13 +390,28 @@ export default function BirthForm({ onSubmit, onClose, isLoading }: BirthFormPro
   }, [])
 
   const handleSubmit = (e: React.FormEvent) => {
+    console.log("🚀 handleSubmit 函数被调用了！")
     e.preventDefault()
-    if (formData.birthDate && formData.timeZone) {
+    console.log("当前步骤:", step)
+    console.log("表单数据:", formData)
+    // Only submit if we're on step 2 and all required fields are filled
+    if (step === 2 && formData.birthDate && formData.timeZone && formData.gender) {
+      console.log("✅ 步骤二了，可以提交了")
+      console.log("提交的formData:", formData)
+      console.log("isTimeKnownInput:", formData.isTimeKnownInput)
+      console.log("birthTime:", formData.birthTime)
+      console.log("🚀 准备调用 onSubmit")
       onSubmit(formData)
+    } else {
+      console.log("❌ 条件不满足，无法提交")
+      console.log("step === 2:", step === 2)
+      console.log("formData.birthDate:", formData.birthDate)
+      console.log("formData.timeZone:", formData.timeZone)
+      console.log("formData.gender:", formData.gender)
     }
   }
 
-  const updateFormData = (field: keyof BirthData, value: string) => {
+  const updateFormData = (field: keyof (BirthData & { reportName?: string }), value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
@@ -411,7 +428,11 @@ export default function BirthForm({ onSubmit, onClose, isLoading }: BirthFormPro
   const displayTimeZones = showAllTimeZones ? filteredTimeZones : popularTimeZones
 
   const nextStep = () => {
-    if (step < 3) setStep(step + 1)
+    console.log("nextStep called, current step:", step)
+    if (step < 2) {
+      console.log("Setting step to:", step + 1)
+      setStep(step + 1)
+    }
   }
 
   const prevStep = () => {
@@ -460,7 +481,7 @@ export default function BirthForm({ onSubmit, onClose, isLoading }: BirthFormPro
             {/* Progress indicator */}
             <div className="relative z-10 pt-6 px-8">
               <div className="flex items-center justify-between mb-6">
-                {[1, 2, 3].map((stepNum) => (
+                {[1, 2].map((stepNum) => (
                   <div key={stepNum} className="flex items-center">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
                       step >= stepNum
@@ -469,7 +490,7 @@ export default function BirthForm({ onSubmit, onClose, isLoading }: BirthFormPro
                     }`}>
                       {stepNum}
                     </div>
-                    {stepNum < 3 && (
+                    {stepNum < 2 && (
                       <div className={`w-16 h-1 mx-2 rounded-full transition-all duration-300 ${
                         step > stepNum ? 'bg-purple-500' : 'bg-white/10'
                       }`} />
@@ -490,7 +511,7 @@ export default function BirthForm({ onSubmit, onClose, isLoading }: BirthFormPro
                   Chart Your Cosmic Destiny
                 </h2>
                 <p className="text-gray-400 text-sm">
-                  Step {step} of 3: {step === 1 ? 'Birth Date' : step === 2 ? 'Location & Time' : 'Personal Details'}
+                  Step {step} of 2: {step === 1 ? 'Birth Information & Gender' : 'Time Zone Selection'}
                 </p>
               </div>
 
@@ -504,28 +525,106 @@ export default function BirthForm({ onSubmit, onClose, isLoading }: BirthFormPro
 
               {/* Form */}
               <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Step 1: Birth Date */}
+                {/* Step 1: Birth Information & Gender */}
                 {step === 1 && (
                   <div className="space-y-6 animate-fade-in">
-                    <ModernDatePicker
-                      value={formData.birthDate}
-                      onChange={(date) => updateFormData('birthDate', date)}
-                      label="Select your birth date"
-                    />
+                    {/* Report Name */}
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                        <Star className="w-5 h-5 text-purple-400" />
+                        Report Name
+                      </h3>
+                      <Input
+                        type="text"
+                        placeholder="例如：2024年运势分析、我的八字报告等（可留空）"
+                        value={formData.reportName || ''}
+                        onChange={(e) => updateFormData('reportName', e.target.value)}
+                        className="w-full bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-purple-400/50 rounded-xl px-4 py-3"
+                      />
+                    </div>
 
-                    <ModernTimePicker
-                      value={formData.birthTime}
-                      onChange={(time) => updateFormData('birthTime', time)}
-                      label="Birth time (optional)"
-                    />
+                    {/* Birth Date */}
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                        <Calendar className="w-5 h-5 text-purple-400" />
+                        Birth Information
+                      </h3>
+                      <ModernDatePicker
+                        value={formData.birthDate}
+                        onChange={(date) => updateFormData('birthDate', date)}
+                        label="Select your birth date"
+                      />
+                    </div>
 
-                    <div className="bg-purple-500/10 border border-purple-500/30 rounded-xl p-4">
+                    {/* Birth Time */}
+                    <div className="space-y-3">
+                      <ModernTimePicker
+                        value={formData.birthTime || ''}
+                        onChange={(time) => {
+                          console.log('Time changed:', time)
+                          updateFormData('birthTime', time)
+                          const isTimeKnown = time !== ''
+                          console.log('Setting isTimeKnownInput to:', isTimeKnown)
+                          updateFormData('isTimeKnownInput', isTimeKnown)
+                        }}
+                        label="Birth time (optional)"
+                      />
+                    </div>
+
+                    {/* Gender Selection */}
+                    <div className="space-y-3">
+                      <h3 className="text-lg font-semibold text-white flex items-center gap-2">
+                        <User className="w-5 h-5 text-purple-400" />
+                        Gender Identity
+                      </h3>
+                      <div className="grid grid-cols-2 gap-4">
+                        {[
+                          { value: 'male', label: 'Male', emoji: '👨', color: 'from-blue-500/20 to-blue-600/20 border-blue-500/30' },
+                          { value: 'female', label: 'Female', emoji: '👩', color: 'from-pink-500/20 to-pink-600/20 border-pink-500/30' }
+                        ].map((option) => (
+                          <button
+                            key={option.value}
+                            type="button"
+                            onClick={() => updateFormData('gender', option.value)}
+                            className={`group relative overflow-hidden rounded-xl border transition-all duration-300 transform hover:scale-105 ${
+                              formData.gender === option.value
+                                ? `bg-gradient-to-br ${option.color} border-current shadow-lg scale-105`
+                                : 'bg-white/5 border-white/10 hover:bg-white/10 hover:border-white/20'
+                            }`}
+                          >
+                            <div className="p-4 text-center">
+                              <div className="text-3xl mb-2 group-hover:scale-110 transition-transform duration-200">
+                                {option.emoji}
+                              </div>
+                              <div className={`text-sm font-medium transition-colors duration-200 ${
+                                formData.gender === option.value
+                                  ? 'text-white'
+                                  : 'text-gray-400 group-hover:text-white'
+                              }`}>
+                                {option.label}
+                              </div>
+                            </div>
+                            {formData.gender === option.value && (
+                              <div className="absolute inset-0 bg-gradient-to-br from-white/10 to-transparent pointer-events-none" />
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Info Card */}
+                    <div className="bg-gradient-to-r from-purple-500/10 via-indigo-500/10 to-purple-500/10 border border-purple-500/30 rounded-xl p-4">
                       <div className="flex items-start gap-3">
-                        <MapPin className="w-5 h-5 text-purple-400 mt-0.5" />
+                        <div className="flex-shrink-0">
+                          <div className="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center">
+                            <Sparkles className="w-4 h-4 text-purple-400" />
+                          </div>
+                        </div>
                         <div>
-                          <h4 className="text-white font-medium mb-1">Why birth time matters</h4>
-                          <p className="text-gray-400 text-sm">
-                            Exact birth time helps us calculate your rising sign and create a more accurate cosmic profile.
+                          <h4 className="text-white font-medium mb-1">Why this information matters</h4>
+                          <p className="text-gray-400 text-sm leading-relaxed">
+                            Your birth date, time, and gender are essential for calculating your unique cosmic blueprint. 
+                            The exact birth time helps determine your rising sign and creates a more accurate astrological profile.
                           </p>
                         </div>
                       </div>
@@ -533,110 +632,97 @@ export default function BirthForm({ onSubmit, onClose, isLoading }: BirthFormPro
                   </div>
                 )}
 
-                {/* Step 2: Location & Time Zone */}
+                {/* Step 2: Time Zone Selection */}
                 {step === 2 && (
                   <div className="space-y-6 animate-fade-in">
-                    <div className="space-y-2">
+                    <div className="text-center space-y-2">
+                      <h3 className="text-2xl font-bold text-white flex items-center justify-center gap-2">
+                        <Globe className="w-6 h-6 text-purple-400" />
+                        Select Your Time Zone
+                      </h3>
+                      <p className="text-gray-400">
+                        This helps us calculate your cosmic profile accurately
+                      </p>
+                    </div>
+
+                    <div className="space-y-3">
                       <label className="flex items-center gap-2 text-sm font-medium text-gray-300">
-                        <Globe className="w-5 h-5 text-purple-400" />
-                        Search Time Zone
+                        <MapPin className="w-5 h-5 text-purple-400" />
+                        Search for your location
                       </label>
                       <div className="relative">
                         <Input
                           type="text"
-                          placeholder="Search city or time zone..."
+                          placeholder="Type your city or country..."
                           value={searchQuery}
                           onChange={(e) => setSearchQuery(e.target.value)}
-                          className="bg-white/5 border-white/10 focus:border-purple-500/50 focus:ring-purple-500/20 text-white placeholder-gray-500"
+                          className="w-full bg-white/5 border-white/10 text-white placeholder-gray-400 focus:border-purple-500/50 focus:ring-purple-500/20 pl-4 pr-10"
                         />
+                        <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                          <Globe className="w-4 h-4 text-gray-400" />
+                        </div>
                       </div>
                     </div>
 
-                    <div className="space-y-2">
-                      <label className="flex items-center gap-2 text-sm font-medium text-gray-300">
-                        <Globe className="w-5 h-5 text-purple-400" />
-                        Select Time Zone
-                      </label>
-                      <div className="max-h-64 overflow-y-auto rounded-lg border border-white/10 bg-white/5">
-                        {displayTimeZones.map((tz) => (
-                          <button
-                            key={tz.value}
-                            type="button"
-                            onClick={() => updateFormData('timeZone', tz.value)}
-                            className={`w-full px-4 py-3 text-left transition-all duration-200 border-b border-white/5 last:border-b-0 ${
-                              formData.timeZone === tz.value
-                                ? 'bg-purple-500/20 text-purple-300 border-purple-500/30'
-                                : 'text-gray-300 hover:bg-white/10 hover:text-white'
-                            }`}
-                          >
-                            <div className="font-medium">{tz.label}</div>
-                            <div className="text-sm text-gray-500">{tz.value}</div>
-                          </button>
-                        ))}
-                      </div>
-
-                      {!showAllTimeZones && (
+                    <div className="max-h-64 overflow-y-auto space-y-2">
+                      {displayTimeZones.map((tz) => (
                         <button
+                          key={tz.value}
                           type="button"
-                          onClick={() => setShowAllTimeZones(true)}
-                          className="w-full py-2 text-purple-400 hover:text-purple-300 text-sm font-medium"
+                          onClick={() => {
+                            updateFormData('timeZone', tz.value)
+                            setSearchQuery('')
+                          }}
+                          className={`w-full text-left p-4 rounded-xl transition-all duration-300 transform hover:scale-[1.02] ${
+                            formData.timeZone === tz.value
+                              ? 'bg-gradient-to-r from-purple-500/20 to-indigo-500/20 border border-purple-500/50 text-purple-300 shadow-lg'
+                              : 'bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white border border-transparent hover:border-white/10'
+                          }`}
                         >
-                          Show all time zones
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <div className="font-medium text-base">{tz.label}</div>
+                              <div className="text-sm text-gray-400 mt-1">{tz.value}</div>
+                            </div>
+                            {formData.timeZone === tz.value && (
+                              <div className="w-6 h-6 rounded-full bg-purple-500 flex items-center justify-center">
+                                <div className="w-2 h-2 bg-white rounded-full"></div>
+                              </div>
+                            )}
+                          </div>
                         </button>
-                      )}
+                      ))}
                     </div>
+
+                    {!showAllTimeZones && (
+                      <button
+                        type="button"
+                        onClick={() => setShowAllTimeZones(true)}
+                        className="w-full py-3 text-purple-400 hover:text-purple-300 text-sm font-medium border border-purple-500/30 rounded-xl hover:bg-purple-500/10 transition-all duration-200"
+                      >
+                        Show all time zones
+                      </button>
+                    )}
+
+                    {/* Confirmation Card */}
+                    {formData.timeZone && (
+                      <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/30 rounded-xl p-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center">
+                            <div className="w-3 h-3 bg-green-400 rounded-full"></div>
+                          </div>
+                          <div>
+                            <h4 className="text-white font-medium">Time zone selected</h4>
+                            <p className="text-gray-300 text-sm">
+                              {displayTimeZones.find(tz => tz.value === formData.timeZone)?.label || formData.timeZone}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
 
-                {/* Step 3: Personal Details */}
-                {step === 3 && (
-                  <div className="space-y-6 animate-fade-in">
-                    <div className="space-y-2">
-                      <label className="flex items-center gap-2 text-sm font-medium text-gray-300">
-                        <User className="w-5 h-5 text-purple-400" />
-                        Gender Identity
-                      </label>
-                      <div className="grid grid-cols-3 gap-3">
-                        {[
-                          { value: 'male', label: 'Male', emoji: '👨' },
-                          { value: 'female', label: 'Female', emoji: '👩' },
-                          { value: 'other', label: 'Other', emoji: '🌈' }
-                        ].map((option) => (
-                          <button
-                            key={option.value}
-                            type="button"
-                            onClick={() => updateFormData('gender', option.value)}
-                            className={`py-4 px-4 rounded-xl border transition-all duration-200 text-sm font-medium group ${
-                              formData.gender === option.value
-                                ? 'bg-purple-500/20 border-purple-500/50 text-purple-400 shadow-lg transform scale-105'
-                                : 'bg-white/5 border-white/10 text-gray-400 hover:bg-white/10 hover:text-white hover:scale-105'
-                            }`}
-                          >
-                            <div className="text-2xl mb-1">{option.emoji}</div>
-                            <div>{option.label}</div>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="bg-gradient-to-r from-purple-500/10 to-indigo-500/10 border border-purple-500/30 rounded-xl p-6">
-                      <h4 className="text-white font-medium mb-3 flex items-center gap-2">
-                        <Sparkles className="w-5 h-5 text-purple-400" />
-                        Ready to Begin Your Cosmic Journey?
-                      </h4>
-                      <div className="space-y-2 text-sm text-gray-300">
-                        <p>✨ Your personalized cosmic report will include:</p>
-                        <ul className="ml-4 space-y-1">
-                          <li>• Detailed personality analysis</li>
-                          <li>• Career guidance and timing</li>
-                          <li>• Relationship compatibility insights</li>
-                          <li>• Life path predictions</li>
-                          <li>• Health and wellness considerations</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </div>
-                )}
 
                 {/* Navigation Buttons */}
                 <div className="flex gap-3 pt-4">
@@ -651,12 +737,14 @@ export default function BirthForm({ onSubmit, onClose, isLoading }: BirthFormPro
                     </Button>
                   )}
 
-                  {step < 3 ? (
+                  {step < 2 ? (
                     <Button
                       type="button"
                       variant="cosmic"
                       onClick={nextStep}
-                      disabled={step === 1 && !formData.birthDate}
+                      disabled={
+                        (step === 1 && (!formData.birthDate || !formData.gender))
+                      }
                       className="flex-1 group relative overflow-hidden"
                     >
                       <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -669,7 +757,27 @@ export default function BirthForm({ onSubmit, onClose, isLoading }: BirthFormPro
                     <Button
                       type="submit"
                       variant="cosmic"
-                      disabled={isLoading || !formData.birthDate || !formData.timeZone}
+                      disabled={(() => {
+                        const disabled = isLoading || !formData.birthDate || !formData.timeZone || !formData.gender
+                        console.log("🔍 按钮禁用状态检查:", {
+                          isLoading,
+                          birthDate: formData.birthDate,
+                          timeZone: formData.timeZone,
+                          gender: formData.gender,
+                          disabled
+                        })
+                        return disabled
+                      })()}
+                      onClick={(e) => {
+                        console.log("🔥 按钮被点击了！")
+                        e.preventDefault()
+                        console.log("Step 2 button clicked")
+                        console.log("formData:", formData)
+                        console.log("isLoading:", isLoading)
+                        console.log("disabled condition:", isLoading || !formData.birthDate || !formData.timeZone || !formData.gender)
+                        console.log("🔥 准备调用 handleSubmit")
+                        handleSubmit(e)
+                      }}
                       className="flex-1 group relative overflow-hidden"
                     >
                       <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
