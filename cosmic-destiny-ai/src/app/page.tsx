@@ -2,6 +2,9 @@
 
 import React, { useState } from 'react'
 import AppProviders from '@/components/AppProviders'
+
+// Prevent static generation
+export const dynamic = 'force-dynamic'
 import StarSystem from '@/components/StarSystem'
 import Navigation from '@/components/Navigation'
 import BirthForm from '@/components/BirthForm'

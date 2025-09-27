@@ -1,9 +1,11 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import AppProviders from '@/components/AppProviders'
 import { useRouter } from 'next/navigation'
 import { useUser } from '@/contexts/UserContext'
+
+// Prevent static generation
+export const dynamic = 'force-dynamic'
 import { Button } from '@/components/ui/button'
 import Navigation from '@/components/Navigation'
 import BirthForm from '@/components/BirthForm'
@@ -105,23 +107,20 @@ export default function Dashboard() {
     router.push(`/report/${reportId}`)
   }
 
-  if (authLoading || loading) {
-    return (
-      <AppProviders>
-        <div className="cosmic-bg min-h-screen flex items-center justify-center">
-          <div className="text-white text-xl">Loading...</div>
-        </div>
-      </AppProviders>
-    )
-  }
-
   if (!user) {
     return null // Will redirect to auth
   }
 
+  if (authLoading || loading) {
+    return (
+      <div className="cosmic-bg min-h-screen flex items-center justify-center">
+        <div className="text-white text-xl">Loading...</div>
+      </div>
+    )
+  }
+
   return (
-    <AppProviders>
-      <div className="cosmic-bg min-h-screen">
+    <div className="cosmic-bg min-h-screen">
         <Navigation user={user} />
 
       <div className="container mx-auto px-4 py-8">
@@ -263,7 +262,6 @@ export default function Dashboard() {
           onClose={() => setShowForm(false)}
         />
       )}
-      </div>
-    </AppProviders>
+    </div>
   )
 }

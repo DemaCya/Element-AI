@@ -1,12 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Disable static generation for pages that use authentication
-  output: 'export',
-  trailingSlash: true,
-  skipTrailingSlashRedirect: true,
-  distDir: 'out',
+  // Configure for serverless deployment
   images: {
     unoptimized: true
+  },
+  // Experimental features for better compatibility
+  experimental: {
+    // Optimize package imports
+    optimizePackageImports: ['lucide-react', '@supabase/supabase-js']
   }
 }
 
