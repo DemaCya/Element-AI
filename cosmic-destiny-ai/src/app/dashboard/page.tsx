@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/contexts/UserContext'
 import { Button } from '@/components/ui/button'
 import Navigation from '@/components/Navigation'
@@ -24,7 +23,6 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const router = useRouter()
-  const supabase = createClient()
 
   useEffect(() => {
     // Listen for open birth form event from navigation
