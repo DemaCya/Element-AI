@@ -1,7 +1,6 @@
 'use client'
 
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import { User } from '@/types'
 
 interface UserContextType {
@@ -15,75 +14,73 @@ const UserContext = createContext<UserContextType | undefined>(undefined)
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
-  const supabase = createClient()
 
   useEffect(() => {
-    const getUser = async () => {
-      // Check for mock user first (for testing)
-      const mockUserStr = localStorage.getItem('mockUser')
-      if (mockUserStr) {
-        const mockUser = JSON.parse(mockUserStr)
-        setUser(mockUser)
-        setLoading(false)
-        return
+    // Only initialize on client side
+    if (typeof window !== 'undefined') {
+      const getUser = async () => {
+        try {
+          // Check for mock user first (for testing)
+          const mockUserStr = localStorage.getItem('mockUser')
+          if (mockUserStr) {
+            const mockUser = JSON.parse(mockUserStr)
+            setUser(mockUser)
+            setLoading(false)
+            return
+          }
+
+          // Dynamic import to avoid build-time errors
+          const { createClient } = await import('@/lib/supabase/client')
+          const client = createClient()
+
+          const { data: { user: authUser } } = await client.auth.getUser()
+
+          if (authUser) {
+            // Get user profile
+            const { data: profile } = await client
+              .from('profiles')
+              .select('*')
+              .eq('id', authUser.id)
+              .single()
+
+            setUser({
+              id: authUser.id,
+              email: authUser.email!,
+              createdAt: authUser.created_at!,
+              profile: profile ? {
+                fullName: profile.full_name,
+                avatarUrl: profile.avatar_url
+              } : undefined
+            })
+          }
+        } catch (error) {
+          console.error('Error getting user:', error)
+        } finally {
+          setLoading(false)
+        }
       }
 
-      const { data: { user: authUser } } = await supabase.auth.getUser()
-
-      if (authUser) {
-        // Get user profile
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', authUser.id)
-          .single()
-
-        setUser({
-          id: authUser.id,
-          email: authUser.email!,
-          createdAt: authUser.created_at!,
-          profile: profile ? {
-            fullName: profile.full_name,
-            avatarUrl: profile.avatar_url
-          } : undefined
-        })
-      }
-
+      getUser()
+    } else {
       setLoading(false)
     }
-
-    getUser()
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single()
-
-        setUser({
-          id: session.user.id,
-          email: session.user.email!,
-          createdAt: session.user.created_at!,
-          profile: profile ? {
-            fullName: profile.full_name,
-            avatarUrl: profile.avatar_url
-          } : undefined
-        })
-      } else if (event === 'SIGNED_OUT') {
-        setUser(null)
-      }
-    })
-
-    return () => subscription.unsubscribe()
-  }, [supabase])
+  }, [])
 
   const signOut = async () => {
-    // Clear mock user if exists
-    localStorage.removeItem('mockUser')
-    await supabase.auth.signOut()
-    setUser(null)
+    try {
+      // Clear mock user if exists
+      localStorage.removeItem('mockUser')
+
+      // Dynamic import to avoid build-time errors
+      const { createClient } = await import('@/lib/supabase/client')
+      const client = createClient()
+
+      await client.auth.signOut()
+      setUser(null)
+    } catch (error) {
+      console.error('Error signing out:', error)
+      setUser(null)
+    }
   }
 
   return (
