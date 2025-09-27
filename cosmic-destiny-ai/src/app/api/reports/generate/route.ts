@@ -343,6 +343,35 @@ export async function POST(request: NextRequest) {
       reportContent = generateMockReport(birthData, baziData)
     }
 
+    // 确保用户profile存在
+    try {
+      const { error: profileCheckError } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('id', user.id)
+        .single()
+
+      if (profileCheckError) {
+        console.log('📝 为用户创建profile记录:', user.email)
+        const { error: createProfileError } = await supabase
+          .from('profiles')
+          .insert({
+            id: user.id,
+            email: user.email,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
+
+        if (createProfileError) {
+          console.error('❌ 创建profile失败:', createProfileError)
+        } else {
+          console.log('✅ profile创建成功')
+        }
+      }
+    } catch (error) {
+      console.log('检查/创建profile时出错:', error)
+    }
+
     // 准备存储到数据库的数据
     const reportData = {
       user_id: user.id,

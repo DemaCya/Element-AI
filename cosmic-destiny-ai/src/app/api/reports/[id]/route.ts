@@ -3,29 +3,31 @@ import { createClient } from '@/lib/supabase/server'
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const supabase = await createClient()
-    
+
     // 验证用户身份
     const { data: { user }, error: authError } = await supabase.auth.getUser()
     if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
+
     // 检查是否是测试报告ID
-    if (params.id.startsWith('test-')) {
-      console.log('🧪 [Testing Mode] 获取测试报告:', params.id)
-      
+    if (id.startsWith('test-')) {
+      console.log('🧪 [Testing Mode] 获取测试报告:', id)
+
       // 从内存中获取测试报告
-      const testReport = typeof global !== 'undefined' 
-        ? (global as any).testReports?.[params.id]
+      const testReport = typeof global !== 'undefined'
+        ? (global as any).testReports?.[id]
         : null
-      
+
       if (testReport && testReport.user_id === user.id) {
-        return NextResponse.json({ 
-          success: true, 
+        return NextResponse.json({
+          success: true,
           report: testReport,
           isTestMode: true
         })
@@ -38,7 +40,7 @@ export async function GET(
     const { data: report, error: dbError } = await supabase
       .from('user_reports')
       .select('*')
-      .eq('id', params.id)
+      .eq('id', id)
       .eq('user_id', user.id)
       .single()
 

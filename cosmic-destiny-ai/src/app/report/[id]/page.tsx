@@ -57,12 +57,21 @@ interface CosmicReport {
   }
 }
 
-export default function ReportPage({ params }: { params: { id: string } }) {
+export default function ReportPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter()
   const { user, loading: authLoading } = useUser()
   const supabase = createClient()
   const [report, setReport] = useState<CosmicReport | null>(null)
   const [loading, setLoading] = useState(true)
+  const [reportId, setReportId] = useState<string>('')
+
+  useEffect(() => {
+    const initReport = async () => {
+      const resolvedParams = await params
+      setReportId(resolvedParams.id)
+    }
+    initReport()
+  }, [params])
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -70,39 +79,60 @@ export default function ReportPage({ params }: { params: { id: string } }) {
       return
     }
 
-    fetchReport()
-  }, [user, authLoading, router, params.id])
+    if (reportId) {
+      fetchReport()
+    }
+  }, [user, authLoading, router, reportId])
+
+  // 检查 URL 参数中是否有支付成功标识
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search)
+    const paymentSuccess = urlParams.get('payment')
+    
+    if (paymentSuccess === 'success') {
+      // 支付成功，刷新报告数据
+      fetchReport()
+      // 清理 URL 参数
+      const newUrl = window.location.pathname
+      window.history.replaceState({}, '', newUrl)
+    }
+  }, [])
 
   const handleUpgrade = async () => {
     try {
-      // TODO: 这里应该先处理支付流程
-      // 现在为了测试，直接调用升级API
-      
-      const response = await fetch(`/api/reports/${params.id}/upgrade`, {
+      // 创建 Creem 支付会话
+      const response = await fetch('/api/checkout/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-        }
+        },
+        body: JSON.stringify({
+          reportId: reportId
+        })
       })
 
       const result = await response.json()
 
       if (!response.ok) {
-        throw new Error(result.error || 'Failed to upgrade report')
+        throw new Error(result.error || 'Failed to create payment session')
       }
 
-      // 刷新页面显示完整报告
-      fetchReport()
+      if (result.checkoutUrl) {
+        // 重定向到 Creem 支付页面
+        window.location.href = result.checkoutUrl
+      } else {
+        throw new Error('No checkout URL received')
+      }
     } catch (error) {
-      console.error('Error upgrading report:', error)
-      alert('Failed to upgrade report. Please try again.')
+      console.error('Error creating payment session:', error)
+      alert('Failed to create payment session. Please try again.')
     }
   }
 
   const fetchReport = async () => {
     try {
       // Fetch report from API
-      const response = await fetch(`/api/reports/${params.id}`)
+      const response = await fetch(`/api/reports/${reportId}`)
       const result = await response.json()
 
       if (!response.ok) {
