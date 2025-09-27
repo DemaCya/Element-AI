@@ -154,16 +154,16 @@ export default function Home() {
             <div className="space-y-8">
               <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-6 border border-purple-500/20">
                 <blockquote className="text-white text-lg italic leading-relaxed">
-                  "The personality analysis was scarily accurate. It gave me a new language to
-                  understand myself and my relationships with others."
+                  &ldquo;The personality analysis was scarily accurate. It gave me a new language to
+                  understand myself and my relationships with others.&rdquo;
                 </blockquote>
                 <cite className="text-purple-200 mt-4 block text-lg">- Alex P.</cite>
               </div>
 
               <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-6 border border-purple-500/20">
                 <blockquote className="text-white text-lg italic leading-relaxed">
-                  "I was skeptical at first, but the career advice was genuinely insightful.
-                  Highly recommended for anyone at a crossroads in their professional life."
+                  &ldquo;I was skeptical at first, but the career advice was genuinely insightful.
+                  Highly recommended for anyone at a crossroads in their professional life.&rdquo;
                 </blockquote>
                 <cite className="text-purple-200 mt-4 block text-lg">- Sarah J.</cite>
               </div>

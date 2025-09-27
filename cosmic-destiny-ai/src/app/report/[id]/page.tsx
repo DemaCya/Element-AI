@@ -413,7 +413,7 @@ export default function ReportPage({ params }: { params: Promise<{ id: string }>
 
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <h3 className="text-lg font-semibold text-purple-300 mb-3">Soul's Purpose</h3>
+                  <h3 className="text-lg font-semibold text-purple-300 mb-3">Soul&apos;s Purpose</h3>
                   <p className="text-gray-200 leading-relaxed">
                     {reportData?.lifePath?.purpose}
                   </p>

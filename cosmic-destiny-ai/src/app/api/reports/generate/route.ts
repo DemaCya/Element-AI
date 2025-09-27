@@ -325,7 +325,7 @@ export async function POST(request: NextRequest) {
     const baziData = await BaziService.calculateBazi(birthData)
 
     let reportContent: string
-    let isPreview = reportType === 'preview'
+    const isPreview = reportType === 'preview'
     
     if (isPreview) {
       // 生成预览报告

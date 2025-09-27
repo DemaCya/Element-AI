@@ -17,12 +17,9 @@ const nextConfig: NextConfig = {
 
   // Bundle optimization
   experimental: {
-    optimizeCss: true,
-    optimizePackageImports: ['lucide-react', 'three', '@google/generative-ai'],
+    optimizePackageImports: ['lucide-react', 'three', '@google/generative-ai', '@google/genai'],
   },
 
-  // Static generation optimizations
-  swcMinify: true,
 
   // Security headers
   async headers() {

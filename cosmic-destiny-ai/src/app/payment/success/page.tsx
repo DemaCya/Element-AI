@@ -1,12 +1,12 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useUser } from '@/contexts/UserContext'
 import { Button } from '@/components/ui/button'
 import { CheckCircle, ArrowRight, Sparkles, AlertCircle } from 'lucide-react'
 
-export default function PaymentSuccessPage() {
+function PaymentSuccessContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { user, loading: authLoading } = useUser()
@@ -137,5 +137,13 @@ export default function PaymentSuccessPage() {
         )}
       </div>
     </div>
+  )
+}
+
+export default function PaymentSuccessPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <PaymentSuccessContent />
+    </Suspense>
   )
 }

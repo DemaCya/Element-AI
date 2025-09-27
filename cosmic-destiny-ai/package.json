@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "TZ=UTC next dev --turbopack",
-    "build": "TZ=UTC next build --turbopack",
+    "build": "TZ=UTC next build",
     "start": "TZ=UTC next start",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
