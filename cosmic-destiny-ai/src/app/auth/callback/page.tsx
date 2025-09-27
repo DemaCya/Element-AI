@@ -2,14 +2,32 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 
 export default function AuthCallback() {
   const [loading, setLoading] = useState(true)
   const router = useRouter()
-  const supabase = createClient()
+  const [supabase, setSupabase] = useState<any>(null)
 
   useEffect(() => {
+    const initializeSupabase = async () => {
+      try {
+        // Dynamic import to avoid build-time errors
+        const { createClient } = await import('@/lib/supabase/client')
+        const client = createClient()
+        setSupabase(client)
+      } catch (error) {
+        console.error('Error initializing Supabase:', error)
+        router.push('/auth?error=Configuration error')
+        setLoading(false)
+      }
+    }
+
+    initializeSupabase()
+  }, [router])
+
+  useEffect(() => {
+    if (!supabase) return
+
     const handleCallback = async () => {
       try {
         const { data, error } = await supabase.auth.getSession()
