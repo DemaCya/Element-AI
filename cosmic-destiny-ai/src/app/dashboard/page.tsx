@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import AppProviders from '@/components/AppProviders'
 import { useRouter } from 'next/navigation'
 import { useUser } from '@/contexts/UserContext'
 import { Button } from '@/components/ui/button'
@@ -106,9 +107,11 @@ export default function Dashboard() {
 
   if (authLoading || loading) {
     return (
-      <div className="cosmic-bg min-h-screen flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
-      </div>
+      <AppProviders>
+        <div className="cosmic-bg min-h-screen flex items-center justify-center">
+          <div className="text-white text-xl">Loading...</div>
+        </div>
+      </AppProviders>
     )
   }
 
@@ -117,8 +120,9 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="cosmic-bg min-h-screen">
-      <Navigation user={user} />
+    <AppProviders>
+      <div className="cosmic-bg min-h-screen">
+        <Navigation user={user} />
 
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
@@ -259,6 +263,7 @@ export default function Dashboard() {
           onClose={() => setShowForm(false)}
         />
       )}
-    </div>
+      </div>
+    </AppProviders>
   )
 }

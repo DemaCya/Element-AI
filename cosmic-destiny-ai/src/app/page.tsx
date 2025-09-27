@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import AppProviders from '@/components/AppProviders'
 import StarSystem from '@/components/StarSystem'
 import Navigation from '@/components/Navigation'
 import BirthForm from '@/components/BirthForm'
@@ -88,7 +89,8 @@ export default function Home() {
   }
 
   return (
-    <div className="cosmic-bg smooth-scroll">
+    <AppProviders>
+      <div className="cosmic-bg smooth-scroll">
       <Navigation user={user} />
 
       {/* Hero Section with Star System */}
@@ -212,6 +214,7 @@ export default function Home() {
           }}
         />
       )}
-    </div>
+      </div>
+    </AppProviders>
   )
 }

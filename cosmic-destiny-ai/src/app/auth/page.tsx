@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
+import AppProviders from '@/components/AppProviders'
 import { useRouter } from 'next/navigation'
 import AuthForm from '@/components/auth/AuthForm'
 import Navigation from '@/components/Navigation'
@@ -65,14 +66,16 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="cosmic-bg min-h-screen">
-      <Navigation user={null} />
+    <AppProviders>
+      <div className="cosmic-bg min-h-screen">
+        <Navigation user={null} />
 
-      <div className="flex items-center justify-center min-h-screen pt-16">
-        <div className="w-full max-w-md">
-          <AuthForm onSuccess={() => router.push('/dashboard')} />
+        <div className="flex items-center justify-center min-h-screen pt-16">
+          <div className="w-full max-w-md">
+            <AuthForm onSuccess={() => router.push('/dashboard')} />
+          </div>
         </div>
       </div>
-    </div>
+    </AppProviders>
   )
 }

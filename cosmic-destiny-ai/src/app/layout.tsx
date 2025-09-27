@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 // import { Inter } from "next/font/google";
 import "./globals.css";
-import SupabaseProvider from "@/components/SupabaseProvider";
-import { UserProvider } from "@/contexts/UserContext";
 import { structuredData, serviceStructuredData, faqStructuredData } from "./structured-data";
 
 // const inter = Inter({
@@ -92,11 +90,7 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen bg-slate-950 text-white antialiased">
-        <SupabaseProvider>
-          <UserProvider>
-            {children}
-          </UserProvider>
-        </SupabaseProvider>
+        {children}
       </body>
     </html>
   );

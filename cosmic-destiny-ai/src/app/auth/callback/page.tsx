@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import AppProviders from '@/components/AppProviders'
 import { useRouter } from 'next/navigation'
 
 export default function AuthCallback() {
@@ -62,12 +63,14 @@ export default function AuthCallback() {
 
   if (loading) {
     return (
-      <div className="cosmic-bg min-h-screen flex items-center justify-center">
+      <AppProviders>
+        <div className="cosmic-bg min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
           <p className="text-white">Authenticating...</p>
         </div>
       </div>
+      </AppProviders>
     )
   }
 
