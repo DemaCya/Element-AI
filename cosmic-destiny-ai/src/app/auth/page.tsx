@@ -25,7 +25,7 @@ export default function AuthPage() {
 
     checkUser()
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event: any, session: any) => {
       if (event === 'SIGNED_IN' && session?.user) {
         setUser(session.user)
         router.push('/dashboard')
