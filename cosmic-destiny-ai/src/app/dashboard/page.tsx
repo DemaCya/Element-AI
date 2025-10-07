@@ -52,14 +52,27 @@ export default function Dashboard() {
 
   const fetchReports = async () => {
     try {
-      const response = await fetch('/api/reports')
-      const result = await response.json()
+      // 生成静态演示报告列表
+      const mockReports: UserReport[] = [
+        {
+          id: 'demo-1',
+          name: '2024年运势分析',
+          birth_date: '1990-01-01',
+          timezone: 'Asia/Shanghai',
+          is_paid: false,
+          created_at: new Date().toISOString()
+        },
+        {
+          id: 'demo-2',
+          name: '我的八字报告',
+          birth_date: '1985-06-15',
+          timezone: 'Asia/Shanghai',
+          is_paid: true,
+          created_at: new Date(Date.now() - 86400000).toISOString()
+        }
+      ]
 
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to fetch reports')
-      }
-
-      setReports(result.reports || [])
+      setReports(mockReports)
     } catch (error) {
       console.error('Error fetching reports:', error)
     } finally {
@@ -70,30 +83,15 @@ export default function Dashboard() {
   const handleBirthFormSubmit = async (birthData: any) => {
     try {
       console.log("调用了handleBirthFormSubmit")
-      // Call API to generate report
-      const response = await fetch('/api/reports/generate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          birthDate: birthData.birthDate,
-          birthTime: birthData.birthTime,
-          timeZone: birthData.timeZone,
-          gender: birthData.gender,
-          isTimeKnownInput: birthData.isTimeKnownInput,
-          reportName: birthData.reportName
-        })
-      })
-
-      const result = await response.json()
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to generate report')
-      }
-
-      // Redirect to report page
-      router.push(`/report/${result.reportId}`)
+      
+      // 生成模拟报告ID
+      const mockReportId = `demo-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+      
+      // 模拟延迟
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      // 重定向到报告页面
+      router.push(`/report`)
     } catch (error) {
       console.error('Error creating report:', error)
       alert('生成报告失败，请稍后重试')
@@ -103,7 +101,7 @@ export default function Dashboard() {
   }
 
   const handleReportClick = (reportId: string) => {
-    router.push(`/report/${reportId}`)
+    router.push(`/report`)
   }
 
   if (authLoading || loading) {

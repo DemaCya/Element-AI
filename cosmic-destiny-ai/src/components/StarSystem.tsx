@@ -10,7 +10,7 @@ interface StarSystemProps {
 
 export default function StarSystem({ className, onCanvasClick }: StarSystemProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const animationRef = useRef<number>()
+  const animationRef = useRef<number | undefined>(undefined)
 
   useEffect(() => {
     if (!canvasRef.current) return
@@ -55,9 +55,7 @@ export default function StarSystem({ className, onCanvasClick }: StarSystemProps
     // 创建中心恒星
     const starGeometryCore = new THREE.SphereGeometry(20, 32, 32)
     const starMaterialCore = new THREE.MeshBasicMaterial({
-      color: 0xffd700,
-      emissive: 0xffd700,
-      emissiveIntensity: 0.5
+      color: 0xffd700
     })
     const centralStar = new THREE.Mesh(starGeometryCore, starMaterialCore)
     scene.add(centralStar)
@@ -101,9 +99,7 @@ export default function StarSystem({ className, onCanvasClick }: StarSystemProps
       // 创建行星
       const planetGeometry = new THREE.SphereGeometry(element.size, 16, 16)
       const planetMaterial = new THREE.MeshBasicMaterial({
-        color: element.color,
-        emissive: element.color,
-        emissiveIntensity: 0.2
+        color: element.color
       })
       const planet = new THREE.Mesh(planetGeometry, planetMaterial)
       planet.position.x = element.radius

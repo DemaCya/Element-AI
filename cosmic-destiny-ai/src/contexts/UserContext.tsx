@@ -19,7 +19,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const getUser = async () => {
-      // Check for mock user first (for testing)
+      // 检查本地存储的模拟用户
       const mockUserStr = localStorage.getItem('mockUser')
       if (mockUserStr) {
         const mockUser = JSON.parse(mockUserStr)
@@ -28,61 +28,27 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         return
       }
 
-      const { data: { user: authUser } } = await supabase.auth.getUser()
-
-      if (authUser) {
-        // Get user profile
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', authUser.id)
-          .single()
-
-        setUser({
-          id: authUser.id,
-          email: authUser.email!,
-          createdAt: authUser.created_at!,
-          profile: profile ? {
-            fullName: profile.full_name,
-            avatarUrl: profile.avatar_url
-          } : undefined
-        })
+      // 创建默认演示用户
+      const demoUser = {
+        id: 'demo-user-1',
+        email: 'demo@cosmicdestiny.com',
+        createdAt: new Date().toISOString(),
+        profile: {
+          fullName: '演示用户',
+          avatarUrl: undefined
+        }
       }
 
+      setUser(demoUser)
       setLoading(false)
     }
 
     getUser()
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single()
-
-        setUser({
-          id: session.user.id,
-          email: session.user.email!,
-          createdAt: session.user.created_at!,
-          profile: profile ? {
-            fullName: profile.full_name,
-            avatarUrl: profile.avatar_url
-          } : undefined
-        })
-      } else if (event === 'SIGNED_OUT') {
-        setUser(null)
-      }
-    })
-
-    return () => subscription.unsubscribe()
-  }, [supabase])
+  }, [])
 
   const signOut = async () => {
-    // Clear mock user if exists
+    // 清除模拟用户
     localStorage.removeItem('mockUser')
-    await supabase.auth.signOut()
     setUser(null)
   }
 

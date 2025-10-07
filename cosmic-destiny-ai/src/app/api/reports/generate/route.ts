@@ -1,11 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
-import { BaziService } from '@/services/baziService'
-import { GeminiService } from '@/services/geminiService'
-import { BirthData, BaziData } from '@/types'
 
 // 生成模拟预览报告（测试用，500-800字）
-function generateMockPreviewReport(birthData: BirthData, baziData: BaziData): string {
+function generateMockPreviewReport(birthData: any, baziData: any): string {
   return `# 您的命理概览
 
 ## 出生信息
@@ -41,7 +37,7 @@ function generateMockPreviewReport(birthData: BirthData, baziData: BaziData): st
 }
 
 // 模拟报告生成函数（测试用）
-function generateMockReport(birthData: BirthData, baziData: BaziData): string {
+function generateMockReport(birthData: any, baziData: any): string {
   return `# 宇宙命理分析报告
 
 ## 出生信息
@@ -295,121 +291,9 @@ function generateMockReport(birthData: BirthData, baziData: BaziData): string {
 }
 
 export async function POST(request: NextRequest) {
-  try {
-    const supabase = await createClient()
-    
-    // 验证用户身份
-    const { data: { user }, error: authError } = await supabase.auth.getUser()
-    if (authError || !user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    // 获取请求数据
-    const body = await request.json()
-    const { birthDate, birthTime, timeZone, gender, isTimeKnownInput, reportType = 'preview', reportName } = body
-
-    if (!birthDate || !timeZone || !gender) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
-    }
-
-    // 准备出生数据
-    const birthData: BirthData = {
-      birthDate,
-      birthTime: birthTime || '',
-      timeZone,
-            gender: gender as 'male' | 'female',
-      isTimeKnownInput: isTimeKnownInput || false
-    }
-
-    // 计算八字
-    const baziData = await BaziService.calculateBazi(birthData)
-
-    let reportContent: string
-    let isPreview = reportType === 'preview'
-    
-    if (isPreview) {
-      // 生成预览报告
-      // TODO: 恢复API调用（当有API Key时）
-      // reportContent = await GeminiService.generatePreviewReport(birthData, baziData)
-      
-      // 模拟预览报告（用于测试）
-      reportContent = generateMockPreviewReport(birthData, baziData)
-    } else {
-      // 生成完整报告
-      // TODO: 恢复API调用（当有API Key时）
-      // reportContent = await GeminiService.generateSingleComprehensiveReport(birthData, baziData)
-      
-      // 模拟完整报告（用于测试）
-      reportContent = generateMockReport(birthData, baziData)
-    }
-
-    // 准备存储到数据库的数据
-    const reportData = {
-      user_id: user.id,
-      name: reportName || `命理报告 ${new Date().toLocaleDateString('zh-CN')}`,
-      birth_date: birthData.birthDate,
-      birth_time: birthData.birthTime || null,
-      timezone: birthData.timeZone,
-      gender: birthData.gender,
-      is_time_known_input: birthData.isTimeKnownInput,
-      bazi_data: baziData,
-      preview_report: isPreview ? reportContent : null,
-      full_report: !isPreview ? reportContent : null,
-      is_paid: !isPreview
-    }
-
-    // 保存到数据库
-    const { data: report, error: dbError } = await supabase
-      .from('user_reports')
-      .insert(reportData)
-      .select()
-      .single()
-
-    if (dbError) {
-      console.error('Database error:', dbError)
-      
-      // 如果是表不存在的错误，返回测试报告ID
-      if (dbError.code === 'PGRST205' || dbError.message?.includes('user_reports')) {
-        console.warn('⚠️ [Testing Mode] 数据库表不存在，返回测试报告ID')
-        
-        // 生成一个临时的报告ID用于测试
-        const testReportId = `test-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-        
-        // 将报告数据存储到内存中（仅用于测试）
-        // 注意：这只是临时解决方案，实际生产环境需要创建数据库表
-        if (typeof global !== 'undefined') {
-          (global as any).testReports = (global as any).testReports || {}
-          ;(global as any).testReports[testReportId] = {
-            id: testReportId,
-            ...reportData,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          }
-        }
-        
-        return NextResponse.json({ 
-          success: true, 
-          reportId: testReportId,
-          message: 'Report generated successfully (test mode)',
-          warning: '请注意：数据库表尚未创建，报告仅临时存储。请参考下方说明创建数据库表。'
-        })
-      }
-      
-      return NextResponse.json({ error: 'Failed to save report' }, { status: 500 })
-    }
-
-    // 返回报告ID
-    return NextResponse.json({ 
-      success: true, 
-      reportId: report.id,
-      message: 'Report generated successfully'
-    })
-
-  } catch (error) {
-    console.error('Error generating report:', error)
-    return NextResponse.json({ 
-      error: 'Internal server error',
-      details: error instanceof Error ? error.message : 'Unknown error'
-    }, { status: 500 })
-  }
+  return NextResponse.json({ 
+    error: 'API disabled for static deployment',
+    message: 'This is a static demo version. All API endpoints are disabled.',
+    status: 'demo_mode'
+  }, { status: 503 })
 }

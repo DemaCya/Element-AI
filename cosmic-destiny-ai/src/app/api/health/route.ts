@@ -1,39 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
 
 export async function GET(request: NextRequest) {
   const startTime = Date.now()
   
   try {
-    // 基础健康检查
+    // 静态部署健康检查
     const health = {
       status: 'healthy',
       timestamp: new Date().toISOString(),
       environment: process.env.NODE_ENV,
       version: process.env.npm_package_version || 'unknown',
       uptime: process.uptime(),
+      deployment: 'static',
       checks: {
         api: 'healthy',
-        database: 'checking',
+        database: 'disabled',
+        static_mode: 'enabled'
       }
-    }
-
-    // 检查数据库连接
-    try {
-      const supabase = await createClient()
-      const { error } = await supabase
-        .from('profiles')
-        .select('count')
-        .limit(1)
-        .single()
-      
-      health.checks.database = error ? 'unhealthy' : 'healthy'
-      if (error) {
-        health.status = 'degraded'
-      }
-    } catch (dbError) {
-      health.checks.database = 'unhealthy'
-      health.status = 'unhealthy'
     }
 
     // 计算响应时间
@@ -43,7 +26,7 @@ export async function GET(request: NextRequest) {
       ...health,
       responseTime: `${responseTime}ms`
     }, {
-      status: health.status === 'healthy' ? 200 : 503,
+      status: 200,
       headers: {
         'Cache-Control': 'no-cache, no-store, must-revalidate',
       }

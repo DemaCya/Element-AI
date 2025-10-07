@@ -49,34 +49,19 @@ export default function Home() {
   const handleBirthFormSubmit = async (data: BirthData & { reportName?: string }) => {
     setShowForm(false)
     
+    // 模拟报告生成（静态模式）
     try {
       console.log("调用了handleBirthFormSubmit")
       console.log("data.isTimeKnownInput:",data.isTimeKnownInput)
-      // Call API to generate report
-      const response = await fetch('/api/reports/generate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          birthDate: data.birthDate,
-          birthTime: data.birthTime,
-          timeZone: data.timeZone,
-          gender: data.gender,
-          isTimeKnownInput: data.isTimeKnownInput,
-          reportType: 'preview', // 生成预览报告
-          reportName: data.reportName
-        })
-      })
-
-      const result = await response.json()
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to generate report')
-      }
-
-      // Redirect to report page
-      window.location.href = `/report/${result.reportId}`
+      
+      // 生成模拟报告ID
+      const mockReportId = `demo-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+      
+      // 模拟延迟
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      // 重定向到报告页面
+      window.location.href = `/report`
     } catch (error) {
       console.error('Error generating report:', error)
       alert('生成报告失败，请稍后重试')

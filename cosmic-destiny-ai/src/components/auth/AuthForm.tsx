@@ -27,33 +27,44 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
     setError('')
 
     try {
+      // 模拟认证过程
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
       if (isSignUp) {
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              full_name: fullName,
-            },
-          },
-        })
-
-        if (error) throw error
-
-        // Show success message for sign up
-        setError('Please check your email to verify your account!')
+        // 模拟注册成功
+        const mockUser = {
+          id: `demo-user-${Date.now()}`,
+          email: email,
+          createdAt: new Date().toISOString(),
+          profile: {
+            fullName: fullName,
+            avatarUrl: undefined
+          }
+        }
+        
+        localStorage.setItem('mockUser', JSON.stringify(mockUser))
+        setError('注册成功！正在登录...')
+        
+        setTimeout(() => {
+          onSuccess?.()
+        }, 1000)
       } else {
-        const { data, error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        })
-
-        if (error) throw error
-
+        // 模拟登录成功
+        const mockUser = {
+          id: 'demo-user-1',
+          email: email,
+          createdAt: new Date().toISOString(),
+          profile: {
+            fullName: '演示用户',
+            avatarUrl: undefined
+          }
+        }
+        
+        localStorage.setItem('mockUser', JSON.stringify(mockUser))
         onSuccess?.()
       }
     } catch (error: any) {
-      setError(error.message || 'An error occurred')
+      setError('认证失败，请重试')
     } finally {
       setLoading(false)
     }
@@ -64,16 +75,23 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
     setError('')
 
     try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
-      })
-
-      if (error) throw error
+      // 模拟Google登录
+      await new Promise(resolve => setTimeout(resolve, 1000))
+      
+      const mockUser = {
+        id: 'demo-user-google',
+        email: 'demo@gmail.com',
+        createdAt: new Date().toISOString(),
+        profile: {
+          fullName: 'Google用户',
+          avatarUrl: undefined
+        }
+      }
+      
+      localStorage.setItem('mockUser', JSON.stringify(mockUser))
+      onSuccess?.()
     } catch (error: any) {
-      setError(error.message || 'An error occurred')
+      setError('Google登录失败，请重试')
       setLoading(false)
     }
   }

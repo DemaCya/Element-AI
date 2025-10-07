@@ -3,13 +3,10 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useUser } from '@/contexts/UserContext'
-import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import {
   ArrowLeft,
   Star,
-  Moon,
-  Sun,
   Zap,
   Heart,
   Briefcase,
@@ -19,8 +16,7 @@ import {
   Sparkles,
   Calendar,
   Clock,
-  Globe,
-  User
+  Globe
 } from 'lucide-react'
 
 interface CosmicReport {
@@ -32,44 +28,12 @@ interface CosmicReport {
   gender: string
   is_paid: boolean
   created_at: string
-  report_data?: string | {
-    personality?: {
-      overview: string
-      strengths: string[]
-      challenges: string[]
-    }
-    career?: {
-      bestPaths: string[]
-      timing: string
-    }
-    relationships?: {
-      compatibility: string
-      advice: string
-    }
-    lifePath?: {
-      purpose: string
-      challenges: string
-    }
-    health?: {
-      considerations: string[]
-      advice: string
-    }
-  }
+  report_data?: string
 }
 
-export async function generateStaticParams() {
-  // 生成一些静态参数用于演示
-  return [
-    { id: 'demo-1' },
-    { id: 'demo-2' },
-    { id: 'demo-3' }
-  ]
-}
-
-export default function ReportPage({ params }: { params: { id: string } }) {
+export default function ReportPage() {
   const router = useRouter()
   const { user, loading: authLoading } = useUser()
-  const supabase = createClient()
   const [report, setReport] = useState<CosmicReport | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -80,7 +44,7 @@ export default function ReportPage({ params }: { params: { id: string } }) {
     }
 
     fetchReport()
-  }, [user, authLoading, router, params.id])
+  }, [user, authLoading, router])
 
   const handleUpgrade = async () => {
     try {
@@ -104,7 +68,7 @@ export default function ReportPage({ params }: { params: { id: string } }) {
     try {
       // 生成静态演示报告
       const mockReport: CosmicReport = {
-        id: params.id,
+        id: 'demo-report',
         name: '演示命理报告',
         birth_date: '1990-01-01',
         birth_time: '12:00',
@@ -184,10 +148,6 @@ export default function ReportPage({ params }: { params: { id: string } }) {
       .replace(/^(?!<[h|l])/gm, '<p class="text-gray-200 leading-relaxed mb-4">')
       .replace(/<p class="text-gray-200 leading-relaxed mb-4"><\/p>/g, '')
   }
-
-  // 检查报告数据格式
-  const isNewFormat = typeof report.report_data === 'string'
-  const reportData = isNewFormat ? null : (report.report_data as any)
 
   return (
     <div className="cosmic-bg min-h-screen">
@@ -290,8 +250,8 @@ export default function ReportPage({ params }: { params: { id: string } }) {
                   </div>
                 </div>
               </>
-            ) : isNewFormat ? (
-              // 新格式：显示完整的报告内容
+            ) : (
+              // 已付费：显示完整的报告内容
               <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-8 border border-purple-500/20">
                 <div className="prose prose-invert max-w-none">
                   <div 
@@ -301,151 +261,6 @@ export default function ReportPage({ params }: { params: { id: string } }) {
                   />
                 </div>
               </div>
-            ) : (
-              // 旧格式：分段显示（向后兼容）
-              <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-8 border border-purple-500/20">
-                <div className="flex items-center gap-3 mb-6">
-                  <Star className="w-6 h-6 text-purple-400" />
-                  <h2 className="text-2xl font-bold text-white">Personality Overview</h2>
-                </div>
-                <p className="text-gray-200 leading-relaxed mb-6">
-                  {reportData?.personality?.overview || 'Personality analysis not available'}
-                </p>
-
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <h3 className="text-lg font-semibold text-purple-300 mb-3">Your Strengths</h3>
-                    <ul className="space-y-2">
-                      {reportData?.personality?.strengths?.map((strength: any, index: any) => (
-                        <li key={index} className="flex items-center gap-2 text-gray-300">
-                          <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                          {strength}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  <div>
-                    <h3 className="text-lg font-semibold text-purple-300 mb-3">Growth Opportunities</h3>
-                    <ul className="space-y-2">
-                      {reportData?.personality?.challenges?.map((challenge: any, index: any) => (
-                        <li key={index} className="flex items-center gap-2 text-gray-300">
-                          <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                          {challenge}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* 旧格式的其他部分（向后兼容） */}
-            {!isNewFormat && (
-              <>
-                {/* Career Guidance */}
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-8 border border-purple-500/20">
-              <div className="flex items-center gap-3 mb-6">
-                <Briefcase className="w-6 h-6 text-purple-400" />
-                <h2 className="text-2xl font-bold text-white">Career Guidance</h2>
-              </div>
-
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold text-purple-300 mb-3">Best Career Paths</h3>
-                <div className="flex flex-wrap gap-2">
-                  {reportData?.career?.bestPaths?.map((path: any, index: any) => (
-                    <span key={index} className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm">
-                      {path}
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-lg font-semibold text-purple-300 mb-3">Cosmic Timing</h3>
-                <p className="text-gray-200 leading-relaxed">
-                  {reportData?.career?.timing}
-                </p>
-              </div>
-            </div>
-
-            {/* Relationships */}
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-8 border border-purple-500/20">
-              <div className="flex items-center gap-3 mb-6">
-                <Heart className="w-6 h-6 text-purple-400" />
-                <h2 className="text-2xl font-bold text-white">Relationship Insights</h2>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <h3 className="text-lg font-semibold text-purple-300 mb-3">Compatibility</h3>
-                  <p className="text-gray-200 leading-relaxed">
-                    {reportData?.relationships?.compatibility}
-                  </p>
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-semibold text-purple-300 mb-3">Relationship Advice</h3>
-                  <p className="text-gray-200 leading-relaxed">
-                    {reportData?.relationships?.advice}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Life Path */}
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-8 border border-purple-500/20">
-              <div className="flex items-center gap-3 mb-6">
-                <Compass className="w-6 h-6 text-purple-400" />
-                <h2 className="text-2xl font-bold text-white">Life Purpose & Path</h2>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <h3 className="text-lg font-semibold text-purple-300 mb-3">Soul's Purpose</h3>
-                  <p className="text-gray-200 leading-relaxed">
-                    {reportData?.lifePath?.purpose}
-                  </p>
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-semibold text-purple-300 mb-3">Life Lessons</h3>
-                  <p className="text-gray-200 leading-relaxed">
-                    {reportData?.lifePath?.challenges}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Health & Wellness */}
-            <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-8 border border-purple-500/20">
-              <div className="flex items-center gap-3 mb-6">
-                <Zap className="w-6 h-6 text-purple-400" />
-                <h2 className="text-2xl font-bold text-white">Health & Wellness</h2>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <h3 className="text-lg font-semibold text-purple-300 mb-3">Considerations</h3>
-                  <ul className="space-y-2">
-                    {reportData?.health?.considerations?.map((item: any, index: any) => (
-                      <li key={index} className="flex items-center gap-2 text-gray-300">
-                        <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                        {item}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-semibold text-purple-300 mb-3">Wellness Advice</h3>
-                  <p className="text-gray-200 leading-relaxed">
-                    {reportData?.health?.advice}
-                  </p>
-                </div>
-              </div>
-            </div>
-              </>
             )}
           </div>
 
