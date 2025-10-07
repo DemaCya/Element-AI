@@ -7,7 +7,7 @@
     "dev:static": "DEPLOYMENT_MODE=static node scripts/switch-deployment-mode.js && TZ=UTC next dev --turbopack",
     "build": "TZ=UTC next build --turbopack",
     "build:static": "DEPLOYMENT_MODE=static node scripts/switch-deployment-mode.js && TZ=UTC next build --turbopack",
-    "build:dynamic": "DEPLOYMENT_MODE=dynamic node scripts/switch-deployment-mode.js && TZ=UTC next build --turbopack",
+    "build:dynamic": "DEPLOYMENT_MODE=dynamic node scripts/switch-deployment-mode.js && DEPLOYMENT_MODE=dynamic TZ=UTC next build --turbopack",
     "start": "TZ=UTC next start",
     "start:static": "DEPLOYMENT_MODE=static TZ=UTC next start",
     "start:dynamic": "DEPLOYMENT_MODE=dynamic TZ=UTC next start",
