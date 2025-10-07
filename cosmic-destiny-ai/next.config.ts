@@ -1,17 +1,28 @@
 import type { NextConfig } from "next";
+import { DEPLOYMENT_MODE, currentConfig, isStatic } from './deploy-config.js';
 
 // 确保使用UTC时区，与腾讯云开发环境保持一致
 process.env.TZ = 'UTC';
 
+// 将部署模式传递给前端
+process.env.NEXT_PUBLIC_DEPLOYMENT_MODE = DEPLOYMENT_MODE;
+
+console.log(`🚀 部署模式: ${DEPLOYMENT_MODE.toUpperCase()}`);
+
 const nextConfig: NextConfig = {
-  // Static export configuration for Vercel
-  output: 'export',
-  trailingSlash: true,
-  skipTrailingSlashRedirect: true,
+  // 根据部署模式动态配置
+  ...(isStatic ? {
+    output: 'export',
+    trailingSlash: true,
+    skipTrailingSlashRedirect: true,
+  } : {
+    trailingSlash: false,
+    skipTrailingSlashRedirect: false,
+  }),
   
-  // Disable ESLint during build for demo purposes
+  // ESLint配置
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: isStatic, // 静态模式时禁用ESLint
   },
   
   // Performance optimizations
@@ -20,7 +31,7 @@ const nextConfig: NextConfig = {
 
   // Image optimization
   images: {
-    unoptimized: true, // Required for static export
+    unoptimized: isStatic, // 静态模式时需要禁用图片优化
     formats: ['image/webp', 'image/avif'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
@@ -30,9 +41,6 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react', 'three'],
   },
-
-  // Static generation optimizations
-  // swcMinify: true, // 在Next.js 15中已弃用
 
   // Security headers
   async headers() {

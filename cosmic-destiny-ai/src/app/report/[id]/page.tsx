@@ -57,15 +57,6 @@ interface CosmicReport {
   }
 }
 
-export async function generateStaticParams() {
-  // 生成一些静态参数用于演示
-  return [
-    { id: 'demo-1' },
-    { id: 'demo-2' },
-    { id: 'demo-3' }
-  ]
-}
-
 export default function ReportPage({ params }: { params: { id: string } }) {
   const router = useRouter()
   const { user, loading: authLoading } = useUser()

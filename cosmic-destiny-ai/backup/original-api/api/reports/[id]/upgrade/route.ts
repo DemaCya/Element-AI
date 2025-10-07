@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-export const dynamic = 'force-static'
-
-export async function GET(request: NextRequest) {
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   return NextResponse.json({ 
     error: 'API disabled for static deployment',
     message: 'This is a static demo version. All API endpoints are disabled.',

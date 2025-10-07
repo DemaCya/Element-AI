@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-export const dynamic = 'force-static'
-
 export async function GET(request: NextRequest) {
   return NextResponse.json({ 
     error: 'API disabled for static deployment',

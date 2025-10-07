@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-export const dynamic = 'force-static'
-
 // 生成模拟预览报告（测试用，500-800字）
 function generateMockPreviewReport(birthData: any, baziData: any): string {
   return `# 您的命理概览
@@ -293,51 +291,9 @@ function generateMockReport(birthData: any, baziData: any): string {
 }
 
 export async function POST(request: NextRequest) {
-  const isStaticMode = process.env.DEPLOYMENT_MODE === 'static'
-  
-  if (isStaticMode) {
-    return NextResponse.json({ 
-      error: 'API disabled for static deployment',
-      message: 'This is a static demo version. All API endpoints are disabled.',
-      status: 'demo_mode'
-    }, { status: 503 })
-  }
-
-  // 动态模式下的正常API逻辑
-  try {
-    const body = await request.json()
-    const { birthData, reportName } = body
-
-    // 这里应该是真实的报告生成逻辑
-    // 包括调用Gemini API、数据库存储等
-    
-    // 模拟报告生成
-    const mockBaziData = {
-      dayMaster: '甲',
-      heavenlyStems: ['甲', '乙', '丙', '丁'],
-      earthlyBranches: ['子', '丑', '寅', '卯'],
-      elements: { wood: 2, fire: 1, earth: 1, metal: 1, water: 1 }
-    }
-
-    const previewReport = generateMockPreviewReport(birthData, mockBaziData)
-    
-    // 生成报告ID
-    const reportId = `report-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-    
-    // 这里应该保存到数据库
-    // await saveReportToDatabase(reportId, birthData, previewReport)
-    
-    return NextResponse.json({
-      success: true,
-      reportId,
-      previewReport,
-      message: '报告生成成功'
-    })
-  } catch (error) {
-    console.error('Error generating report:', error)
-    return NextResponse.json({
-      error: 'Failed to generate report',
-      message: '报告生成失败，请稍后重试'
-    }, { status: 500 })
-  }
+  return NextResponse.json({ 
+    error: 'API disabled for static deployment',
+    message: 'This is a static demo version. All API endpoints are disabled.',
+    status: 'demo_mode'
+  }, { status: 503 })
 }

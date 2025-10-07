@@ -1,24 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server'
 
-export const dynamic = 'force-static'
-
 export async function GET(request: NextRequest) {
   const startTime = Date.now()
-  const isStaticMode = process.env.DEPLOYMENT_MODE === 'static'
   
   try {
-    // 根据部署模式进行健康检查
+    // 静态部署健康检查
     const health = {
       status: 'healthy',
       timestamp: new Date().toISOString(),
       environment: process.env.NODE_ENV,
       version: process.env.npm_package_version || 'unknown',
       uptime: process.uptime(),
-      deployment: isStaticMode ? 'static' : 'dynamic',
+      deployment: 'static',
       checks: {
         api: 'healthy',
-        database: isStaticMode ? 'disabled' : 'enabled',
-        static_mode: isStaticMode ? 'enabled' : 'disabled'
+        database: 'disabled',
+        static_mode: 'enabled'
       }
     }
 
