@@ -1,28 +1,22 @@
 import type { NextConfig } from "next";
-import { DEPLOYMENT_MODE, currentConfig, isStatic } from './deploy-config.js';
 
 // 确保使用UTC时区，与腾讯云开发环境保持一致
 process.env.TZ = 'UTC';
 
-// 将部署模式传递给前端
-process.env.NEXT_PUBLIC_DEPLOYMENT_MODE = DEPLOYMENT_MODE;
+// 默认使用静态模式，适合Vercel自动部署
+const isStatic = true;
 
-console.log(`🚀 部署模式: ${DEPLOYMENT_MODE.toUpperCase()}`);
+console.log(`🚀 部署模式: STATIC (默认)`);
 
 const nextConfig: NextConfig = {
-  // 根据部署模式动态配置
-  ...(isStatic ? {
-    output: 'export',
-    trailingSlash: true,
-    skipTrailingSlashRedirect: true,
-  } : {
-    trailingSlash: false,
-    skipTrailingSlashRedirect: false,
-  }),
+  // 静态导出配置，适合Vercel自动部署
+  output: 'export',
+  trailingSlash: true,
+  skipTrailingSlashRedirect: true,
   
   // ESLint配置
   eslint: {
-    ignoreDuringBuilds: isStatic, // 静态模式时禁用ESLint
+    ignoreDuringBuilds: true, // 静态模式时禁用ESLint
   },
   
   // Performance optimizations
@@ -31,7 +25,7 @@ const nextConfig: NextConfig = {
 
   // Image optimization
   images: {
-    unoptimized: isStatic, // 静态模式时需要禁用图片优化
+    unoptimized: true, // 静态模式时需要禁用图片优化
     formats: ['image/webp', 'image/avif'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
