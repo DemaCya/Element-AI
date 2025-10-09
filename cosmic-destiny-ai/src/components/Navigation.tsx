@@ -273,7 +273,6 @@ export default function Navigation({ user, profile }: NavigationProps) {
                     setShowLogoutModal(false)
                     setIsMenuOpen(false)
                     await signOut()
-                    window.location.reload()
                   }}
                   className="bg-red-600 hover:bg-red-700"
                 >
@@ -292,8 +291,6 @@ export default function Navigation({ user, profile }: NavigationProps) {
         onClose={() => setShowAuthModal(false)}
         onSuccess={() => {
           setShowAuthModal(false)
-          // Force refresh to update navigation with user info
-          window.location.reload()
         }}
       />
     </>

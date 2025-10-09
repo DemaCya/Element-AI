@@ -192,8 +192,6 @@ export default function Home() {
           onClose={() => setShowAuthModal(false)}
           onSuccess={() => {
             setShowAuthModal(false)
-            // Force page refresh to update navigation with user info
-            window.location.reload()
           }}
         />
       )}
