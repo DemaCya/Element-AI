@@ -91,9 +91,21 @@ export default function Dashboard() {
       return
     }
 
-    console.log("=== 开始创建报告 ===")
-    console.log("用户信息:", { id: user.id, email: user.email })
-    console.log("报告数据:", birthData)
+    // 持久化日志记录
+    const logToStorage = (message: string, data?: any) => {
+      const timestamp = new Date().toISOString()
+      const logEntry = { timestamp, message, data }
+      console.log(`[${timestamp}] ${message}`, data)
+      
+      // 保存到localStorage以便查看
+      const existingLogs = JSON.parse(localStorage.getItem('reportCreationLogs') || '[]')
+      existingLogs.push(logEntry)
+      localStorage.setItem('reportCreationLogs', JSON.stringify(existingLogs.slice(-50))) // 只保留最近50条
+    }
+
+    logToStorage("=== 开始创建报告 ===")
+    logToStorage("用户信息", { id: user.id, email: user.email })
+    logToStorage("报告数据", birthData)
 
     try {
       // 生成模拟报告内容
@@ -139,9 +151,9 @@ export default function Dashboard() {
 您的体质偏向于需要平衡的调理。建议多进行户外活动，保持心情愉悦，避免过度思虑。在饮食方面，多食用新鲜蔬果，少食辛辣刺激食物。定期进行冥想或瑜伽练习，有助于平衡身心。`
 
       // 创建报告记录
-      console.log('=== 准备插入数据库 ===')
-      console.log('用户ID:', user.id)
-      console.log('Supabase客户端:', supabase)
+      logToStorage('=== 准备插入数据库 ===')
+      logToStorage('用户ID', user.id)
+      logToStorage('Supabase客户端', supabase)
       
       const reportInsertData = {
         user_id: user.id,
@@ -163,8 +175,8 @@ export default function Dashboard() {
         preview_report: mockPreviewReport
       }
       
-      console.log('插入数据:', reportInsertData)
-      console.log('开始执行数据库插入...')
+      logToStorage('插入数据', reportInsertData)
+      logToStorage('开始执行数据库插入...')
 
       const { data: reportData, error: reportError } = await supabase
         .from('user_reports')
@@ -172,14 +184,14 @@ export default function Dashboard() {
         .select()
         .single()
 
-      console.log('=== 数据库操作完成 ===')
-      console.log('返回数据:', reportData)
-      console.log('错误信息:', reportError)
+      logToStorage('=== 数据库操作完成 ===')
+      logToStorage('返回数据', reportData)
+      logToStorage('错误信息', reportError)
 
       if (reportError) {
-        console.error('=== 数据库插入失败 ===')
-        console.error('Error creating report:', reportError)
-        console.error('Error details:', {
+        logToStorage('=== 数据库插入失败 ===')
+        logToStorage('Error creating report', reportError)
+        logToStorage('Error details', {
           message: reportError.message,
           details: reportError.details,
           hint: reportError.hint,
@@ -189,34 +201,49 @@ export default function Dashboard() {
         return
       }
 
-      console.log('=== 报告创建成功 ===')
-      console.log('报告数据:', reportData)
-      console.log('报告ID:', reportData.id)
+      logToStorage('=== 报告创建成功 ===')
+      logToStorage('报告数据', reportData)
+      logToStorage('报告ID', reportData.id)
 
       // 重新获取报告列表
-      console.log('开始重新获取报告列表...')
+      logToStorage('开始重新获取报告列表...')
       await fetchReports()
-      console.log('报告列表获取完成')
+      logToStorage('报告列表获取完成')
       
       // 重定向到报告页面
-      console.log('准备重定向到报告页面:', `/report?id=${reportData.id}`)
+      logToStorage('准备重定向到报告页面', `/report?id=${reportData.id}`)
       router.push(`/report?id=${reportData.id}`)
-      console.log('重定向完成')
+      logToStorage('重定向完成')
     } catch (error) {
-      console.error('=== 捕获到异常 ===')
-      console.error('Error creating report:', error)
-      console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace')
-      console.error('Error message:', error instanceof Error ? error.message : String(error))
+      logToStorage('=== 捕获到异常 ===')
+      logToStorage('Error creating report', error)
+      logToStorage('Error stack', error instanceof Error ? error.stack : 'No stack trace')
+      logToStorage('Error message', error instanceof Error ? error.message : String(error))
       alert(`生成报告失败: ${error instanceof Error ? error.message : '未知错误'}`)
     } finally {
-      console.log('=== 清理状态 ===')
+      logToStorage('=== 清理状态 ===')
       setShowForm(false)
-      console.log('表单已关闭')
+      logToStorage('表单已关闭')
     }
   }
 
   const handleReportClick = (reportId: string) => {
     router.push(`/report?id=${reportId}`)
+  }
+
+  // 添加查看日志的辅助函数（开发调试用）
+  const viewLogs = () => {
+    const logs = JSON.parse(localStorage.getItem('reportCreationLogs') || '[]')
+    console.log('=== 持久化日志 ===')
+    logs.forEach((log: any) => {
+      console.log(`[${log.timestamp}] ${log.message}`, log.data)
+    })
+    return logs
+  }
+
+  // 在window对象上添加查看日志的方法（开发调试用）
+  if (typeof window !== 'undefined') {
+    (window as any).viewReportLogs = viewLogs
   }
 
   if (authLoading || loading) {
