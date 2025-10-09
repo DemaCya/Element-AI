@@ -49,7 +49,7 @@ export default function AuthPage() {
 
   return (
     <div className="cosmic-bg min-h-screen">
-      <Navigation user={null} />
+      <Navigation user={null} profile={null} />
 
       <div className="flex items-center justify-center min-h-screen pt-16">
         <div className="w-full max-w-md">

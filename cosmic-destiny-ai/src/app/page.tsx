@@ -14,7 +14,7 @@ import { useUser } from '@/contexts/UserContext'
 export default function Home() {
   const [showForm, setShowForm] = useState(false)
   const [showAuthModal, setShowAuthModal] = useState(false)
-  const { user } = useUser()
+  const { user, profile } = useUser()
 
   const faqItems = [
     {
@@ -74,7 +74,7 @@ export default function Home() {
 
   return (
     <div className="cosmic-bg smooth-scroll">
-      <Navigation user={user} />
+      <Navigation user={user} profile={profile} />
 
       {/* Hero Section with Star System */}
       <section className="relative h-screen flex items-center justify-center overflow-hidden">

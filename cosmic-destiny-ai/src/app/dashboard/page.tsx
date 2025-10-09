@@ -19,7 +19,7 @@ interface UserReport {
 }
 
 export default function Dashboard() {
-  const { user, signOut, loading: authLoading } = useUser()
+  const { user, profile, signOut, loading: authLoading } = useUser()
   const [reports, setReports] = useState<UserReport[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -118,7 +118,7 @@ export default function Dashboard() {
 
   return (
     <div className="cosmic-bg min-h-screen">
-      <Navigation user={user} />
+      <Navigation user={user} profile={profile} />
 
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
@@ -141,7 +141,7 @@ export default function Dashboard() {
                 </div>
                 <div>
                   <h2 className="text-xl font-semibold text-white">
-                    {user.profile?.fullName || user.email}
+                    {profile?.full_name || user.email}
                   </h2>
                   <p className="text-gray-400">{user.email}</p>
                 </div>

@@ -9,18 +9,17 @@ import InfoPanel from './InfoPanel'
 import Logo from './Logo'
 import AuthModal from './auth/AuthModal'
 import { useUser } from '@/contexts/UserContext'
+import { User as SupabaseUser } from '@supabase/supabase-js'
+import { Database } from '@/lib/database.types'
+
+type Profile = Database['public']['Tables']['profiles']['Row']
 
 interface NavigationProps {
-  user?: {
-    id: string
-    email: string
-    profile?: {
-      fullName?: string
-    }
-  } | null
+  user?: SupabaseUser | null
+  profile?: Profile | null
 }
 
-export default function Navigation({ user }: NavigationProps) {
+export default function Navigation({ user, profile }: NavigationProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [activePanel, setActivePanel] = useState<'about' | 'philosophy' | null>(null)
   const [showAuthModal, setShowAuthModal] = useState(false)
@@ -77,7 +76,7 @@ export default function Navigation({ user }: NavigationProps) {
                     className="flex items-center gap-2"
                   >
                     <User className="w-4 h-4" />
-                    <span>{user.profile?.fullName || user.email}</span>
+                    <span>{profile?.full_name || user?.email}</span>
                     <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${showUserDropdown ? 'rotate-180' : ''}`} />
                   </Button>
 
