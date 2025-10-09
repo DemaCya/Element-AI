@@ -51,28 +51,21 @@ export default function Dashboard() {
   }, [user, authLoading, router])
 
   const fetchReports = async () => {
-    try {
-      // 生成静态演示报告列表
-      const mockReports: UserReport[] = [
-        {
-          id: 'demo-1',
-          name: '2024年运势分析',
-          birth_date: '1990-01-01',
-          timezone: 'Asia/Shanghai',
-          is_paid: false,
-          created_at: new Date().toISOString()
-        },
-        {
-          id: 'demo-2',
-          name: '我的八字报告',
-          birth_date: '1985-06-15',
-          timezone: 'Asia/Shanghai',
-          is_paid: true,
-          created_at: new Date(Date.now() - 86400000).toISOString()
-        }
-      ]
+    if (!user) return
 
-      setReports(mockReports)
+    try {
+      const { data, error } = await supabase
+        .from('user_reports')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+
+      if (error) {
+        console.error('Error fetching reports:', error)
+        return
+      }
+
+      setReports(data || [])
     } catch (error) {
       console.error('Error fetching reports:', error)
     } finally {
@@ -81,17 +74,89 @@ export default function Dashboard() {
   }
 
   const handleBirthFormSubmit = async (birthData: any) => {
+    if (!user) return
+
     try {
       console.log("调用了handleBirthFormSubmit")
       
-      // 生成模拟报告ID
-      const mockReportId = `demo-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-      
-      // 模拟延迟
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      // 生成模拟报告内容
+      const mockPreviewReport = `# 您的命理概览
+
+## 出生信息
+- 出生日期：${birthData.birthDate}
+- 出生时间：${birthData.birthTime || '未知'}
+- 性别：${birthData.gender === 'male' ? '男' : '女'}
+- 时区：${birthData.timeZone}
+
+## 核心性格特征
+基于您的八字分析，您的日主为甲，这赋予了您独特的个性魅力。您是一个充满智慧和创造力的人，善于观察和思考，总能在细节中发现别人忽视的价值。您的内心深处有着对完美的追求，这使您在做事时格外认真细致。同时，您具有很强的直觉力和同理心，能够敏锐地感知他人的情绪变化。
+
+## 天赋潜能
+您最突出的天赋在于创新思维和沟通能力。您天生具有将复杂概念简单化的能力，善于用独特的视角解决问题。在艺术创作、策略规划或人际交往方面，您都展现出超乎常人的天赋。特别是在需要创意和灵感的领域，您总能迸发出令人惊喜的想法。
+
+---
+
+**想要了解更多详细内容吗？**
+
+完整报告包含：
+- 深度人格分析和成长建议
+- 详细职业规划和财富策略  
+- 全面感情分析和最佳配对
+- 人生使命和关键转折点
+- 个性化健康养生方案
+- 以及更多专属于您的命理指导...
+
+立即解锁完整报告，开启您的命运探索之旅！`
+
+      const mockFullReport = mockPreviewReport + `
+
+## 完整版内容（付费解锁）
+
+### 详细职业规划
+根据您的五行配置，最适合您的职业方向是创意产业和知识服务业。设计、媒体、教育、咨询等需要创造力和沟通能力的行业都很适合您。您也适合担任团队的智囊角色，为组织提供战略性建议。创业也是不错的选择，特别是在文化创意或科技创新领域。
+
+### 感情运势分析
+在感情方面，您追求心灵层面的共鸣。您需要一个能够理解您内心世界、与您进行深度交流的伴侣。您的感情表达方式含蓄而深情，更喜欢用行动而非言语来表达爱意。建议您在选择伴侣时，重视精神契合度，寻找能够共同成长的人生伴侣。
+
+### 健康养生建议
+您的体质偏向于需要平衡的调理。建议多进行户外活动，保持心情愉悦，避免过度思虑。在饮食方面，多食用新鲜蔬果，少食辛辣刺激食物。定期进行冥想或瑜伽练习，有助于平衡身心。`
+
+      // 创建报告记录
+      const { data: reportData, error: reportError } = await supabase
+        .from('user_reports')
+        .insert({
+          user_id: user.id,
+          name: birthData.reportName || `命理报告 - ${new Date(birthData.birthDate).toLocaleDateString()}`,
+          birth_date: birthData.birthDate,
+          birth_time: birthData.birthTime || null,
+          timezone: birthData.timeZone,
+          gender: birthData.gender,
+          is_time_known_input: birthData.isTimeKnownInput,
+          is_paid: false,
+          bazi_data: {
+            // 模拟八字数据
+            heavenlyStems: ['甲', '乙', '丙', '丁'],
+            earthlyBranches: ['子', '丑', '寅', '卯'],
+            dayMaster: '甲',
+            elements: { wood: 2, fire: 1, earth: 1, metal: 1, water: 1 }
+          },
+          full_report: mockFullReport,
+          preview_report: mockPreviewReport
+        })
+        .select()
+        .single()
+
+      if (reportError) {
+        console.error('Error creating report:', reportError)
+        alert('创建报告失败，请稍后重试')
+        return
+      }
+
+      // 重新获取报告列表
+      await fetchReports()
       
       // 重定向到报告页面
-      router.push(`/report`)
+      router.push(`/report?id=${reportData.id}`)
     } catch (error) {
       console.error('Error creating report:', error)
       alert('生成报告失败，请稍后重试')
@@ -101,7 +166,7 @@ export default function Dashboard() {
   }
 
   const handleReportClick = (reportId: string) => {
-    router.push(`/report`)
+    router.push(`/report?id=${reportId}`)
   }
 
   if (authLoading || loading) {
