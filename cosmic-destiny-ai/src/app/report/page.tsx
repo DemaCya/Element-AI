@@ -1,8 +1,9 @@
 'use client'
 
 import React, { useState, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useUser } from '@/contexts/UserContext'
+import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import {
   ArrowLeft,
@@ -18,24 +19,17 @@ import {
   Clock,
   Globe
 } from 'lucide-react'
+import { Database } from '@/lib/database.types'
 
-interface CosmicReport {
-  id: string
-  name?: string
-  birth_date: string
-  birth_time?: string
-  timezone: string
-  gender: string
-  is_paid: boolean
-  created_at: string
-  report_data?: string
-}
+type CosmicReport = Database['public']['Tables']['user_reports']['Row']
 
 export default function ReportPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const { user, loading: authLoading } = useUser()
   const [report, setReport] = useState<CosmicReport | null>(null)
   const [loading, setLoading] = useState(true)
+  const supabase = createClient()
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -43,8 +37,44 @@ export default function ReportPage() {
       return
     }
 
-    fetchReport()
+    if (user) {
+      fetchReport()
+    }
   }, [user, authLoading, router])
+
+  const fetchReport = async () => {
+    const reportId = searchParams.get('id')
+    
+    if (!reportId || !user) {
+      console.log('No report ID or user, redirecting to dashboard')
+      router.push('/dashboard')
+      return
+    }
+
+    try {
+      console.log('Fetching report with ID:', reportId)
+      const { data, error } = await supabase
+        .from('user_reports')
+        .select('*')
+        .eq('id', reportId)
+        .eq('user_id', user.id)
+        .single()
+
+      if (error) {
+        console.error('Error fetching report:', error)
+        router.push('/dashboard')
+        return
+      }
+
+      console.log('Report fetched successfully:', data)
+      setReport(data)
+    } catch (error) {
+      console.error('Error fetching report:', error)
+      router.push('/dashboard')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleUpgrade = async () => {
     try {
@@ -64,60 +94,6 @@ export default function ReportPage() {
     }
   }
 
-  const fetchReport = async () => {
-    try {
-      // 生成静态演示报告
-      const mockReport: CosmicReport = {
-        id: 'demo-report',
-        name: '演示命理报告',
-        birth_date: '1990-01-01',
-        birth_time: '12:00',
-        timezone: 'Asia/Shanghai',
-        gender: 'male',
-        is_paid: false,
-        created_at: new Date().toISOString(),
-        report_data: `# 您的命理概览
-
-## 出生信息
-- 出生日期：1990-01-01
-- 出生时间：12:00 (系统默认)
-- 性别：男
-
-## 核心性格特征
-基于您的八字分析，您的日主为甲，这赋予了您独特的个性魅力。您是一个充满智慧和创造力的人，善于观察和思考，总能在细节中发现别人忽视的价值。您的内心深处有着对完美的追求，这使您在做事时格外认真细致。同时，您具有很强的直觉力和同理心，能够敏锐地感知他人的情绪变化。
-
-## 天赋潜能
-您最突出的天赋在于创新思维和沟通能力。您天生具有将复杂概念简单化的能力，善于用独特的视角解决问题。在艺术创作、策略规划或人际交往方面，您都展现出超乎常人的天赋。特别是在需要创意和灵感的领域，您总能迸发出令人惊喜的想法。
-
-## 事业方向
-根据您的五行配置，最适合您的职业方向是创意产业和知识服务业。设计、媒体、教育、咨询等需要创造力和沟通能力的行业都很适合您。您也适合担任团队的智囊角色，为组织提供战略性建议。创业也是不错的选择，特别是在文化创意或科技创新领域。
-
-## 感情运势
-在感情方面，您追求心灵层面的共鸣。您需要一个能够理解您内心世界、与您进行深度交流的伴侣。您的感情表达方式含蓄而深情，更喜欢用行动而非言语来表达爱意。建议您在选择伴侣时，重视精神契合度，寻找能够共同成长的人生伴侣。
-
----
-
-**想要了解更多详细内容吗？**
-
-完整报告包含：
-- 深度人格分析和成长建议
-- 详细职业规划和财富策略  
-- 全面感情分析和最佳配对
-- 人生使命和关键转折点
-- 个性化健康养生方案
-- 以及更多专属于您的命理指导...
-
-立即解锁完整报告，开启您的命运探索之旅！`
-      }
-
-      setReport(mockReport)
-    } catch (error) {
-      console.error('Error fetching report:', error)
-      router.push('/dashboard')
-    } finally {
-      setLoading(false)
-    }
-  }
 
   if (authLoading || loading) {
     return (
@@ -147,6 +123,47 @@ export default function ReportPage() {
       .replace(/\n\n/g, '</p><p class="text-gray-200 leading-relaxed mb-4">')
       .replace(/^(?!<[h|l])/gm, '<p class="text-gray-200 leading-relaxed mb-4">')
       .replace(/<p class="text-gray-200 leading-relaxed mb-4"><\/p>/g, '')
+  }
+
+  // 获取报告内容
+  const getReportContent = () => {
+    if (!report) return ''
+    
+    // 如果有预览报告且未付费，显示预览
+    if (!report.is_paid && report.preview_report) {
+      return report.preview_report
+    }
+    
+    // 如果有完整报告，显示完整报告
+    if (report.full_report) {
+      return report.full_report
+    }
+    
+    // 如果没有报告内容，显示默认内容
+    return `# 您的命理概览
+
+## 出生信息
+- 出生日期：${report.birth_date}
+- 出生时间：${report.birth_time || '未知'}
+- 性别：${report.gender === 'male' ? '男' : '女'}
+- 时区：${report.timezone}
+
+## 报告状态
+${report.is_paid ? '✅ 完整版报告' : '📋 预览版报告'}
+
+${!report.is_paid ? `
+
+**想要了解更多详细内容吗？**
+
+完整报告包含：
+- 深度人格分析和成长建议
+- 详细职业规划和财富策略  
+- 全面感情分析和最佳配对
+- 人生使命和关键转折点
+- 个性化健康养生方案
+- 以及更多专属于您的命理指导...
+
+立即解锁完整报告，开启您的命运探索之旅！` : ''}`
   }
 
   return (
@@ -220,7 +237,7 @@ export default function ReportPage() {
                   <div className="prose prose-invert max-w-none">
                     <div 
                       dangerouslySetInnerHTML={{ 
-                        __html: parseReportContent(report.report_data as string) 
+                        __html: parseReportContent(getReportContent()) 
                       }}
                     />
                   </div>
@@ -256,7 +273,7 @@ export default function ReportPage() {
                 <div className="prose prose-invert max-w-none">
                   <div 
                     dangerouslySetInnerHTML={{ 
-                      __html: parseReportContent(report.report_data as string) 
+                      __html: parseReportContent(getReportContent()) 
                     }}
                   />
                 </div>
