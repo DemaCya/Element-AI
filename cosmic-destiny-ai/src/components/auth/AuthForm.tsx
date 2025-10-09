@@ -68,8 +68,8 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
         }
       }
     } catch (error: any) {
-      setError('认证失败，请重试')
       console.error('Auth error:', error)
+      setError(`认证失败: ${error.message || '请重试'}`)
     } finally {
       setLoading(false)
     }
@@ -93,9 +93,9 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
       }
       // 如果成功，用户会被重定向到Google，然后回到callback页面
     } catch (error: any) {
-      setError('Google登录失败，请重试')
-      setLoading(false)
       console.error('Google auth error:', error)
+      setError(`Google登录失败: ${error.message || '请重试'}`)
+      setLoading(false)
     }
   }
 
