@@ -242,9 +242,11 @@ export default function Dashboard() {
   }
 
   // 在window对象上添加查看日志的方法（开发调试用）
-  if (typeof window !== 'undefined') {
-    (window as any).viewReportLogs = viewLogs
-  }
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      (window as any).viewReportLogs = viewLogs
+    }
+  }, [])
 
   if (authLoading || loading) {
     return (
