@@ -27,44 +27,49 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
     setError('')
 
     try {
-      // 模拟认证过程
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
       if (isSignUp) {
-        // 模拟注册成功
-        const mockUser = {
-          id: `demo-user-${Date.now()}`,
-          email: email,
-          createdAt: new Date().toISOString(),
-          profile: {
-            fullName: fullName,
-            avatarUrl: undefined
+        // 注册新用户
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              full_name: fullName
+            }
           }
+        })
+
+        if (error) {
+          setError(error.message)
+          return
         }
-        
-        localStorage.setItem('mockUser', JSON.stringify(mockUser))
-        setError('注册成功！正在登录...')
-        
-        setTimeout(() => {
-          onSuccess?.()
-        }, 1000)
+
+        if (data.user) {
+          setError('注册成功！请检查您的邮箱以验证账户。')
+          // 等待一下再跳转，让用户看到成功消息
+          setTimeout(() => {
+            onSuccess?.()
+          }, 2000)
+        }
       } else {
-        // 模拟登录成功
-        const mockUser = {
-          id: 'demo-user-1',
-          email: email,
-          createdAt: new Date().toISOString(),
-          profile: {
-            fullName: '演示用户',
-            avatarUrl: undefined
-          }
+        // 登录现有用户
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        })
+
+        if (error) {
+          setError(error.message)
+          return
         }
-        
-        localStorage.setItem('mockUser', JSON.stringify(mockUser))
-        onSuccess?.()
+
+        if (data.user) {
+          onSuccess?.()
+        }
       }
     } catch (error: any) {
       setError('认证失败，请重试')
+      console.error('Auth error:', error)
     } finally {
       setLoading(false)
     }
@@ -75,24 +80,22 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
     setError('')
 
     try {
-      // 模拟Google登录
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      const mockUser = {
-        id: 'demo-user-google',
-        email: 'demo@gmail.com',
-        createdAt: new Date().toISOString(),
-        profile: {
-          fullName: 'Google用户',
-          avatarUrl: undefined
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`
         }
+      })
+
+      if (error) {
+        setError(error.message)
+        setLoading(false)
       }
-      
-      localStorage.setItem('mockUser', JSON.stringify(mockUser))
-      onSuccess?.()
+      // 如果成功，用户会被重定向到Google，然后回到callback页面
     } catch (error: any) {
       setError('Google登录失败，请重试')
       setLoading(false)
+      console.error('Google auth error:', error)
     }
   }
 
