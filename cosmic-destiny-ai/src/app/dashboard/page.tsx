@@ -86,11 +86,16 @@ export default function Dashboard() {
   }
 
   const handleBirthFormSubmit = async (birthData: any) => {
-    if (!user) return
+    if (!user) {
+      console.error('No user found, cannot create report')
+      return
+    }
+
+    console.log("=== 开始创建报告 ===")
+    console.log("用户信息:", { id: user.id, email: user.email })
+    console.log("报告数据:", birthData)
 
     try {
-      console.log("调用了handleBirthFormSubmit")
-      
       // 生成模拟报告内容
       const mockPreviewReport = `# 您的命理概览
 
@@ -134,8 +139,11 @@ export default function Dashboard() {
 您的体质偏向于需要平衡的调理。建议多进行户外活动，保持心情愉悦，避免过度思虑。在饮食方面，多食用新鲜蔬果，少食辛辣刺激食物。定期进行冥想或瑜伽练习，有助于平衡身心。`
 
       // 创建报告记录
-      console.log('准备创建报告，用户ID:', user.id)
-      console.log('报告数据:', {
+      console.log('=== 准备插入数据库 ===')
+      console.log('用户ID:', user.id)
+      console.log('Supabase客户端:', supabase)
+      
+      const reportInsertData = {
         user_id: user.id,
         name: birthData.reportName || `命理报告 - ${new Date(birthData.birthDate).toLocaleDateString()}`,
         birth_date: birthData.birthDate,
@@ -143,34 +151,33 @@ export default function Dashboard() {
         timezone: birthData.timeZone,
         gender: birthData.gender,
         is_time_known_input: birthData.isTimeKnownInput,
-        is_paid: false
-      })
+        is_paid: false,
+        bazi_data: {
+          // 模拟八字数据
+          heavenlyStems: ['甲', '乙', '丙', '丁'],
+          earthlyBranches: ['子', '丑', '寅', '卯'],
+          dayMaster: '甲',
+          elements: { wood: 2, fire: 1, earth: 1, metal: 1, water: 1 }
+        },
+        full_report: mockFullReport,
+        preview_report: mockPreviewReport
+      }
+      
+      console.log('插入数据:', reportInsertData)
+      console.log('开始执行数据库插入...')
 
       const { data: reportData, error: reportError } = await supabase
         .from('user_reports')
-        .insert({
-          user_id: user.id,
-          name: birthData.reportName || `命理报告 - ${new Date(birthData.birthDate).toLocaleDateString()}`,
-          birth_date: birthData.birthDate,
-          birth_time: birthData.birthTime || null,
-          timezone: birthData.timeZone,
-          gender: birthData.gender,
-          is_time_known_input: birthData.isTimeKnownInput,
-          is_paid: false,
-          bazi_data: {
-            // 模拟八字数据
-            heavenlyStems: ['甲', '乙', '丙', '丁'],
-            earthlyBranches: ['子', '丑', '寅', '卯'],
-            dayMaster: '甲',
-            elements: { wood: 2, fire: 1, earth: 1, metal: 1, water: 1 }
-          },
-          full_report: mockFullReport,
-          preview_report: mockPreviewReport
-        })
+        .insert(reportInsertData)
         .select()
         .single()
 
+      console.log('=== 数据库操作完成 ===')
+      console.log('返回数据:', reportData)
+      console.log('错误信息:', reportError)
+
       if (reportError) {
+        console.error('=== 数据库插入失败 ===')
         console.error('Error creating report:', reportError)
         console.error('Error details:', {
           message: reportError.message,
@@ -182,18 +189,29 @@ export default function Dashboard() {
         return
       }
 
-      console.log('报告创建成功:', reportData)
+      console.log('=== 报告创建成功 ===')
+      console.log('报告数据:', reportData)
+      console.log('报告ID:', reportData.id)
 
       // 重新获取报告列表
+      console.log('开始重新获取报告列表...')
       await fetchReports()
+      console.log('报告列表获取完成')
       
       // 重定向到报告页面
+      console.log('准备重定向到报告页面:', `/report?id=${reportData.id}`)
       router.push(`/report?id=${reportData.id}`)
+      console.log('重定向完成')
     } catch (error) {
+      console.error('=== 捕获到异常 ===')
       console.error('Error creating report:', error)
-      alert('生成报告失败，请稍后重试')
+      console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace')
+      console.error('Error message:', error instanceof Error ? error.message : String(error))
+      alert(`生成报告失败: ${error instanceof Error ? error.message : '未知错误'}`)
     } finally {
+      console.log('=== 清理状态 ===')
       setShowForm(false)
+      console.log('表单已关闭')
     }
   }
 
