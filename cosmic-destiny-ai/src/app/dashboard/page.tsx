@@ -51,9 +51,14 @@ export default function Dashboard() {
   }, [user, authLoading, router])
 
   const fetchReports = async () => {
-    if (!user) return
+    if (!user) {
+      console.log('No user, skipping fetchReports')
+      setLoading(false)
+      return
+    }
 
     try {
+      console.log('Fetching reports for user:', user.id)
       const { data, error } = await supabase
         .from('user_reports')
         .select('*')
@@ -62,9 +67,16 @@ export default function Dashboard() {
 
       if (error) {
         console.error('Error fetching reports:', error)
+        console.error('Error details:', {
+          message: error.message,
+          details: error.details,
+          hint: error.hint,
+          code: error.code
+        })
         return
       }
 
+      console.log('Fetched reports:', data)
       setReports(data || [])
     } catch (error) {
       console.error('Error fetching reports:', error)
@@ -122,6 +134,18 @@ export default function Dashboard() {
 您的体质偏向于需要平衡的调理。建议多进行户外活动，保持心情愉悦，避免过度思虑。在饮食方面，多食用新鲜蔬果，少食辛辣刺激食物。定期进行冥想或瑜伽练习，有助于平衡身心。`
 
       // 创建报告记录
+      console.log('准备创建报告，用户ID:', user.id)
+      console.log('报告数据:', {
+        user_id: user.id,
+        name: birthData.reportName || `命理报告 - ${new Date(birthData.birthDate).toLocaleDateString()}`,
+        birth_date: birthData.birthDate,
+        birth_time: birthData.birthTime || null,
+        timezone: birthData.timeZone,
+        gender: birthData.gender,
+        is_time_known_input: birthData.isTimeKnownInput,
+        is_paid: false
+      })
+
       const { data: reportData, error: reportError } = await supabase
         .from('user_reports')
         .insert({
@@ -148,9 +172,17 @@ export default function Dashboard() {
 
       if (reportError) {
         console.error('Error creating report:', reportError)
-        alert('创建报告失败，请稍后重试')
+        console.error('Error details:', {
+          message: reportError.message,
+          details: reportError.details,
+          hint: reportError.hint,
+          code: reportError.code
+        })
+        alert(`创建报告失败: ${reportError.message}`)
         return
       }
+
+      console.log('报告创建成功:', reportData)
 
       // 重新获取报告列表
       await fetchReports()
