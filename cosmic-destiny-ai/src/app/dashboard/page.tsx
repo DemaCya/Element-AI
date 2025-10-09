@@ -86,8 +86,20 @@ export default function Dashboard() {
   }
 
   const handleBirthFormSubmit = async (birthData: any) => {
+    console.log("🚀 handleBirthFormSubmit 被调用了！")
+    console.log("用户状态:", user)
+    console.log("报告数据:", birthData)
+    
+    // 立即保存到localStorage
+    localStorage.setItem('debug_last_call', JSON.stringify({
+      timestamp: new Date().toISOString(),
+      user: user ? { id: user.id, email: user.email } : null,
+      birthData
+    }))
+    
     if (!user) {
       console.error('No user found, cannot create report')
+      localStorage.setItem('debug_error', 'No user found')
       return
     }
 
@@ -215,6 +227,13 @@ export default function Dashboard() {
       router.push(`/report?id=${reportData.id}`)
       logToStorage('重定向完成')
     } catch (error) {
+      console.error("💥 捕获到异常:", error)
+      localStorage.setItem('debug_error', JSON.stringify({
+        timestamp: new Date().toISOString(),
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : 'No stack trace'
+      }))
+      
       logToStorage('=== 捕获到异常 ===')
       logToStorage('Error creating report', error)
       logToStorage('Error stack', error instanceof Error ? error.stack : 'No stack trace')
