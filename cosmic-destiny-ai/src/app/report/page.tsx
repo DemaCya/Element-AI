@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useUser } from '@/contexts/UserContext'
 import { createClient } from '@/lib/supabase/client'
@@ -23,7 +23,8 @@ import { Database } from '@/lib/database.types'
 
 type CosmicReport = Database['public']['Tables']['user_reports']['Row']
 
-export default function ReportPage() {
+// 使用useSearchParams的组件
+function ReportContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { user, loading: authLoading } = useUser()
@@ -301,5 +302,21 @@ ${!report.is_paid ? `
         </div>
       </div>
     </div>
+  )
+}
+
+// 主页面组件，用Suspense包装
+export default function ReportPage() {
+  return (
+    <Suspense fallback={
+      <div className="cosmic-bg min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
+          <p className="text-white">Loading your cosmic report...</p>
+        </div>
+      </div>
+    }>
+      <ReportContent />
+    </Suspense>
   )
 }
