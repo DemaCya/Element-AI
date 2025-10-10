@@ -69,9 +69,13 @@ function initializeSupabase() {
 
   logger.supabase(`🔄 Init call #${state.initCount}, session: ${state.sessionId}, isNavigation: ${isPageNavigation}`)
 
-  // 如果已经初始化且是页面导航，直接返回
-  if (state.isInitialized && state.supabase && isPageNavigation) {
-    logger.supabase('🚀 Page navigation detected, reusing existing client')
+  // 如果已经初始化，直接返回现有状态
+  if (state.isInitialized && state.supabase) {
+    if (isPageNavigation) {
+      logger.supabase('🚀 Page navigation detected, reusing existing client')
+    } else {
+      logger.supabase('♻️ Reusing existing Supabase client')
+    }
     return state
   }
 
@@ -106,6 +110,12 @@ function initializeSupabase() {
 
 export function SupabaseProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<GlobalSupabaseState>(() => {
+    // 检查是否已经初始化过
+    const existingState = getGlobalState()
+    if (existingState.isInitialized && existingState.supabase) {
+      logger.supabase('♻️ SupabaseProvider: Reusing existing initialized state')
+      return existingState
+    }
     return initializeSupabase()
   })
 
@@ -113,7 +123,10 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const handleNavigation = () => {
       logger.supabase('🧭 Navigation detected, preserving Supabase state')
-      setState(initializeSupabase())
+      // 只更新导航时间，不重新初始化客户端
+      const state = getGlobalState()
+      state.lastNavigationTime = Date.now()
+      setState({ ...state })
     }
 
     if (typeof window !== 'undefined') {

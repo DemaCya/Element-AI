@@ -16,12 +16,12 @@ export function createClient() {
   
   // 如果已有客户端，直接返回
   if (globalSupabaseClient) {
-    const msg = `Returning existing global client (call #${clientCreationCount})`
+    const msg = `♻️ Returning existing global client (call #${clientCreationCount})`
     logger.supabase(msg)
     return globalSupabaseClient
   }
 
-  logger.supabase(`Creating new global client (call #${clientCreationCount})`)
+  logger.supabase(`✨ Creating new global client (call #${clientCreationCount})`)
   
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
