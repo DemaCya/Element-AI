@@ -7,6 +7,7 @@ import { useUser } from '@/contexts/UserContext'
 import { Button } from '@/components/ui/button'
 
 // 强制动态渲染
+// 强制动态渲染 - Vercel部署触发
 export const dynamic = 'force-dynamic'
 import Navigation from '@/components/Navigation'
 import BirthForm from '@/components/BirthForm'
