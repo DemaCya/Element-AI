@@ -52,6 +52,20 @@ function DashboardContent() {
         const { data, error } = await supabase.from('user_reports').select('count').limit(1)
         if (error) {
           console.error('❌ Supabase连接测试失败:', error)
+          console.error('错误详情:', {
+            message: error.message,
+            details: error.details,
+            hint: error.hint,
+            code: error.code
+          })
+          
+          // 如果是CORS错误，提供解决建议
+          if (error.message.includes('Load failed') || error.message.includes('CORS')) {
+            console.error('🚨 这可能是CORS问题！请检查Supabase Dashboard设置：')
+            console.error('1. 进入 Settings → API')
+            console.error('2. 在 Site URL 中添加你的Vercel域名')
+            console.error('3. 在 Additional Redirect URLs 中添加你的域名')
+          }
         } else {
           console.log('✅ Supabase连接测试成功:', data)
         }
