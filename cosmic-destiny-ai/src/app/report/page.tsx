@@ -3,7 +3,7 @@
 import React, { useState, useEffect, Suspense, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useUser } from '@/contexts/UserContext'
-import { createClient } from '@/lib/supabase/client'
+import { useSupabase } from '@/contexts/SupabaseContext'
 import { Button } from '@/components/ui/button'
 import DebugInfo from '@/components/DebugInfo'
 
@@ -34,7 +34,7 @@ function ReportContent() {
   const { user, loading: authLoading } = useUser()
   const [report, setReport] = useState<CosmicReport | null>(null)
   const [loading, setLoading] = useState(true)
-  const supabase = createClient()
+  const supabase = useSupabase()
 
   const fetchReport = useCallback(async () => {
     const reportId = searchParams.get('id')

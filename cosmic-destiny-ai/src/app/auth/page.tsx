@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { useSupabase } from '@/contexts/SupabaseContext'
 import AuthForm from '@/components/auth/AuthForm'
 import Navigation from '@/components/Navigation'
 
@@ -10,7 +10,7 @@ export default function AuthPage() {
   const [user, setUser] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const router = useRouter()
-  const supabase = createClient()
+  const supabase = useSupabase()
 
   useEffect(() => {
     const checkUser = async () => {

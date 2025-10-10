@@ -1,7 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { useSupabase } from './SupabaseContext'
 import { User } from '@supabase/supabase-js'
 import { Database } from '@/lib/database.types'
 
@@ -20,7 +20,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
-  const [supabase] = useState(() => createClient())
+  const supabase = useSupabase()
 
   useEffect(() => {
     const getUser = async () => {

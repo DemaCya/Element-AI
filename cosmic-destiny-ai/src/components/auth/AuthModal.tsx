@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { X, Mail, Lock, User, Eye, EyeOff } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { createClient } from '@/lib/supabase/client'
+import { useSupabase } from '@/contexts/SupabaseContext'
 
 interface AuthModalProps {
   isOpen: boolean
@@ -22,7 +22,7 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
   const [error, setError] = useState('')
   const [isVisible, setIsVisible] = useState(false)
 
-  const supabase = createClient()
+  const supabase = useSupabase()
 
   useEffect(() => {
     if (isOpen) {

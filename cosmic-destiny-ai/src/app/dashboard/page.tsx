@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, Suspense, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { useSupabase } from '@/contexts/SupabaseContext'
 import { useUser } from '@/contexts/UserContext'
 import { Button } from '@/components/ui/button'
 
@@ -31,7 +31,7 @@ function DashboardContent() {
   const [showForm, setShowForm] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
-  const supabase = createClient()
+  const supabase = useSupabase()
 
   useEffect(() => {
     // Listen for open birth form event from navigation

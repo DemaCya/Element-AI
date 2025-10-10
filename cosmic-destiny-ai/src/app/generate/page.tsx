@@ -3,7 +3,7 @@
 import React, { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useUser } from '@/contexts/UserContext'
-import { createClient } from '@/lib/supabase/client'
+import { useSupabase } from '@/contexts/SupabaseContext'
 import { Button } from '@/components/ui/button'
 import { Sparkles, Calendar, Clock, Globe, User, AlertCircle, CheckCircle } from 'lucide-react'
 
@@ -36,7 +36,7 @@ function GenerateReportContent() {
   const [currentStep, setCurrentStep] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [reportId, setReportId] = useState<string | null>(null)
-  const supabase = createClient()
+  const supabase = useSupabase()
 
   // Generation steps configuration
   const generationSteps: GenerationStep[] = [

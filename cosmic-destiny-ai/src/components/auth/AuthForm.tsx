@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { useSupabase } from '@/contexts/SupabaseContext'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Mail, Lock, User, Eye, EyeOff } from 'lucide-react'
@@ -19,7 +19,7 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
 
-  const supabase = createClient()
+  const supabase = useSupabase()
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault()

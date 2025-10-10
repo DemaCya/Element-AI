@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import SupabaseProvider from "@/components/SupabaseProvider";
+import { SupabaseProvider } from "@/contexts/SupabaseContext";
 import { UserProvider } from "@/contexts/UserContext";
 import { structuredData, serviceStructuredData, faqStructuredData } from "./structured-data";
 
