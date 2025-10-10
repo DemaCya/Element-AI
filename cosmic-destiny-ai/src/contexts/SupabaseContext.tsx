@@ -13,67 +13,78 @@ interface SupabaseContextType {
 
 const SupabaseContext = createContext<SupabaseContextType | undefined>(undefined)
 
-// 增强的全局状态管理，包含页面导航持久化
-const getGlobalState = () => {
+// 全局状态管理，避免Turbopack解析问题
+interface GlobalSupabaseState {
+  supabase: SupabaseClient<Database> | null
+  isInitialized: boolean
+  initCount: number
+  sessionId: string | null
+  lastNavigationTime: number
+}
+
+// 全局变量，避免对象字面量语法问题
+let globalState: GlobalSupabaseState | null = null
+
+// 初始化全局状态
+const getGlobalState = (): GlobalSupabaseState => {
   if (typeof window === 'undefined') {
     return {
       supabase: null,
       isInitialized: false,
       initCount: 0,
-      sessionId: null
+      sessionId: null,
+      lastNavigationTime: 0
     }
   }
 
-  if (!(window as any).__cosmicSupabaseState) {
-    // 生成唯一会话ID，用于跟踪页面刷新
+  if (!globalState) {
+    // 生成唯一会话ID
     const sessionId = Date.now().toString(36) + Math.random().toString(36).substr(2)
 
-    (window as any).__cosmicSupabaseState = {
+    globalState = {
       supabase: null,
       isInitialized: false,
       initCount: 0,
-      sessionId,
+      sessionId: sessionId,
       lastNavigationTime: Date.now()
     }
 
     logger.supabase(`🆔 Created new session: ${sessionId}`)
   }
 
-  // 记录页面导航时间
-  (window as any).__cosmicSupabaseState.lastNavigationTime = Date.now()
+  // 更新导航时间
+  globalState.lastNavigationTime = Date.now()
 
-  return (window as any).__cosabaseState
+  return globalState
 }
 
-// 增强的初始化函数，处理页面导航状态
+// 初始化Supabase客户端
 function initializeSupabase() {
-  const globalSupabaseState = getGlobalState()
-  globalSupabaseState.initCount++
+  const state = getGlobalState()
+  state.initCount++
 
   const currentTime = Date.now()
-  const timeSinceLastNavigation = currentTime - (globalSupabaseState.lastNavigationTime || 0)
-  const isPageNavigation = timeSinceLastNavigation < 1000 // 1秒内的导航认为是页面导航
+  const timeSinceNavigation = currentTime - state.lastNavigationTime
+  const isPageNavigation = timeSinceNavigation < 1000
 
-  logger.supabase(`🔄 Init call #${globalSupabaseState.initCount}, session: ${globalSupabaseState.sessionId}, isNavigation: ${isPageNavigation}`)
+  logger.supabase(`🔄 Init call #${state.initCount}, session: ${state.sessionId}, isNavigation: ${isPageNavigation}`)
 
-  // 如果已经初始化且是页面导航，直接返回现有客户端
-  if (globalSupabaseState.isInitialized && globalSupabaseState.supabase) {
-    if (isPageNavigation) {
-      logger.supabase('🚀 Page navigation detected, reusing existing client')
-    }
-    return globalSupabaseState
+  // 如果已经初始化且是页面导航，直接返回
+  if (state.isInitialized && state.supabase && isPageNavigation) {
+    logger.supabase('🚀 Page navigation detected, reusing existing client')
+    return state
   }
 
   if (typeof window === 'undefined') {
     logger.supabase('🖥️ Server side, skipping initialization')
-    return globalSupabaseState
+    return state
   }
 
   try {
-    logger.supabase(`✨ Initializing Supabase client (call #${globalSupabaseState.initCount}, session: ${globalSupabaseState.sessionId})`)
+    logger.supabase(`✨ Initializing Supabase client (call #${state.initCount}, session: ${state.sessionId})`)
     const client = createClient()
-    globalSupabaseState.supabase = client
-    globalSupabaseState.isInitialized = true
+    state.supabase = client
+    state.isInitialized = true
     logger.supabase('✅ Supabase client initialized successfully')
 
     // 恢复持久化日志
@@ -86,16 +97,15 @@ function initializeSupabase() {
 
   } catch (error) {
     logger.error('❌ Supabase: Failed to initialize', error)
-    globalSupabaseState.supabase = null
-    globalSupabaseState.isInitialized = true // 即使失败也设置为true，避免无限loading
+    state.supabase = null
+    state.isInitialized = true
   }
 
-  return globalSupabaseState
+  return state
 }
 
 export function SupabaseProvider({ children }: { children: React.ReactNode }) {
-  const [state, setState] = useState(() => {
-    // 只在组件第一次挂载时初始化
+  const [state, setState] = useState<GlobalSupabaseState>(() => {
     return initializeSupabase()
   })
 
@@ -106,11 +116,9 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
       setState(initializeSupabase())
     }
 
-    // 监听路由变化
     if (typeof window !== 'undefined') {
       window.addEventListener('popstate', handleNavigation)
 
-      // 监听 pushstate/replacestate (SPA导航)
       const originalPushState = history.pushState
       const originalReplaceState = history.replaceState
 
@@ -132,7 +140,7 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
     }
   }, [])
 
-  // 在客户端渲染完成前显示loading，但减少等待时间
+  // Loading状态
   if (typeof window === 'undefined' || !state.isInitialized) {
     return (
       <div className="cosmic-bg min-h-screen flex items-center justify-center">
@@ -145,7 +153,7 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <SupabaseContext.Provider value={{ supabase: state.supabase, isInitialized: state.isInitialized }}>
+    <SupabaseContext.Provider value={{ supabase: state.supabase!, isInitialized: state.isInitialized }}>
       {children}
     </SupabaseContext.Provider>
   )
@@ -156,8 +164,8 @@ export function useSupabase() {
   if (context === undefined) {
     throw new Error('useSupabase must be used within a SupabaseProvider')
   }
-  return context.supabase as any
+  return context.supabase
 }
 
-// 导出创建客户端的函数，供非React环境使用（如API路由）
+// 导出创建客户端的函数
 export { createClient }

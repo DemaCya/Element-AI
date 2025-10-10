@@ -99,7 +99,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
               setProfile(null)
               globalUserState.cachedProfile = null
             } else {
-              logger.supabase('🔍 UserContext: Profile fetched:', profileData?.id)
+              logger.supabase('🔍 UserContext: Profile fetched:', (profileData as any)?.id)
               setProfile(profileData)
               globalUserState.cachedProfile = profileData
             }
@@ -141,7 +141,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       async (event: any, session: any) => {
         if (!isMounted) return
 
-        logger.supabase('🔍 UserContext: Auth state change:', event, session?.user?.id)
+        logger.supabase('🔍 UserContext: Auth state change:', { event, userId: session?.user?.id })
 
         if (event === 'SIGNED_IN' && session?.user) {
           logger.supabase('🔍 UserContext: User signed in:', session.user.id)
@@ -161,7 +161,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
               setProfile(null)
               globalUserState.cachedProfile = null
             } else {
-              logger.supabase('🔍 UserContext: Profile fetched on sign in:', profileData?.id)
+              logger.supabase('🔍 UserContext: Profile fetched on sign in:', (profileData as any)?.id)
               setProfile(profileData)
               globalUserState.cachedProfile = profileData
             }
