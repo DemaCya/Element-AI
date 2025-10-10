@@ -116,15 +116,19 @@ function DashboardContent() {
     } finally {
       setLoading(false)
     }
-  }, [user, supabase])
+  }, [user])
 
   useEffect(() => {
+    console.log('🔍 Dashboard useEffect:', { authLoading, user: user?.id, hasUser: !!user })
+    
     if (!authLoading && !user) {
+      console.log('No user, redirecting to auth')
       router.push('/auth')
       return
     }
 
     if (user) {
+      console.log('User found, fetching reports')
       fetchReports()
     }
   }, [user, authLoading, router, fetchReports])

@@ -1,6 +1,13 @@
 import { createBrowserClient } from '@supabase/ssr'
 
+let supabaseClient: ReturnType<typeof createBrowserClient> | null = null
+
 export function createClient() {
+  // 如果已经创建过客户端，直接返回
+  if (supabaseClient) {
+    return supabaseClient
+  }
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
@@ -17,7 +24,7 @@ export function createClient() {
     throw new Error('Missing Supabase configuration')
   }
 
-  const client = createBrowserClient(supabaseUrl, supabaseAnonKey)
+  supabaseClient = createBrowserClient(supabaseUrl, supabaseAnonKey)
   console.log('✅ Supabase客户端创建成功')
-  return client
+  return supabaseClient
 }

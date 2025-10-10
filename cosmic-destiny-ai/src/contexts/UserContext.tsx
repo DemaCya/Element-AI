@@ -54,6 +54,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     // 监听认证状态变化
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event: any, session: any) => {
+        console.log('Auth state change:', event, session?.user?.id)
+        
         if (event === 'SIGNED_IN' && session?.user) {
           setUser(session.user)
           
@@ -73,7 +75,11 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
           setUser(null)
           setProfile(null)
         }
-        setLoading(false)
+        
+        // 只在特定事件时设置loading为false
+        if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+          setLoading(false)
+        }
       }
     )
 

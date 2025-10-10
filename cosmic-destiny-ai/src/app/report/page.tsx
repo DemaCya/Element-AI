@@ -72,7 +72,7 @@ function ReportContent() {
     } finally {
       setLoading(false)
     }
-  }, [searchParams, user, supabase, router])
+  }, [searchParams, user, router])
 
   useEffect(() => {
     if (!authLoading && !user) {
