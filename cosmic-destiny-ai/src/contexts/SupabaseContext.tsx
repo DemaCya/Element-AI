@@ -13,19 +13,30 @@ interface SupabaseContextType {
 
 const SupabaseContext = createContext<SupabaseContextType | undefined>(undefined)
 
-// 全局状态，确保只初始化一次
-let globalSupabaseState: {
-  supabase: SupabaseClient<Database> | null
-  isInitialized: boolean
-  initCount: number
-} = {
-  supabase: null,
-  isInitialized: false,
-  initCount: 0
+// 使用 window 对象保持全局状态，避免页面导航时重置
+const getGlobalState = () => {
+  if (typeof window === 'undefined') {
+    return {
+      supabase: null,
+      isInitialized: false,
+      initCount: 0
+    }
+  }
+  
+  if (!(window as any).__cosmicSupabaseState) {
+    (window as any).__cosmicSupabaseState = {
+      supabase: null,
+      isInitialized: false,
+      initCount: 0
+    }
+  }
+  
+  return (window as any).__cosmicSupabaseState
 }
 
 // 初始化函数，只执行一次
 function initializeSupabase() {
+  const globalSupabaseState = getGlobalState()
   globalSupabaseState.initCount++
   
   // 如果已经初始化，静默返回（减少日志噪音）
@@ -45,19 +56,13 @@ function initializeSupabase() {
   try {
     logger.supabase(`✨ Initializing Supabase client (call #${globalSupabaseState.initCount})`)
     const client = createClient()
-    globalSupabaseState = {
-      supabase: client,
-      isInitialized: true,
-      initCount: globalSupabaseState.initCount
-    }
+    globalSupabaseState.supabase = client
+    globalSupabaseState.isInitialized = true
     logger.supabase('✅ Supabase client initialized successfully')
   } catch (error) {
     logger.error('❌ Supabase: Failed to initialize', error)
-    globalSupabaseState = {
-      supabase: null,
-      isInitialized: true, // 即使失败也设置为true，避免无限loading
-      initCount: globalSupabaseState.initCount
-    }
+    globalSupabaseState.supabase = null
+    globalSupabaseState.isInitialized = true // 即使失败也设置为true，避免无限loading
   }
 
   return globalSupabaseState
