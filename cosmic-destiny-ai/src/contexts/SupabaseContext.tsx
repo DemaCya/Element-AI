@@ -1,6 +1,6 @@
 'use client'
 
-import React, { createContext, useContext, useMemo } from 'react'
+import React, { createContext, useContext, useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { SupabaseClient } from '@supabase/supabase-js'
 import { Database } from '@/lib/database.types'
@@ -28,8 +28,12 @@ let globalSupabaseState: {
 function initializeSupabase() {
   globalSupabaseState.initCount++
   
+  // 如果已经初始化，静默返回（减少日志噪音）
   if (globalSupabaseState.isInitialized && globalSupabaseState.supabase) {
-    logger.supabase(`Already initialized (call #${globalSupabaseState.initCount}), returning existing state`)
+    // 只在第一次调用时记录日志
+    if (globalSupabaseState.initCount === 1) {
+      logger.supabase('✅ Supabase already initialized, returning existing client')
+    }
     return globalSupabaseState
   }
 
@@ -39,14 +43,14 @@ function initializeSupabase() {
   }
 
   try {
-    logger.supabase(`✨ Initializing for the first time (call #${globalSupabaseState.initCount})`)
+    logger.supabase(`✨ Initializing Supabase client (call #${globalSupabaseState.initCount})`)
     const client = createClient()
     globalSupabaseState = {
       supabase: client,
       isInitialized: true,
       initCount: globalSupabaseState.initCount
     }
-    logger.supabase('✅ Global state initialized successfully')
+    logger.supabase('✅ Supabase client initialized successfully')
   } catch (error) {
     logger.error('❌ Supabase: Failed to initialize', error)
     globalSupabaseState = {
@@ -60,11 +64,11 @@ function initializeSupabase() {
 }
 
 export function SupabaseProvider({ children }: { children: React.ReactNode }) {
-  // 使用 useMemo 确保只初始化一次，不使用 useState
-  const state = useMemo(() => {
-    // 在组件初始化时检查全局状态
+  // 直接使用全局状态，避免重复初始化
+  const [state] = useState(() => {
+    // 只在组件第一次挂载时初始化
     return initializeSupabase()
-  }, []) // 空依赖数组，确保只运行一次
+  })
 
   // 在客户端渲染完成前显示loading
   if (typeof window === 'undefined' || !state.isInitialized || !state.supabase) {
