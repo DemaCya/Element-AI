@@ -80,35 +80,7 @@ function DashboardContent() {
     }
   }, [user, supabase])
 
-  // 处理从首页传来的URL参数，自动创建报告
-  useEffect(() => {
-    const birthDate = searchParams.get('birthDate')
-    const birthTime = searchParams.get('birthTime')
-    const timeZone = searchParams.get('timeZone')
-    const gender = searchParams.get('gender')
-    const isTimeKnownInput = searchParams.get('isTimeKnownInput')
-    const reportName = searchParams.get('reportName')
-
-    if (birthDate && timeZone && gender && user) {
-      console.log("🚀 检测到URL参数，自动创建报告")
-      console.log("参数:", { birthDate, birthTime, timeZone, gender, isTimeKnownInput, reportName })
-      
-      const birthData = {
-        birthDate,
-        birthTime: birthTime || '',
-        timeZone,
-        gender: gender as 'male' | 'female',
-        isTimeKnownInput: isTimeKnownInput === 'true',
-        reportName: reportName || ''
-      }
-      
-      // 自动创建报告
-      handleBirthFormSubmit(birthData)
-      
-      // 清除URL参数
-      router.replace('/dashboard')
-    }
-  }, [searchParams, user, router])
+  // Dashboard只负责显示报告列表，不再处理报告生成
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -156,178 +128,19 @@ function DashboardContent() {
     }
   }
 
+  // 处理从dashboard直接创建报告的情况
   const handleBirthFormSubmit = async (birthData: any) => {
-    console.log("🚀 handleBirthFormSubmit 被调用了！")
-    console.log("用户状态:", user)
-    console.log("报告数据:", birthData)
+    // 重定向到专门的报告生成页面
+    const params = new URLSearchParams({
+      birthDate: birthData.birthDate,
+      birthTime: birthData.birthTime || '',
+      timeZone: birthData.timeZone,
+      gender: birthData.gender,
+      isTimeKnownInput: birthData.isTimeKnownInput.toString(),
+      reportName: birthData.reportName || ''
+    })
     
-    // 立即保存到localStorage
-    localStorage.setItem('debug_last_call', JSON.stringify({
-      timestamp: new Date().toISOString(),
-      user: user ? { id: user.id, email: user.email } : null,
-      birthData
-    }))
-    
-    if (!user) {
-      console.error('No user found, cannot create report')
-      localStorage.setItem('debug_error', 'No user found')
-      return
-    }
-
-    // 持久化日志记录
-    const logToStorage = (message: string, data?: any) => {
-      const timestamp = new Date().toISOString()
-      const logEntry = { timestamp, message, data }
-      console.log(`[${timestamp}] ${message}`, data)
-      
-      // 保存到localStorage以便查看
-      const existingLogs = JSON.parse(localStorage.getItem('reportCreationLogs') || '[]')
-      existingLogs.push(logEntry)
-      localStorage.setItem('reportCreationLogs', JSON.stringify(existingLogs.slice(-50))) // 只保留最近50条
-    }
-
-    logToStorage("=== 开始创建报告 ===")
-    logToStorage("用户信息", { id: user.id, email: user.email })
-    logToStorage("报告数据", birthData)
-
-    try {
-      // 生成模拟报告内容
-      const mockPreviewReport = `# 您的命理概览
-
-## 出生信息
-- 出生日期：${birthData.birthDate}
-- 出生时间：${birthData.birthTime || '未知'}
-- 性别：${birthData.gender === 'male' ? '男' : '女'}
-- 时区：${birthData.timeZone}
-
-## 核心性格特征
-基于您的八字分析，您的日主为甲，这赋予了您独特的个性魅力。您是一个充满智慧和创造力的人，善于观察和思考，总能在细节中发现别人忽视的价值。您的内心深处有着对完美的追求，这使您在做事时格外认真细致。同时，您具有很强的直觉力和同理心，能够敏锐地感知他人的情绪变化。
-
-## 天赋潜能
-您最突出的天赋在于创新思维和沟通能力。您天生具有将复杂概念简单化的能力，善于用独特的视角解决问题。在艺术创作、策略规划或人际交往方面，您都展现出超乎常人的天赋。特别是在需要创意和灵感的领域，您总能迸发出令人惊喜的想法。
-
----
-
-**想要了解更多详细内容吗？**
-
-完整报告包含：
-- 深度人格分析和成长建议
-- 详细职业规划和财富策略  
-- 全面感情分析和最佳配对
-- 人生使命和关键转折点
-- 个性化健康养生方案
-- 以及更多专属于您的命理指导...
-
-立即解锁完整报告，开启您的命运探索之旅！`
-
-      const mockFullReport = mockPreviewReport + `
-
-## 完整版内容（付费解锁）
-
-### 详细职业规划
-根据您的五行配置，最适合您的职业方向是创意产业和知识服务业。设计、媒体、教育、咨询等需要创造力和沟通能力的行业都很适合您。您也适合担任团队的智囊角色，为组织提供战略性建议。创业也是不错的选择，特别是在文化创意或科技创新领域。
-
-### 感情运势分析
-在感情方面，您追求心灵层面的共鸣。您需要一个能够理解您内心世界、与您进行深度交流的伴侣。您的感情表达方式含蓄而深情，更喜欢用行动而非言语来表达爱意。建议您在选择伴侣时，重视精神契合度，寻找能够共同成长的人生伴侣。
-
-### 健康养生建议
-您的体质偏向于需要平衡的调理。建议多进行户外活动，保持心情愉悦，避免过度思虑。在饮食方面，多食用新鲜蔬果，少食辛辣刺激食物。定期进行冥想或瑜伽练习，有助于平衡身心。`
-
-      // 创建报告记录
-      logToStorage('=== 准备插入数据库 ===')
-      logToStorage('用户ID', user.id)
-      logToStorage('Supabase客户端', supabase)
-      
-      const reportInsertData = {
-        user_id: user.id,
-        name: birthData.reportName || `命理报告 - ${new Date(birthData.birthDate).toLocaleDateString()}`,
-        birth_date: birthData.birthDate,
-        birth_time: birthData.birthTime || null,
-        timezone: birthData.timeZone,
-        gender: birthData.gender,
-        is_time_known_input: birthData.isTimeKnownInput,
-        is_paid: false,
-        bazi_data: {
-          // 模拟八字数据
-          heavenlyStems: ['甲', '乙', '丙', '丁'],
-          earthlyBranches: ['子', '丑', '寅', '卯'],
-          dayMaster: '甲',
-          elements: { wood: 2, fire: 1, earth: 1, metal: 1, water: 1 }
-        },
-        full_report: mockFullReport,
-        preview_report: mockPreviewReport
-      }
-      
-      logToStorage('插入数据', reportInsertData)
-      logToStorage('开始执行数据库插入...')
-
-      const { data: reportData, error: reportError } = await supabase
-        .from('user_reports')
-        .insert(reportInsertData)
-        .select()
-        .single()
-
-      logToStorage('=== 数据库操作完成 ===')
-      logToStorage('返回数据', reportData)
-      logToStorage('错误信息', reportError)
-
-      if (reportError) {
-        logToStorage('=== 数据库插入失败 ===')
-        logToStorage('Error creating report', reportError)
-        logToStorage('Error details', {
-          message: reportError.message,
-          details: reportError.details,
-          hint: reportError.hint,
-          code: reportError.code
-        })
-        alert(`创建报告失败: ${reportError.message}`)
-        return
-      }
-
-      logToStorage('=== 报告创建成功 ===')
-      logToStorage('报告数据', reportData)
-      logToStorage('报告ID', reportData.id)
-
-      // 重新获取报告列表
-      logToStorage('开始重新获取报告列表...')
-      await fetchReports()
-      logToStorage('报告列表获取完成')
-      
-      // 重定向到报告页面
-      logToStorage('准备重定向到报告页面', `/report?id=${reportData.id}`)
-      logToStorage('报告数据验证', {
-        hasId: !!reportData.id,
-        id: reportData.id,
-        reportData: reportData
-      })
-      
-      if (!reportData.id) {
-        logToStorage('=== 错误：报告ID不存在 ===')
-        alert('报告创建失败：缺少报告ID')
-        return
-      }
-      
-      logToStorage('开始重定向...')
-      router.push(`/report?id=${reportData.id}`)
-      logToStorage('重定向完成')
-    } catch (error) {
-      console.error("💥 捕获到异常:", error)
-      localStorage.setItem('debug_error', JSON.stringify({
-        timestamp: new Date().toISOString(),
-        error: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : 'No stack trace'
-      }))
-      
-      logToStorage('=== 捕获到异常 ===')
-      logToStorage('Error creating report', error)
-      logToStorage('Error stack', error instanceof Error ? error.stack : 'No stack trace')
-      logToStorage('Error message', error instanceof Error ? error.message : String(error))
-      alert(`生成报告失败: ${error instanceof Error ? error.message : '未知错误'}`)
-    } finally {
-      logToStorage('=== 清理状态 ===')
-      setShowForm(false)
-      logToStorage('表单已关闭')
-    }
+    router.push(`/generate?${params.toString()}`)
   }
 
   const handleReportClick = (reportId: string) => {

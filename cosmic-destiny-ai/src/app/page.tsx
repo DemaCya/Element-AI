@@ -49,7 +49,7 @@ export default function Home() {
   const handleBirthFormSubmit = async (data: BirthData & { reportName?: string }) => {
     setShowForm(false)
     
-    // 重定向到dashboard，让dashboard处理报告生成
+    // 重定向到专门的报告生成页面
     // 将数据通过URL参数传递
     const params = new URLSearchParams({
       birthDate: data.birthDate,
@@ -60,7 +60,7 @@ export default function Home() {
       reportName: data.reportName || ''
     })
     
-    window.location.href = `/dashboard?${params.toString()}`
+    window.location.href = `/generate?${params.toString()}`
   }
 
   const scrollToContent = () => {
