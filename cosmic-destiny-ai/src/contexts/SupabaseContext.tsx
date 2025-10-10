@@ -81,7 +81,7 @@ export function useSupabase() {
   if (context === undefined) {
     throw new Error('useSupabase must be used within a SupabaseProvider')
   }
-  return context.supabase
+  return context.supabase as any
 }
 
 // 导出创建客户端的函数，供非React环境使用（如API路由）

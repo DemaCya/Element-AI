@@ -22,7 +22,7 @@ export class PaymentService {
     try {
       // For now, create a placeholder payment record
       // This will be replaced with actual Creem integration
-      const supabase = createClient()
+      const supabase = createClient() as any
 
       const { data, error } = await supabase
         .from('payments')
@@ -34,7 +34,7 @@ export class PaymentService {
           status: 'pending',
           payment_method: 'creem',
           created_at: new Date().toISOString()
-        })
+        } as any)
         .select()
         .single()
 
@@ -44,7 +44,7 @@ export class PaymentService {
       }
 
       // Simulate payment process (replace with actual Creem integration)
-      const paymentResult = await this.simulateCreemPayment(paymentData, data.id)
+      const paymentResult = await this.simulateCreemPayment(paymentData, (data as any).id)
 
       if (paymentResult.success) {
         // Update payment record to completed
@@ -54,8 +54,8 @@ export class PaymentService {
             status: 'completed',
             payment_id: paymentResult.paymentId,
             updated_at: new Date().toISOString()
-          })
-          .eq('id', data.id)
+          } as any)
+          .eq('id', (data as any).id)
 
         // Update user report to paid
         await supabase
@@ -63,7 +63,7 @@ export class PaymentService {
           .update({
             is_paid: true,
             updated_at: new Date().toISOString()
-          })
+          } as any)
           .eq('id', paymentData.reportId)
 
         return { success: true, paymentId: paymentResult.paymentId }
@@ -75,8 +75,8 @@ export class PaymentService {
             status: 'failed',
             error_message: paymentResult.error,
             updated_at: new Date().toISOString()
-          })
-          .eq('id', data.id)
+          } as any)
+          .eq('id', (data as any).id)
 
         return { success: false, error: paymentResult.error }
       }
@@ -116,7 +116,7 @@ export class PaymentService {
 
   static async verifyPayment(paymentId: string): Promise<PaymentResult> {
     try {
-      const supabase = createClient()
+      const supabase = createClient() as any
 
       const { data, error } = await supabase
         .from('payments')
@@ -128,10 +128,10 @@ export class PaymentService {
         return { success: false, error: 'Payment not found' }
       }
 
-      if (data.status === 'completed') {
-        return { success: true, paymentId: data.payment_id }
-      } else if (data.status === 'failed') {
-        return { success: false, error: data.error_message || 'Payment failed' }
+      if ((data as any).status === 'completed') {
+        return { success: true, paymentId: (data as any).payment_id }
+      } else if ((data as any).status === 'failed') {
+        return { success: false, error: (data as any).error_message || 'Payment failed' }
       } else {
         return { success: false, error: 'Payment is still processing' }
       }
@@ -149,7 +149,7 @@ export class PaymentService {
     error?: string
   }> {
     try {
-      const supabase = createClient()
+      const supabase = createClient() as any
 
       // Get report details
       const { data: report, error: reportError } = await supabase
@@ -203,17 +203,17 @@ export class PaymentService {
       const { event, data } = payload
 
       if (event === 'payment.completed') {
-        const supabase = createClient()
+        const supabase = createClient() as any
 
         // Update payment record
         await supabase
           .from('payments')
           .update({
             status: 'completed',
-            payment_id: data.payment_id,
+            payment_id: (data as any).payment_id,
             updated_at: new Date().toISOString()
-          })
-          .eq('id', data.metadata.payment_record_id)
+          } as any)
+          .eq('id', (data as any).metadata.payment_record_id)
 
         // Update user report to paid
         await supabase
@@ -221,8 +221,8 @@ export class PaymentService {
           .update({
             is_paid: true,
             updated_at: new Date().toISOString()
-          })
-          .eq('id', data.metadata.report_id)
+          } as any)
+          .eq('id', (data as any).metadata.report_id)
       }
 
     } catch (error) {

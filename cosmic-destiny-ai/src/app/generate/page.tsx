@@ -159,7 +159,7 @@ function GenerateReportContent() {
 
       const { data: reportData, error: reportError } = await supabase
         .from('user_reports')
-        .insert(reportInsertData)
+        .insert(reportInsertData as any)
         .select()
         .single()
 
@@ -167,12 +167,12 @@ function GenerateReportContent() {
         throw new Error(`Failed to save report: ${reportError.message}`)
       }
 
-      setReportId(reportData.id)
+      setReportId((reportData as any).id)
       await updateStepStatus(3, 'completed')
 
       // Delay before redirect to let user see completion status
       setTimeout(() => {
-        router.push(`/report?id=${reportData.id}`)
+        router.push(`/report?id=${(reportData as any).id}`)
       }, 1000)
 
     } catch (error) {
