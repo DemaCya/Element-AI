@@ -39,13 +39,16 @@ const getGlobalState = (): GlobalSupabaseState => {
     // 生成唯一会话ID
     const sessionId = Date.now().toString(36) + Math.random().toString(36).substr(2)
 
-    (window as any).__cosmicSupabaseState = {
+    // 使用Object.assign避免Turbopack解析问题
+    const newState: GlobalSupabaseState = {
       supabase: null,
       isInitialized: false,
       initCount: 0,
       sessionId: sessionId,
       lastNavigationTime: Date.now()
     }
+    
+    Object.assign((window as any), { __cosmicSupabaseState: newState })
 
     logger.supabase(`🆔 Created new session: ${sessionId}`)
   }
