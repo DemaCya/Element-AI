@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState, Suspense } from 'react'
+import React, { useEffect, useState, Suspense, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/contexts/UserContext'
@@ -82,18 +82,7 @@ function DashboardContent() {
 
   // Dashboard只负责显示报告列表，不再处理报告生成
 
-  useEffect(() => {
-    if (!authLoading && !user) {
-      router.push('/auth')
-      return
-    }
-
-    if (user) {
-      fetchReports()
-    }
-  }, [user, authLoading, router])
-
-  const fetchReports = async () => {
+  const fetchReports = useCallback(async () => {
     if (!user) {
       console.log('No user, skipping fetchReports')
       setLoading(false)
@@ -116,6 +105,7 @@ function DashboardContent() {
           hint: error.hint,
           code: error.code
         })
+        setLoading(false)
         return
       }
 
@@ -126,7 +116,18 @@ function DashboardContent() {
     } finally {
       setLoading(false)
     }
-  }
+  }, [user, supabase])
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/auth')
+      return
+    }
+
+    if (user) {
+      fetchReports()
+    }
+  }, [user, authLoading, router, fetchReports])
 
   // 处理从dashboard直接创建报告的情况
   const handleBirthFormSubmit = async (birthData: any) => {
