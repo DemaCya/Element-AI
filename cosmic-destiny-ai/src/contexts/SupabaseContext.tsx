@@ -22,10 +22,7 @@ interface GlobalSupabaseState {
   lastNavigationTime: number
 }
 
-// 全局变量，避免对象字面量语法问题
-let globalState: GlobalSupabaseState | null = null
-
-// 初始化全局状态
+// 全局变量，使用window对象确保跨页面持久化
 const getGlobalState = (): GlobalSupabaseState => {
   if (typeof window === 'undefined') {
     return {
@@ -37,11 +34,12 @@ const getGlobalState = (): GlobalSupabaseState => {
     }
   }
 
-  if (!globalState) {
+  // 使用window对象确保跨页面持久化
+  if (!(window as any).__cosmicSupabaseState) {
     // 生成唯一会话ID
     const sessionId = Date.now().toString(36) + Math.random().toString(36).substr(2)
 
-    globalState = {
+    (window as any).__cosmicSupabaseState = {
       supabase: null,
       isInitialized: false,
       initCount: 0,
@@ -52,13 +50,13 @@ const getGlobalState = (): GlobalSupabaseState => {
     logger.supabase(`🆔 Created new session: ${sessionId}`)
   }
 
-  return globalState
+  return (window as any).__cosmicSupabaseState
 }
 
 // 更新导航时间（仅在需要时调用）
 const updateNavigationTime = () => {
-  if (globalState) {
-    globalState.lastNavigationTime = Date.now()
+  if (typeof window !== 'undefined' && (window as any).__cosmicSupabaseState) {
+    (window as any).__cosmicSupabaseState.lastNavigationTime = Date.now()
   }
 }
 
