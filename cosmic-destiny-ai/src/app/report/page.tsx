@@ -39,17 +39,24 @@ function ReportContent() {
   const fetchReport = useCallback(async () => {
     const reportId = searchParams.get('id')
     
-    console.log('🔍 fetchReport called with:', { reportId, user: user?.id })
+    console.log('📄 Report: fetchReport called with:', { reportId, userId: user?.id })
     
-    if (!reportId || !user) {
-      console.log('No report ID or user, redirecting to dashboard')
+    if (!reportId) {
+      console.log('❌ Report: No report ID, redirecting to dashboard')
       setLoading(false)
       router.push('/dashboard')
       return
     }
+    
+    if (!user) {
+      console.log('⏳ Report: No user yet, waiting...')
+      return
+    }
 
     try {
-      console.log('Fetching report with ID:', reportId)
+      console.log('🔍 Report: Fetching report with ID:', reportId)
+      setLoading(true) // 确保显示loading状态
+      
       const { data, error } = await supabase
         .from('user_reports')
         .select('*')
@@ -58,33 +65,36 @@ function ReportContent() {
         .single()
 
       if (error) {
-        console.error('Error fetching report:', error)
+        console.error('❌ Report: Error fetching report:', error)
         setLoading(false)
         router.push('/dashboard')
         return
       }
 
-      console.log('Report fetched successfully:', data)
+      console.log('✅ Report: Report fetched successfully')
       setReport(data)
+      setLoading(false)
     } catch (error) {
-      console.error('Error fetching report:', error)
+      console.error('❌ Report: Exception while fetching report:', error)
       setLoading(false)
       router.push('/dashboard')
-    } finally {
-      setLoading(false)
     }
-  }, [searchParams, user, router])
+  }, [searchParams, user, supabase, router]) // 添加 supabase 到依赖项
 
   useEffect(() => {
+    console.log('🔍 Report useEffect triggered:', { authLoading, userId: user?.id, hasUser: !!user })
+    
     if (!authLoading && !user) {
+      console.log('🔀 Report: No user, redirecting to auth')
       router.push('/auth')
       return
     }
 
-    if (user) {
+    if (user && !authLoading) {
+      console.log('👤 Report: User found, fetching report')
       fetchReport()
     }
-  }, [user, authLoading, router, fetchReport])
+  }, [user, authLoading, fetchReport, router]) // 保持依赖项完整
 
   const handleUpgrade = async () => {
     try {

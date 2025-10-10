@@ -85,13 +85,13 @@ function DashboardContent() {
 
   const fetchReports = useCallback(async () => {
     if (!user) {
-      console.log('No user, skipping fetchReports')
+      console.log('📊 Dashboard: No user, skipping fetchReports')
       setLoading(false)
       return
     }
 
     try {
-      console.log('Fetching reports for user:', user.id)
+      console.log('📊 Dashboard: Fetching reports for user:', user.id)
       const { data, error } = await supabase
         .from('user_reports')
         .select('*')
@@ -99,7 +99,7 @@ function DashboardContent() {
         .order('created_at', { ascending: false })
 
       if (error) {
-        console.error('Error fetching reports:', error)
+        console.error('❌ Dashboard: Error fetching reports:', error)
         console.error('Error details:', {
           message: error.message,
           details: error.details,
@@ -110,29 +110,29 @@ function DashboardContent() {
         return
       }
 
-      console.log('Fetched reports:', data)
+      console.log('✅ Dashboard: Fetched reports:', data?.length, 'reports')
       setReports(data || [])
     } catch (error) {
-      console.error('Error fetching reports:', error)
+      console.error('❌ Dashboard: Exception while fetching reports:', error)
     } finally {
       setLoading(false)
     }
-  }, [user])
+  }, [user, supabase]) // 添加 supabase 到依赖项
 
   useEffect(() => {
-    console.log('🔍 Dashboard useEffect:', { authLoading, user: user?.id, hasUser: !!user })
+    console.log('🔍 Dashboard useEffect triggered:', { authLoading, userId: user?.id, hasUser: !!user })
     
     if (!authLoading && !user) {
-      console.log('No user, redirecting to auth')
+      console.log('🔀 Dashboard: No user, redirecting to auth')
       router.push('/auth')
       return
     }
 
-    if (user) {
-      console.log('User found, fetching reports')
+    if (user && !authLoading) {
+      console.log('👤 Dashboard: User found, fetching reports')
       fetchReports()
     }
-  }, [user, authLoading, router, fetchReports])
+  }, [user, authLoading, fetchReports, router]) // 保持依赖项完整
 
   // 处理从dashboard直接创建报告的情况
   const handleBirthFormSubmit = async (birthData: any) => {

@@ -1,8 +1,10 @@
 import { createBrowserClient } from '@supabase/ssr'
 import { Database } from '@/lib/database.types'
+import { logger } from '@/lib/logger'
 
 // 全局单例客户端
 let globalSupabaseClient: ReturnType<typeof createBrowserClient<Database>> | null = null
+let clientCreationCount = 0
 
 /**
  * 创建Supabase客户端（单例模式）
@@ -10,19 +12,23 @@ let globalSupabaseClient: ReturnType<typeof createBrowserClient<Database>> | nul
  * 此函数主要用于非React环境（如API路由、服务端代码等）
  */
 export function createClient() {
+  clientCreationCount++
+  
   // 如果已有客户端，直接返回
   if (globalSupabaseClient) {
-    console.log('🔧 Supabase: Returning existing global client')
+    const msg = `Returning existing global client (call #${clientCreationCount})`
+    logger.supabase(msg)
     return globalSupabaseClient
   }
 
-  console.log('🔧 Supabase: Creating new global client')
+  logger.supabase(`Creating new global client (call #${clientCreationCount})`)
   
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    console.error('❌ Missing Supabase environment variables')
+    const error = 'Missing Supabase environment variables'
+    logger.error(`❌ ${error}`)
     throw new Error('Missing Supabase configuration')
   }
 
@@ -30,11 +36,21 @@ export function createClient() {
     const client = createBrowserClient<Database>(supabaseUrl, supabaseAnonKey)
     globalSupabaseClient = client
     
-    console.log('✅ Supabase: Global client created and cached')
+    logger.supabase('✅ Global client created and cached successfully')
     return client
   } catch (error) {
-    console.error('❌ Supabase: Failed to create client', error)
+    logger.error('❌ Supabase: Failed to create client', error)
     throw error
+  }
+}
+
+/**
+ * 获取客户端创建统计
+ */
+export function getClientStats() {
+  return {
+    creationCount: clientCreationCount,
+    hasClient: !!globalSupabaseClient
   }
 }
 
@@ -43,5 +59,5 @@ export function createClient() {
  */
 export function resetClient() {
   globalSupabaseClient = null
-  console.log('🔧 Supabase: Global client reset')
+  logger.supabase('Global client reset')
 }
