@@ -44,6 +44,27 @@ function DashboardContent() {
     }
   }, [])
 
+  // 测试Supabase连接
+  useEffect(() => {
+    const testConnection = async () => {
+      try {
+        console.log('🔍 测试Supabase连接...')
+        const { data, error } = await supabase.from('user_reports').select('count').limit(1)
+        if (error) {
+          console.error('❌ Supabase连接测试失败:', error)
+        } else {
+          console.log('✅ Supabase连接测试成功:', data)
+        }
+      } catch (err) {
+        console.error('❌ Supabase连接异常:', err)
+      }
+    }
+    
+    if (user) {
+      testConnection()
+    }
+  }, [user, supabase])
+
   // 处理从首页传来的URL参数，自动创建报告
   useEffect(() => {
     const birthDate = searchParams.get('birthDate')
