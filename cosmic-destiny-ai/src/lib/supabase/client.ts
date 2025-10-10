@@ -3,20 +3,35 @@ import { createBrowserClient } from '@supabase/ssr'
 // 使用全局变量确保单例模式在静态导出模式下也能工作
 declare global {
   var __supabaseClient: ReturnType<typeof createBrowserClient> | undefined
+  var __supabaseCreationCount: number | undefined
 }
 
-// 创建一个全局的Supabase客户端实例
-let _supabaseClient: ReturnType<typeof createBrowserClient> | null = null
 let _clientCreationCount = 0
 
-function getSupabaseClient() {
-  if (_supabaseClient) {
-    console.log('🔧 Supabase: Returning existing client (creation count:', _clientCreationCount, ')')
-    return _supabaseClient
+export function createClient() {
+  // 添加调用栈信息来调试
+  const stack = new Error().stack
+  const caller = stack?.split('\n')[2]?.trim() || 'unknown'
+  
+  // 初始化全局计数器
+  if (typeof window !== 'undefined' && globalThis.__supabaseCreationCount === undefined) {
+    globalThis.__supabaseCreationCount = 0
+  }
+  
+  // 检查全局变量中是否已有客户端
+  if (typeof window !== 'undefined' && globalThis.__supabaseClient) {
+    console.log('🔧 Supabase: Returning existing global client (global count:', globalThis.__supabaseCreationCount, ')', 'caller:', caller)
+    return globalThis.__supabaseClient
   }
 
+  // 增加全局计数器
+  if (typeof window !== 'undefined') {
+    globalThis.__supabaseCreationCount = (globalThis.__supabaseCreationCount || 0) + 1
+  }
   _clientCreationCount++
-  console.log('🔧 Supabase: Creating new client (creation count:', _clientCreationCount, ')')
+  
+  console.log('🔧 Supabase: Creating new client (global count:', globalThis.__supabaseCreationCount, ', local count:', _clientCreationCount, ')', 'caller:', caller)
+  
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
@@ -34,28 +49,17 @@ function getSupabaseClient() {
   }
 
   try {
-    _supabaseClient = createBrowserClient(supabaseUrl, supabaseAnonKey)
-    console.log('✅ Supabase客户端创建成功')
-    return _supabaseClient
+    const client = createBrowserClient(supabaseUrl, supabaseAnonKey)
+    
+    // 将客户端存储到全局变量中
+    if (typeof window !== 'undefined') {
+      globalThis.__supabaseClient = client
+    }
+    
+    console.log('✅ Supabase客户端创建成功并存储到全局变量')
+    return client
   } catch (error) {
     console.error('❌ Supabase客户端创建失败:', error)
     throw error
   }
-}
-
-export function createClient() {
-  // 检查全局变量中是否已有客户端
-  if (typeof window !== 'undefined' && globalThis.__supabaseClient) {
-    console.log('🔧 Supabase: Returning existing global client')
-    return globalThis.__supabaseClient
-  }
-
-  const client = getSupabaseClient()
-  
-  // 将客户端存储到全局变量中
-  if (typeof window !== 'undefined') {
-    globalThis.__supabaseClient = client
-  }
-  
-  return client
 }
