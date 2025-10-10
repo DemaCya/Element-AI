@@ -38,27 +38,54 @@ function createSupabaseClient(): SupabaseClient<Database> {
   return client
 }
 
-export function SupabaseProvider({ children }: { children: React.ReactNode }) {
-  const [supabase, setSupabase] = useState<SupabaseClient<Database> | null>(null)
-  const [isInitialized, setIsInitialized] = useState(false)
+// 全局状态，确保只初始化一次
+let globalSupabaseState: {
+  supabase: SupabaseClient<Database> | null
+  isInitialized: boolean
+} = {
+  supabase: null,
+  isInitialized: false
+}
 
-  useEffect(() => {
-    // 只在客户端初始化
-    if (typeof window === 'undefined') return
+// 初始化函数，只执行一次
+function initializeSupabase() {
+  if (globalSupabaseState.isInitialized) {
+    console.log('🔧 Supabase: Already initialized, returning existing state')
+    return globalSupabaseState
+  }
 
-    try {
-      const client = createSupabaseClient()
-      setSupabase(client)
-      setIsInitialized(true)
-      console.log('✅ SupabaseProvider: Client initialized')
-    } catch (error) {
-      console.error('❌ SupabaseProvider: Failed to initialize client', error)
-      setIsInitialized(true) // 即使失败也设置为true，避免无限loading
+  if (typeof window === 'undefined') {
+    console.log('🔧 Supabase: Server side, skipping initialization')
+    return globalSupabaseState
+  }
+
+  try {
+    const client = createSupabaseClient()
+    globalSupabaseState = {
+      supabase: client,
+      isInitialized: true
     }
-  }, [])
+    console.log('✅ Supabase: Global state initialized')
+  } catch (error) {
+    console.error('❌ Supabase: Failed to initialize', error)
+    globalSupabaseState = {
+      supabase: null,
+      isInitialized: true // 即使失败也设置为true，避免无限loading
+    }
+  }
+
+  return globalSupabaseState
+}
+
+export function SupabaseProvider({ children }: { children: React.ReactNode }) {
+  const [state, setState] = useState(() => {
+    // 在组件初始化时检查全局状态
+    const globalState = initializeSupabase()
+    return globalState
+  })
 
   // 在客户端渲染完成前显示loading
-  if (typeof window === 'undefined' || !isInitialized || !supabase) {
+  if (typeof window === 'undefined' || !state.isInitialized || !state.supabase) {
     return (
       <div className="cosmic-bg min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -70,7 +97,7 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <SupabaseContext.Provider value={{ supabase, isInitialized }}>
+    <SupabaseContext.Provider value={{ supabase: state.supabase, isInitialized: state.isInitialized }}>
       {children}
     </SupabaseContext.Provider>
   )
