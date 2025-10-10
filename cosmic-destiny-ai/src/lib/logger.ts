@@ -112,6 +112,27 @@ class PersistentLogger {
     console.log(msg, data)
     this.addLog('log', msg, data)
   }
+
+  // 导航专用日志
+  navigation(message: string, data?: any) {
+    const msg = `🧭 Navigation: ${message}`
+    console.log(msg, data)
+    this.addLog('log', msg, data)
+  }
+
+  // 页面性能日志
+  performance(message: string, data?: any) {
+    const msg = `⚡ Performance: ${message}`
+    console.log(msg, data)
+    this.addLog('log', msg, data)
+  }
+
+  // 状态管理日志
+  state(message: string, data?: any) {
+    const msg = `🔄 State: ${message}`
+    console.log(msg, data)
+    this.addLog('log', msg, data)
+  }
 }
 
 // 创建单例实例

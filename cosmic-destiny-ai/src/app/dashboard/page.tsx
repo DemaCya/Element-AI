@@ -121,14 +121,16 @@ function DashboardContent() {
 
   useEffect(() => {
     console.log('🔍 Dashboard useEffect triggered:', { authLoading, userId: user?.id, hasUser: !!user })
-    
+
+    // 更快的重定向逻辑，不等待authLoading完成
     if (!authLoading && !user) {
       console.log('🔀 Dashboard: No user, redirecting to auth')
       router.push('/auth')
       return
     }
 
-    if (user && !authLoading) {
+    // 只要用户存在就开始获取报告，不等待authLoading
+    if (user) {
       console.log('👤 Dashboard: User found, fetching reports')
       fetchReports()
     }
@@ -170,10 +172,16 @@ function DashboardContent() {
     }
   }, [])
 
-  if (authLoading || loading) {
+  // 更智能的loading逻辑 - 如果有用户数据但还在加载，显示简化的loading
+  if (authLoading || (loading && user)) {
     return (
       <div className="cosmic-bg min-h-screen flex items-center justify-center">
-        <div className="text-white text-xl">Loading...</div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mx-auto mb-2"></div>
+          <p className="text-white text-sm">
+            {authLoading ? 'Verifying session...' : 'Loading reports...'}
+          </p>
+        </div>
       </div>
     )
   }

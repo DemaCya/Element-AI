@@ -4,6 +4,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 import { useSupabase } from './SupabaseContext'
 import { User } from '@supabase/supabase-js'
 import { Database } from '@/lib/database.types'
+import { logger } from '@/lib/logger'
 
 type Profile = Database['public']['Tables']['profiles']['Row']
 
@@ -16,6 +17,29 @@ interface UserContextType {
 
 const UserContext = createContext<UserContextType | undefined>(undefined)
 
+// 全局用户状态管理，避免页面导航时重复检查
+const getGlobalUserState = () => {
+  if (typeof window === 'undefined') {
+    return {
+      cachedUser: null,
+      cachedProfile: null,
+      lastCheck: 0,
+      sessionId: null
+    }
+  }
+
+  if (!(window as any).__cosmicUserState) {
+    (window as any).__cosmicUserState = {
+      cachedUser: null,
+      cachedProfile: null,
+      lastCheck: 0,
+      sessionId: Date.now().toString(36)
+    }
+  }
+
+  return (window as any).__cosmicUserState
+}
+
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
@@ -23,49 +47,107 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const supabase = useSupabase()
 
   useEffect(() => {
+    let isMounted = true
+    const globalUserState = getGlobalUserState()
+
     const getUser = async () => {
-      console.log('🔍 UserContext: Starting getUser')
+      const currentTime = Date.now()
+      const timeSinceLastCheck = currentTime - globalUserState.lastCheck
+
+      logger.supabase(`🔍 UserContext: getUser, timeSinceLastCheck: ${timeSinceLastCheck}ms`)
+
       try {
-        console.log('🔍 UserContext: Calling supabase.auth.getUser()')
+        // 如果最近检查过且有缓存用户，直接使用缓存（减少网络请求）
+        if (timeSinceLastCheck < 5000 && globalUserState.cachedUser) {
+          logger.supabase('📦 UserContext: Using cached user data')
+          setUser(globalUserState.cachedUser)
+          setProfile(globalUserState.cachedProfile)
+          setLoading(false)
+          return
+        }
+
+        logger.supabase('🔍 UserContext: Calling supabase.auth.getUser()')
         const { data: { user }, error } = await supabase.auth.getUser()
-        console.log('🔍 UserContext: getUser result:', { user: user?.id, error })
-        setUser(user)
 
-        if (user) {
-          console.log('🔍 UserContext: Fetching profile for user:', user.id)
-          // 获取用户profile信息
-          const { data: profileData, error: profileError } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', user.id)
-            .single()
+        if (!isMounted) return
 
-          if (profileError) {
-            console.error('Error fetching profile:', profileError)
+        logger.supabase('🔍 UserContext: getUser result:', { user: user?.id, error })
+
+        if (error) {
+          logger.error('UserContext: getUser error:', error)
+          setUser(null)
+          setProfile(null)
+          globalUserState.cachedUser = null
+          globalUserState.cachedProfile = null
+        } else {
+          setUser(user)
+          globalUserState.cachedUser = user
+
+          if (user) {
+            logger.supabase('🔍 UserContext: Fetching profile for user:', user.id)
+            // 获取用户profile信息
+            const { data: profileData, error: profileError } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', user.id)
+              .single()
+
+            if (!isMounted) return
+
+            if (profileError) {
+              logger.error('UserContext: Profile fetch error:', profileError)
+              setProfile(null)
+              globalUserState.cachedProfile = null
+            } else {
+              logger.supabase('🔍 UserContext: Profile fetched:', profileData?.id)
+              setProfile(profileData)
+              globalUserState.cachedProfile = profileData
+            }
           } else {
-            console.log('🔍 UserContext: Profile fetched:', profileData)
-            setProfile(profileData)
+            setProfile(null)
+            globalUserState.cachedProfile = null
           }
         }
+
+        globalUserState.lastCheck = currentTime
+
       } catch (error) {
-        console.error('Error getting user:', error)
+        if (!isMounted) return
+        logger.error('UserContext: getUser exception:', error)
+        setUser(null)
+        setProfile(null)
+        globalUserState.cachedUser = null
+        globalUserState.cachedProfile = null
       } finally {
-        console.log('🔍 UserContext: Setting loading to false')
-        setLoading(false)
+        if (isMounted) {
+          logger.supabase('🔍 UserContext: Setting loading to false')
+          setLoading(false)
+        }
       }
     }
+
+    // 设置初始加载超时，避免长时间loading
+    const loadingTimeout = setTimeout(() => {
+      if (isMounted && loading) {
+        logger.supabase('⏰ UserContext: Loading timeout, setting loading to false')
+        setLoading(false)
+      }
+    }, 3000)
 
     getUser()
 
     // 监听认证状态变化
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event: any, session: any) => {
-        console.log('🔍 UserContext: Auth state change:', event, session?.user?.id)
-        
+        if (!isMounted) return
+
+        logger.supabase('🔍 UserContext: Auth state change:', event, session?.user?.id)
+
         if (event === 'SIGNED_IN' && session?.user) {
-          console.log('🔍 UserContext: User signed in:', session.user.id)
+          logger.supabase('🔍 UserContext: User signed in:', session.user.id)
           setUser(session.user)
-          
+          globalUserState.cachedUser = session.user
+
           // 获取用户profile信息
           const { data: profileData, error: profileError } = await supabase
             .from('profiles')
@@ -73,39 +155,62 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
             .eq('id', session.user.id)
             .single()
 
-          if (profileError) {
-            console.error('Error fetching profile:', profileError)
-          } else {
-            console.log('🔍 UserContext: Profile fetched on sign in:', profileData)
-            setProfile(profileData)
+          if (isMounted) {
+            if (profileError) {
+              logger.error('UserContext: Profile fetch error on sign in:', profileError)
+              setProfile(null)
+              globalUserState.cachedProfile = null
+            } else {
+              logger.supabase('🔍 UserContext: Profile fetched on sign in:', profileData?.id)
+              setProfile(profileData)
+              globalUserState.cachedProfile = profileData
+            }
           }
         } else if (event === 'SIGNED_OUT') {
-          console.log('🔍 UserContext: User signed out')
+          logger.supabase('🔍 UserContext: User signed out')
           setUser(null)
           setProfile(null)
+          globalUserState.cachedUser = null
+          globalUserState.cachedProfile = null
         }
-        
+
         // 只在特定事件时设置loading为false
         if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
-          console.log('🔍 UserContext: Setting loading to false due to auth event:', event)
-          setLoading(false)
+          logger.supabase('🔍 UserContext: Setting loading to false due to auth event:', event)
+          if (isMounted) {
+            setLoading(false)
+          }
         }
       }
     )
 
-    return () => subscription.unsubscribe()
-  }, [supabase])
+    return () => {
+      isMounted = false
+      clearTimeout(loadingTimeout)
+      subscription.unsubscribe()
+    }
+  }, [supabase, loading])
 
   const signOut = async () => {
     try {
+      const globalUserState = getGlobalUserState()
+
       const { error } = await supabase.auth.signOut()
       if (error) {
-        console.error('Error signing out:', error)
+        logger.error('UserContext: Sign out error:', error)
       }
+
+      // 清除全局缓存
+      globalUserState.cachedUser = null
+      globalUserState.cachedProfile = null
+      globalUserState.lastCheck = 0
+
       setUser(null)
       setProfile(null)
+
+      logger.supabase('👋 UserContext: User signed out successfully')
     } catch (error) {
-      console.error('Error signing out:', error)
+      logger.error('UserContext: Sign out exception:', error)
     }
   }
 
