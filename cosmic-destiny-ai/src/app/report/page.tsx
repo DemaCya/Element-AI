@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState, useEffect, Suspense } from 'react'
+import React, { useState, useEffect, Suspense, useCallback } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useUser } from '@/contexts/UserContext'
 import { createClient } from '@/lib/supabase/client'
@@ -35,22 +35,14 @@ function ReportContent() {
   const [loading, setLoading] = useState(true)
   const supabase = createClient()
 
-  useEffect(() => {
-    if (!authLoading && !user) {
-      router.push('/auth')
-      return
-    }
-
-    if (user) {
-      fetchReport()
-    }
-  }, [user, authLoading, router])
-
-  const fetchReport = async () => {
+  const fetchReport = useCallback(async () => {
     const reportId = searchParams.get('id')
+    
+    console.log('🔍 fetchReport called with:', { reportId, user: user?.id })
     
     if (!reportId || !user) {
       console.log('No report ID or user, redirecting to dashboard')
+      setLoading(false)
       router.push('/dashboard')
       return
     }
@@ -66,6 +58,7 @@ function ReportContent() {
 
       if (error) {
         console.error('Error fetching report:', error)
+        setLoading(false)
         router.push('/dashboard')
         return
       }
@@ -74,11 +67,23 @@ function ReportContent() {
       setReport(data)
     } catch (error) {
       console.error('Error fetching report:', error)
+      setLoading(false)
       router.push('/dashboard')
     } finally {
       setLoading(false)
     }
-  }
+  }, [searchParams, user, supabase, router])
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push('/auth')
+      return
+    }
+
+    if (user) {
+      fetchReport()
+    }
+  }, [user, authLoading, router, fetchReport])
 
   const handleUpgrade = async () => {
     try {
