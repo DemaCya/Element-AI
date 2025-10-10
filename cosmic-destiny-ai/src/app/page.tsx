@@ -49,23 +49,18 @@ export default function Home() {
   const handleBirthFormSubmit = async (data: BirthData & { reportName?: string }) => {
     setShowForm(false)
     
-    // 模拟报告生成（静态模式）
-    try {
-      console.log("调用了handleBirthFormSubmit")
-      console.log("data.isTimeKnownInput:",data.isTimeKnownInput)
-      
-      // 生成模拟报告ID
-      const mockReportId = `demo-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-      
-      // 模拟延迟
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // 重定向到报告页面
-      window.location.href = `/report`
-    } catch (error) {
-      console.error('Error generating report:', error)
-      alert('生成报告失败，请稍后重试')
-    }
+    // 重定向到dashboard，让dashboard处理报告生成
+    // 将数据通过URL参数传递
+    const params = new URLSearchParams({
+      birthDate: data.birthDate,
+      birthTime: data.birthTime || '',
+      timeZone: data.timeZone,
+      gender: data.gender,
+      isTimeKnownInput: data.isTimeKnownInput.toString(),
+      reportName: data.reportName || ''
+    })
+    
+    window.location.href = `/dashboard?${params.toString()}`
   }
 
   const scrollToContent = () => {

@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/contexts/UserContext'
 import { Button } from '@/components/ui/button'
@@ -24,6 +24,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
   const supabase = createClient()
 
   useEffect(() => {
@@ -38,6 +39,36 @@ export default function Dashboard() {
       window.removeEventListener('openBirthForm', handleOpenBirthForm)
     }
   }, [])
+
+  // 处理从首页传来的URL参数，自动创建报告
+  useEffect(() => {
+    const birthDate = searchParams.get('birthDate')
+    const birthTime = searchParams.get('birthTime')
+    const timeZone = searchParams.get('timeZone')
+    const gender = searchParams.get('gender')
+    const isTimeKnownInput = searchParams.get('isTimeKnownInput')
+    const reportName = searchParams.get('reportName')
+
+    if (birthDate && timeZone && gender && user) {
+      console.log("🚀 检测到URL参数，自动创建报告")
+      console.log("参数:", { birthDate, birthTime, timeZone, gender, isTimeKnownInput, reportName })
+      
+      const birthData = {
+        birthDate,
+        birthTime: birthTime || '',
+        timeZone,
+        gender: gender as 'male' | 'female',
+        isTimeKnownInput: isTimeKnownInput === 'true',
+        reportName: reportName || ''
+      }
+      
+      // 自动创建报告
+      handleBirthFormSubmit(birthData)
+      
+      // 清除URL参数
+      router.replace('/dashboard')
+    }
+  }, [searchParams, user, router])
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -224,6 +255,19 @@ export default function Dashboard() {
       
       // 重定向到报告页面
       logToStorage('准备重定向到报告页面', `/report?id=${reportData.id}`)
+      logToStorage('报告数据验证', {
+        hasId: !!reportData.id,
+        id: reportData.id,
+        reportData: reportData
+      })
+      
+      if (!reportData.id) {
+        logToStorage('=== 错误：报告ID不存在 ===')
+        alert('报告创建失败：缺少报告ID')
+        return
+      }
+      
+      logToStorage('开始重定向...')
       router.push(`/report?id=${reportData.id}`)
       logToStorage('重定向完成')
     } catch (error) {
