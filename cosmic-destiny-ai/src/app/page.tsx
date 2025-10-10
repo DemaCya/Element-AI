@@ -1,6 +1,7 @@
 'use client'
 
 import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import StarSystem from '@/components/StarSystem'
 import Navigation from '@/components/Navigation'
 import BirthForm from '@/components/BirthForm'
@@ -15,6 +16,7 @@ export default function Home() {
   const [showForm, setShowForm] = useState(false)
   const [showAuthModal, setShowAuthModal] = useState(false)
   const { user, profile } = useUser()
+  const router = useRouter()
 
   const faqItems = [
     {
@@ -60,7 +62,7 @@ export default function Home() {
       reportName: data.reportName || ''
     })
     
-    window.location.href = `/generate?${params.toString()}`
+    router.push(`/generate?${params.toString()}`)
   }
 
   const scrollToContent = () => {

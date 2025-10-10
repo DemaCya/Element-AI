@@ -1,7 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { createBrowserClient } from '@supabase/ssr'
+import { createClient } from '@/lib/supabase/client'
 import { SupabaseClient } from '@supabase/supabase-js'
 import { Database } from '@/lib/database.types'
 
@@ -12,31 +12,7 @@ interface SupabaseContextType {
 
 const SupabaseContext = createContext<SupabaseContextType | undefined>(undefined)
 
-// 全局单例客户端
-let globalSupabaseClient: SupabaseClient<Database> | null = null
-
-function createSupabaseClient(): SupabaseClient<Database> {
-  if (globalSupabaseClient) {
-    console.log('🔧 Supabase: Returning existing global client')
-    return globalSupabaseClient
-  }
-
-  console.log('🔧 Supabase: Creating new global client')
-  
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    console.error('❌ Missing Supabase environment variables')
-    throw new Error('Missing Supabase configuration')
-  }
-
-  const client = createBrowserClient<Database>(supabaseUrl, supabaseAnonKey)
-  globalSupabaseClient = client
-  
-  console.log('✅ Supabase: Global client created and cached')
-  return client
-}
+// 使用统一的客户端创建函数
 
 // 全局状态，确保只初始化一次
 let globalSupabaseState: {
@@ -60,7 +36,7 @@ function initializeSupabase() {
   }
 
   try {
-    const client = createSupabaseClient()
+    const client = createClient()
     globalSupabaseState = {
       supabase: client,
       isInitialized: true
@@ -112,4 +88,4 @@ export function useSupabase() {
 }
 
 // 导出创建客户端的函数，供非React环境使用（如API路由）
-export { createSupabaseClient }
+export { createClient }
