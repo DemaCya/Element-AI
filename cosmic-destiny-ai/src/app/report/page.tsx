@@ -5,6 +5,9 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useUser } from '@/contexts/UserContext'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
+
+// 强制动态渲染
+export const dynamic = 'force-dynamic'
 import {
   ArrowLeft,
   Star,
