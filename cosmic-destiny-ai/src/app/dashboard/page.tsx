@@ -1,10 +1,13 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { useUser } from '@/contexts/UserContext'
 import { Button } from '@/components/ui/button'
+
+// 强制动态渲染
+export const dynamic = 'force-dynamic'
 import Navigation from '@/components/Navigation'
 import BirthForm from '@/components/BirthForm'
 import { Calendar, FileText, CreditCard, User, LogOut, Sparkles } from 'lucide-react'
@@ -18,7 +21,8 @@ interface UserReport {
   created_at: string
 }
 
-export default function Dashboard() {
+// 使用useSearchParams的组件
+function DashboardContent() {
   const { user, profile, signOut, loading: authLoading } = useUser()
   const [reports, setReports] = useState<UserReport[]>([])
   const [loading, setLoading] = useState(true)
@@ -467,5 +471,21 @@ export default function Dashboard() {
         />
       )}
     </div>
+  )
+}
+
+// 主页面组件，用Suspense包装
+export default function Dashboard() {
+  return (
+    <Suspense fallback={
+      <div className="cosmic-bg min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
+          <p className="text-white">Loading your dashboard...</p>
+        </div>
+      </div>
+    }>
+      <DashboardContent />
+    </Suspense>
   )
 }
