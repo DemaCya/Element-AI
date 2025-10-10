@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 export const dynamic = 'force-dynamic'
 import Navigation from '@/components/Navigation'
 import BirthForm from '@/components/BirthForm'
+import DebugInfo from '@/components/DebugInfo'
 import { Calendar, FileText, CreditCard, User, LogOut, Sparkles } from 'lucide-react'
 
 interface UserReport {
@@ -183,6 +184,7 @@ function DashboardContent() {
 
   return (
     <div className="cosmic-bg min-h-screen">
+      <DebugInfo />
       <Navigation user={user} profile={profile} />
 
       <div className="container mx-auto px-4 py-8">

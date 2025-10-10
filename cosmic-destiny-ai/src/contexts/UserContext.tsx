@@ -20,15 +20,19 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
-  const supabase = createClient()
+  const [supabase] = useState(() => createClient())
 
   useEffect(() => {
     const getUser = async () => {
+      console.log('🔍 UserContext: Starting getUser')
       try {
-        const { data: { user } } = await supabase.auth.getUser()
+        console.log('🔍 UserContext: Calling supabase.auth.getUser()')
+        const { data: { user }, error } = await supabase.auth.getUser()
+        console.log('🔍 UserContext: getUser result:', { user: user?.id, error })
         setUser(user)
 
         if (user) {
+          console.log('🔍 UserContext: Fetching profile for user:', user.id)
           // 获取用户profile信息
           const { data: profileData, error: profileError } = await supabase
             .from('profiles')
@@ -39,12 +43,14 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
           if (profileError) {
             console.error('Error fetching profile:', profileError)
           } else {
+            console.log('🔍 UserContext: Profile fetched:', profileData)
             setProfile(profileData)
           }
         }
       } catch (error) {
         console.error('Error getting user:', error)
       } finally {
+        console.log('🔍 UserContext: Setting loading to false')
         setLoading(false)
       }
     }
@@ -54,9 +60,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     // 监听认证状态变化
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event: any, session: any) => {
-        console.log('Auth state change:', event, session?.user?.id)
+        console.log('🔍 UserContext: Auth state change:', event, session?.user?.id)
         
         if (event === 'SIGNED_IN' && session?.user) {
+          console.log('🔍 UserContext: User signed in:', session.user.id)
           setUser(session.user)
           
           // 获取用户profile信息
@@ -69,15 +76,18 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
           if (profileError) {
             console.error('Error fetching profile:', profileError)
           } else {
+            console.log('🔍 UserContext: Profile fetched on sign in:', profileData)
             setProfile(profileData)
           }
         } else if (event === 'SIGNED_OUT') {
+          console.log('🔍 UserContext: User signed out')
           setUser(null)
           setProfile(null)
         }
         
         // 只在特定事件时设置loading为false
         if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED') {
+          console.log('🔍 UserContext: Setting loading to false due to auth event:', event)
           setLoading(false)
         }
       }
