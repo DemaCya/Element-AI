@@ -38,33 +38,33 @@ function GenerateReportContent() {
   const [reportId, setReportId] = useState<string | null>(null)
   const supabase = createClient()
 
-  // 生成步骤配置
+  // Generation steps configuration
   const generationSteps: GenerationStep[] = [
     {
       id: 'validate',
-      title: '验证用户信息',
-      description: '检查用户登录状态和输入数据',
+      title: 'Validating User Information',
+      description: 'Checking user login status and input data',
       status: 'pending',
       icon: <User className="w-5 h-5" />
     },
     {
       id: 'calculate',
-      title: '计算八字命理',
-      description: '基于出生信息计算天干地支',
+      title: 'Calculating Bazi Destiny',
+      description: 'Computing heavenly stems and earthly branches based on birth information',
       status: 'pending',
       icon: <Sparkles className="w-5 h-5" />
     },
     {
       id: 'generate',
-      title: '生成报告内容',
-      description: '使用AI生成个性化命理报告',
+      title: 'Generating Report Content',
+      description: 'Using AI to generate personalized destiny report',
       status: 'pending',
       icon: <Calendar className="w-5 h-5" />
     },
     {
       id: 'save',
-      title: '保存报告数据',
-      description: '将报告存储到数据库',
+      title: 'Saving Report Data',
+      description: 'Storing the report in the database',
       status: 'pending',
       icon: <CheckCircle className="w-5 h-5" />
     }
@@ -77,17 +77,17 @@ function GenerateReportContent() {
     }
 
     if (user) {
-      // 检查是否有必要的参数
+      // Check for required parameters
       const birthDate = searchParams.get('birthDate')
       const timeZone = searchParams.get('timeZone')
       const gender = searchParams.get('gender')
 
       if (!birthDate || !timeZone || !gender) {
-        setError('缺少必要的出生信息，请重新填写表单')
+        setError('Missing required birth information, please fill out the form again')
         return
       }
 
-      // 开始生成报告
+      // Start generating report
       generateReport()
     }
   }, [user, authLoading, router, searchParams])
@@ -97,12 +97,12 @@ function GenerateReportContent() {
     setError(null)
 
     try {
-      // 步骤1: 验证用户信息
+      // Step 1: Validate user information
       await updateStepStatus(0, 'processing')
-      await new Promise(resolve => setTimeout(resolve, 500)) // 模拟处理时间
+      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate processing time
       
       if (!user) {
-        throw new Error('用户未登录')
+        throw new Error('User not logged in')
       }
 
       const birthData: BirthData = {
@@ -116,11 +116,11 @@ function GenerateReportContent() {
 
       await updateStepStatus(0, 'completed')
 
-      // 步骤2: 计算八字命理
+      // Step 2: Calculate Bazi destiny
       await updateStepStatus(1, 'processing')
-      await new Promise(resolve => setTimeout(resolve, 1000)) // 模拟计算时间
+      await new Promise(resolve => setTimeout(resolve, 1000)) // Simulate calculation time
       
-      // 这里应该调用真实的八字计算服务
+      // Here should call real Bazi calculation service
       const baziData = {
         heavenlyStems: ['甲', '乙', '丙', '丁'],
         earthlyBranches: ['子', '丑', '寅', '卯'],
@@ -130,18 +130,18 @@ function GenerateReportContent() {
 
       await updateStepStatus(1, 'completed')
 
-      // 步骤3: 生成报告内容
+      // Step 3: Generate report content
       await updateStepStatus(2, 'processing')
-      await new Promise(resolve => setTimeout(resolve, 2000)) // 模拟AI生成时间
+      await new Promise(resolve => setTimeout(resolve, 2000)) // Simulate AI generation time
       
       const mockPreviewReport = generatePreviewReport(birthData, baziData)
       const mockFullReport = generateFullReport(birthData, baziData)
 
       await updateStepStatus(2, 'completed')
 
-      // 步骤4: 保存报告数据
+      // Step 4: Save report data
       await updateStepStatus(3, 'processing')
-      await new Promise(resolve => setTimeout(resolve, 500)) // 模拟保存时间
+      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate save time
       
       const reportInsertData = {
         user_id: user.id,
@@ -164,27 +164,27 @@ function GenerateReportContent() {
         .single()
 
       if (reportError) {
-        throw new Error(`保存报告失败: ${reportError.message}`)
+        throw new Error(`Failed to save report: ${reportError.message}`)
       }
 
       setReportId(reportData.id)
       await updateStepStatus(3, 'completed')
 
-      // 延迟一下再重定向，让用户看到完成状态
+      // Delay before redirect to let user see completion status
       setTimeout(() => {
         router.push(`/report?id=${reportData.id}`)
       }, 1000)
 
     } catch (error) {
-      console.error('生成报告失败:', error)
-      setError(error instanceof Error ? error.message : '生成报告时发生未知错误')
+      console.error('Failed to generate report:', error)
+      setError(error instanceof Error ? error.message : 'Unknown error occurred while generating report')
       setIsGenerating(false)
     }
   }
 
   const updateStepStatus = async (stepIndex: number, status: GenerationStep['status']) => {
     setCurrentStep(stepIndex)
-    // 这里可以添加更复杂的步骤状态管理
+    // Here can add more complex step status management
     await new Promise(resolve => setTimeout(resolve, 100))
   }
 
@@ -244,7 +244,7 @@ function GenerateReportContent() {
       <div className="cosmic-bg min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
-          <p className="text-white">验证用户身份...</p>
+          <p className="text-white">Verifying user identity...</p>
         </div>
       </div>
     )
@@ -263,12 +263,12 @@ function GenerateReportContent() {
             <div className="flex items-center justify-center gap-2 mb-4">
               <Sparkles className="w-8 h-8 text-purple-400" />
               <h1 className="text-4xl font-bold text-glow bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent">
-                生成您的命理报告
+                Generating Your Destiny Report
               </h1>
               <Sparkles className="w-8 h-8 text-purple-400" />
             </div>
             <p className="text-xl text-gray-300">
-              正在为您生成专属的宇宙命理分析报告
+              Creating your personalized cosmic destiny analysis report
             </p>
           </div>
 
@@ -278,7 +278,7 @@ function GenerateReportContent() {
               <div className="flex items-center gap-3">
                 <AlertCircle className="w-6 h-6 text-red-400" />
                 <div>
-                  <h3 className="text-red-200 font-semibold mb-2">生成报告时发生错误</h3>
+                  <h3 className="text-red-200 font-semibold mb-2">Error occurred while generating report</h3>
                   <p className="text-red-300">{error}</p>
                 </div>
               </div>
@@ -288,13 +288,13 @@ function GenerateReportContent() {
                   variant="outline"
                   className="border-red-400 text-red-400 hover:bg-red-400/10"
                 >
-                  返回首页
+                  Back to Home
                 </Button>
                 <Button
                   onClick={() => window.location.reload()}
                   className="bg-red-600 hover:bg-red-700"
                 >
-                  重试
+                  Retry
                 </Button>
               </div>
             </div>
@@ -351,8 +351,8 @@ function GenerateReportContent() {
               <div className="flex items-center gap-3">
                 <CheckCircle className="w-6 h-6 text-green-400" />
                 <div>
-                  <h3 className="text-green-200 font-semibold mb-2">报告生成成功！</h3>
-                  <p className="text-green-300">正在跳转到您的专属报告页面...</p>
+                  <h3 className="text-green-200 font-semibold mb-2">Report generated successfully!</h3>
+                  <p className="text-green-300">Redirecting to your personalized report page...</p>
                 </div>
               </div>
             </div>
@@ -370,7 +370,7 @@ export default function GenerateReport() {
       <div className="cosmic-bg min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
-          <p className="text-white">准备生成报告...</p>
+          <p className="text-white">Preparing to generate report...</p>
         </div>
       </div>
     }>
