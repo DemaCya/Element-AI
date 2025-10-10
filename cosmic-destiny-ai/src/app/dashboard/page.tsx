@@ -90,6 +90,12 @@ function DashboardContent() {
       return
     }
 
+    // 避免重复请求
+    if (loading) {
+      console.log('📊 Dashboard: Already loading, skipping duplicate request')
+      return
+    }
+
     try {
       console.log('📊 Dashboard: Fetching reports for user:', user.id)
       const { data, error } = await supabase
@@ -117,7 +123,7 @@ function DashboardContent() {
     } finally {
       setLoading(false)
     }
-  }, [user, supabase]) // 添加 supabase 到依赖项
+  }, [user, supabase, loading]) // 添加 loading 到依赖项
 
   useEffect(() => {
     console.log('🔍 Dashboard useEffect triggered:', { authLoading, userId: user?.id, hasUser: !!user })

@@ -18,8 +18,6 @@ interface GlobalSupabaseState {
   supabase: SupabaseClient<Database> | null
   isInitialized: boolean
   initCount: number
-  sessionId: string | null
-  lastNavigationTime: number
 }
 
 // 全局变量，使用window对象确保跨页面持久化
@@ -28,65 +26,42 @@ const getGlobalState = (): GlobalSupabaseState => {
     return {
       supabase: null,
       isInitialized: false,
-      initCount: 0,
-      sessionId: null,
-      lastNavigationTime: 0
+      initCount: 0
     }
   }
 
   // 使用window对象确保跨页面持久化
   if (!(window as any).__cosmicSupabaseState) {
-    // 生成唯一会话ID
-    const sessionId = Date.now().toString(36) + Math.random().toString(36).substr(2)
-
-    // 使用Object.assign避免Turbopack解析问题
     const newState: GlobalSupabaseState = {
       supabase: null,
       isInitialized: false,
-      initCount: 0,
-      sessionId: sessionId,
-      lastNavigationTime: Date.now()
+      initCount: 0
     }
     
     Object.assign((window as any), { __cosmicSupabaseState: newState })
-
-    logger.supabase(`🆔 Created new session: ${sessionId}`)
+    logger.supabase('🆔 Created new global state')
   }
 
   return (window as any).__cosmicSupabaseState
 }
 
-// 更新导航时间（仅在需要时调用）
-const updateNavigationTime = () => {
-  if (typeof window !== 'undefined' && (window as any).__cosmicSupabaseState) {
-    (window as any).__cosmicSupabaseState.lastNavigationTime = Date.now()
-  }
-}
 
 // 初始化Supabase客户端
 function initializeSupabase() {
   const state = getGlobalState()
   state.initCount++
 
-  const currentTime = Date.now()
-  const timeSinceNavigation = currentTime - state.lastNavigationTime
-  const isPageNavigation = timeSinceNavigation < 1000
-
-  logger.supabase(`🔄 Init call #${state.initCount}, session: ${state.sessionId}, isNavigation: ${isPageNavigation}`)
+  logger.supabase(`🔄 Init call #${state.initCount}`)
 
   // 如果已经初始化，直接返回现有状态
   if (state.isInitialized && state.supabase) {
-    if (isPageNavigation) {
-      logger.supabase('🚀 Page navigation detected, reusing existing client')
-    } else {
-      logger.supabase('♻️ Reusing existing Supabase client')
-    }
+    logger.supabase('♻️ Reusing existing Supabase client')
     return state
   }
 
-  // 检查全局状态是否被意外重置
-  if (state.initCount > 1 && !state.isInitialized) {
-    logger.supabase('⚠️ Global state was reset, this should not happen in normal navigation')
+  // 检查重复初始化
+  if (state.initCount > 1) {
+    logger.supabase(`⚠️ Multiple init calls detected: ${state.initCount}`)
   }
 
   if (typeof window === 'undefined') {
@@ -95,7 +70,7 @@ function initializeSupabase() {
   }
 
   try {
-    logger.supabase(`✨ Initializing Supabase client (call #${state.initCount}, session: ${state.sessionId})`)
+    logger.supabase(`✨ Initializing Supabase client (call #${state.initCount})`)
     const client = createClient()
     state.supabase = client
     state.isInitialized = true
@@ -136,8 +111,6 @@ export function SupabaseProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const handleNavigation = () => {
       logger.supabase('🧭 Navigation detected, preserving Supabase state')
-      // 只更新导航时间，不重新初始化客户端
-      updateNavigationTime()
       const state = getGlobalState()
       setState({ ...state })
     }

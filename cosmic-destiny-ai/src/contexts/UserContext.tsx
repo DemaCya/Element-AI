@@ -1,7 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useEffect, useState } from 'react'
-import { useSupabase } from './SupabaseContext'
+import { useSupabase } from '@/contexts/SupabaseContext'
 import { User } from '@supabase/supabase-js'
 import { Database } from '@/lib/database.types'
 import { logger } from '@/lib/logger'
@@ -58,11 +58,18 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
       try {
         // 如果最近检查过且有缓存用户，直接使用缓存（减少网络请求）
-        if (timeSinceLastCheck < 5000 && globalUserState.cachedUser) {
+        // 增加缓存时间到30秒，减少频繁调用
+        if (timeSinceLastCheck < 30000 && globalUserState.cachedUser) {
           logger.supabase('📦 UserContext: Using cached user data')
           setUser(globalUserState.cachedUser)
           setProfile(globalUserState.cachedProfile)
           setLoading(false)
+          return
+        }
+
+        // 如果正在加载中，避免重复请求
+        if (loading && timeSinceLastCheck < 1000) {
+          logger.supabase('⏳ UserContext: Already loading, skipping duplicate request')
           return
         }
 
