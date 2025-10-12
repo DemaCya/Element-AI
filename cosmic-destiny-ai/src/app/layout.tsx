@@ -3,7 +3,6 @@ import "./globals.css";
 import { SupabaseProvider } from "@/contexts/SupabaseContext";
 import { UserProvider } from "@/contexts/UserContext";
 import { structuredData, serviceStructuredData, faqStructuredData } from "./structured-data";
-import NavigationEnhancer from "@/components/NavigationEnhancer";
 
 export const metadata: Metadata = {
   title: 'Cosmic Destiny AI - AI-Powered Chinese Astrology & Fortune Telling',
@@ -86,13 +85,11 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen bg-slate-950 text-white antialiased">
-        <NavigationEnhancer>
-          <SupabaseProvider>
-            <UserProvider>
-              {children}
-            </UserProvider>
-          </SupabaseProvider>
-        </NavigationEnhancer>
+        <SupabaseProvider>
+          <UserProvider>
+            {children}
+          </UserProvider>
+        </SupabaseProvider>
       </body>
     </html>
   );

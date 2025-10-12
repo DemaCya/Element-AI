@@ -20,45 +20,42 @@ interface UserReport {
 
 function DashboardContent() {
   const { user, profile, signOut, loading: authLoading } = useUser()
+  const supabase = useSupabase()
+  const router = useRouter()
+  
   const [reports, setReports] = useState<UserReport[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
-  const router = useRouter()
-  const supabase = useSupabase()
-
-  const fetchReports = useCallback(async () => {
-    if (!user) return
-
-    try {
-      const { data, error } = await supabase
-        .from('user_reports')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-
-      if (error) {
-        console.error('Error fetching reports:', error)
-        return
-      }
-
-      setReports(data || [])
-    } catch (error) {
-      console.error('Exception while fetching reports:', error)
-    } finally {
-      setLoading(false)
-    }
-  }, [user, supabase])
 
   useEffect(() => {
-    if (!authLoading && !user) {
+    // 如果还在加载，等待
+    if (authLoading) return
+    
+    // 如果没有用户，跳转到登录页
+    if (!user) {
       router.push('/auth')
       return
     }
 
-    if (user) {
-      fetchReports()
+    // 获取用户的报告
+    async function fetchReports() {
+      try {
+        const { data } = await supabase
+          .from('user_reports')
+          .select('*')
+          .eq('user_id', user!.id)
+          .order('created_at', { ascending: false })
+
+        setReports(data || [])
+      } catch (error) {
+        console.error('Failed to fetch reports:', error)
+      } finally {
+        setLoading(false)
+      }
     }
-  }, [user, authLoading, fetchReports, router])
+
+    fetchReports()
+  }, [user, authLoading, supabase, router])
 
   const handleBirthFormSubmit = async (birthData: any) => {
     const params = new URLSearchParams({
