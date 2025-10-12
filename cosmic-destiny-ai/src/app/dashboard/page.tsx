@@ -24,11 +24,11 @@ function DashboardContent() {
   const router = useRouter()
   
   const [reports, setReports] = useState<UserReport[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loadingReports, setLoadingReports] = useState(false)
   const [showForm, setShowForm] = useState(false)
 
   useEffect(() => {
-    // 如果还在加载，等待
+    // 如果还在加载用户，等待
     if (authLoading) return
     
     // 如果没有用户，跳转到登录页
@@ -37,24 +37,52 @@ function DashboardContent() {
       return
     }
 
-    // 获取用户的报告
+    // 有用户了，开始加载报告
+    let mounted = true
+    setLoadingReports(true)
+    
+    // 超时保护：3秒后强制结束loading
+    const timeout = setTimeout(() => {
+      if (mounted) {
+        console.warn('⚠️ Reports loading timeout')
+        setLoadingReports(false)
+      }
+    }, 3000)
+
     async function fetchReports() {
       try {
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from('user_reports')
           .select('*')
           .eq('user_id', user!.id)
           .order('created_at', { ascending: false })
 
-        setReports(data || [])
+        if (!mounted) return
+        
+        if (error) {
+          console.error('❌ Failed to fetch reports:', error)
+          setReports([])
+        } else {
+          setReports(data || [])
+        }
       } catch (error) {
-        console.error('Failed to fetch reports:', error)
+        if (!mounted) return
+        console.error('❌ Exception fetching reports:', error)
+        setReports([])
       } finally {
-        setLoading(false)
+        if (mounted) {
+          clearTimeout(timeout)
+          setLoadingReports(false)
+        }
       }
     }
 
     fetchReports()
+    
+    return () => {
+      mounted = false
+      clearTimeout(timeout)
+    }
   }, [user, authLoading, supabase, router])
 
   const handleBirthFormSubmit = async (birthData: any) => {
@@ -74,19 +102,19 @@ function DashboardContent() {
     router.push(`/report?id=${reportId}`)
   }
 
-  if (authLoading || (loading && user)) {
+  // 简化的加载逻辑：只看 authLoading
+  if (authLoading) {
     return (
       <div className="cosmic-bg min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mx-auto mb-2"></div>
-          <p className="text-white text-sm">
-            {authLoading ? 'Verifying session...' : 'Loading reports...'}
-          </p>
+          <p className="text-white text-sm">Verifying session...</p>
         </div>
       </div>
     )
   }
 
+  // authLoading 完成后，如果没有用户，会被重定向
   if (!user) {
     return null
   }
@@ -141,7 +169,12 @@ function DashboardContent() {
                 My Reports
               </h3>
 
-              {reports.length === 0 ? (
+              {loadingReports ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mx-auto mb-2"></div>
+                  <p className="text-gray-400 text-sm">Loading reports...</p>
+                </div>
+              ) : reports.length === 0 ? (
                 <div className="text-center py-8">
                   <Calendar className="w-16 h-16 text-purple-400 mx-auto mb-4 opacity-50" />
                   <p className="text-gray-400 mb-4">No reports yet</p>

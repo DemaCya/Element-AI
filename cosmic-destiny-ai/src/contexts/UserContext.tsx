@@ -23,26 +23,60 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const supabase = useSupabase()
 
   useEffect(() => {
+    let mounted = true
+    
+    // 超时保护：2秒后强制结束loading
+    const timeout = setTimeout(() => {
+      if (mounted) {
+        console.warn('⚠️ User loading timeout, forcing loading=false')
+        setLoading(false)
+      }
+    }, 2000)
+
     // 获取当前用户
     async function loadUser() {
       try {
-        const { data: { user } } = await supabase.auth.getUser()
+        const { data: { user }, error } = await supabase.auth.getUser()
+        
+        if (!mounted) return
+        
+        if (error) {
+          console.error('❌ Failed to get user:', error)
+          setUser(null)
+          setProfile(null)
+          return
+        }
+        
         setUser(user)
         
         // 如果有用户，获取profile
         if (user) {
-          const { data: profileData } = await supabase
+          const { data: profileData, error: profileError } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', user.id)
             .single()
           
+          if (!mounted) return
+          
+          if (profileError) {
+            console.error('❌ Failed to get profile:', profileError)
+          }
+          
           setProfile(profileData || null)
+        } else {
+          setProfile(null)
         }
       } catch (error) {
-        console.error('Failed to load user:', error)
+        if (!mounted) return
+        console.error('❌ Exception loading user:', error)
+        setUser(null)
+        setProfile(null)
       } finally {
-        setLoading(false)
+        if (mounted) {
+          clearTimeout(timeout)
+          setLoading(false)
+        }
       }
     }
 
@@ -51,6 +85,8 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     // 监听认证状态变化
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        if (!mounted) return
+        
         if (event === 'SIGNED_IN' && session?.user) {
           setUser(session.user)
           const { data: profileData } = await supabase
@@ -66,7 +102,11 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       }
     )
 
-    return () => subscription.unsubscribe()
+    return () => {
+      mounted = false
+      clearTimeout(timeout)
+      subscription.unsubscribe()
+    }
   }, [supabase])
 
   const signOut = async () => {
