@@ -54,32 +54,58 @@ function ReportContent() {
     }
 
     try {
-      console.log('🔍 Report: Fetching report with ID:', reportId)
-      setLoading(true) // 确保显示loading状态
+      console.log('🔍 Report: Starting to fetch report with ID:', reportId, 'for user:', user.id)
+      setLoading(true)
       
-      const { data, error } = await supabase
+      // 添加超时保护
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('Query timeout')), 10000)
+      )
+      
+      const queryPromise = supabase
         .from('user_reports')
         .select('*')
         .eq('id', reportId)
         .eq('user_id', user.id)
         .single()
+      
+      console.log('📡 Report: Query sent, waiting for response...')
+      
+      const { data, error } = await Promise.race([
+        queryPromise,
+        timeoutPromise
+      ]) as any
+
+      console.log('📬 Report: Response received', { hasData: !!data, hasError: !!error })
 
       if (error) {
         console.error('❌ Report: Error fetching report:', error)
+        console.error('❌ Report: Error details:', JSON.stringify(error))
+        alert('无法加载报告，将返回控制台。错误：' + error.message)
         setLoading(false)
         router.push('/dashboard')
         return
       }
 
-      console.log('✅ Report: Report fetched successfully')
+      if (!data) {
+        console.error('❌ Report: No data returned')
+        alert('报告不存在或您无权访问')
+        setLoading(false)
+        router.push('/dashboard')
+        return
+      }
+
+      console.log('✅ Report: Report fetched successfully', data)
       setReport(data)
       setLoading(false)
     } catch (error) {
       console.error('❌ Report: Exception while fetching report:', error)
+      console.error('❌ Report: Exception details:', JSON.stringify(error, Object.getOwnPropertyNames(error)))
+      alert('加载报告时出错，将返回控制台。错误：' + (error instanceof Error ? error.message : String(error)))
       setLoading(false)
       router.push('/dashboard')
     }
-  }, [searchParams, user, supabase, router]) // 添加 supabase 到依赖项
+  }, [searchParams, user, supabase, router])
 
   useEffect(() => {
     console.log('🔍 Report useEffect triggered:', { authLoading, userId: user?.id, hasUser: !!user })
