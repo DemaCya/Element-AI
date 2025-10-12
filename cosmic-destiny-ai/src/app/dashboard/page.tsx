@@ -28,49 +28,72 @@ function DashboardContent() {
   const [showForm, setShowForm] = useState(false)
 
   useEffect(() => {
+    console.log('🔍 Dashboard useEffect triggered:', { authLoading, hasUser: !!user, userId: user?.id })
+    
     // 如果还在加载用户，等待
-    if (authLoading) return
+    if (authLoading) {
+      console.log('⏳ Dashboard: Auth still loading, waiting...')
+      return
+    }
     
     // 如果没有用户，跳转到登录页
     if (!user) {
+      console.log('🔀 Dashboard: No user, redirecting to auth')
       router.push('/auth')
       return
     }
 
+    console.log('👤 Dashboard: User found, starting to fetch reports for user:', user.id)
+    
     // 有用户了，开始加载报告
     let mounted = true
+    let timeoutReached = false
     setLoadingReports(true)
     
-    // 超时保护：3秒后强制结束loading
+    // 超时保护：10秒后强制结束loading（但不中断查询）
     const timeout = setTimeout(() => {
-      if (mounted) {
+      if (mounted && !timeoutReached) {
         console.warn('⚠️ Reports loading timeout')
+        timeoutReached = true
         setLoadingReports(false)
       }
-    }, 3000)
+    }, 10000)
 
     async function fetchReports() {
       try {
+        console.log('📡 Dashboard: Sending query to fetch reports...')
+        const startTime = Date.now()
+        
         const { data, error } = await supabase
           .from('user_reports')
           .select('*')
           .eq('user_id', user!.id)
           .order('created_at', { ascending: false })
 
-        if (!mounted) return
+        const elapsed = Date.now() - startTime
+        console.log(`📬 Dashboard: Query completed in ${elapsed}ms`)
+
+        if (!mounted) {
+          console.log('🚫 Dashboard: Component unmounted, ignoring results')
+          return
+        }
         
         if (error) {
-          console.error('❌ Failed to fetch reports:', error)
+          console.error('❌ Dashboard: Failed to fetch reports:', error)
+          console.error('❌ Dashboard: Error details:', JSON.stringify(error))
           setReports([])
         } else {
+          console.log(`✅ Dashboard: Fetched ${data?.length || 0} reports`)
           setReports(data || [])
         }
       } catch (error) {
         if (!mounted) return
-        console.error('❌ Exception fetching reports:', error)
+        console.error('❌ Dashboard: Exception fetching reports:', error)
+        console.error('❌ Dashboard: Exception details:', JSON.stringify(error, Object.getOwnPropertyNames(error)))
         setReports([])
       } finally {
-        if (mounted) {
+        if (mounted && !timeoutReached) {
+          console.log('✅ Dashboard: Fetch complete, clearing timeout')
           clearTimeout(timeout)
           setLoadingReports(false)
         }
@@ -80,6 +103,7 @@ function DashboardContent() {
     fetchReports()
     
     return () => {
+      console.log('🧹 Dashboard: Cleanup - unmounting')
       mounted = false
       clearTimeout(timeout)
     }

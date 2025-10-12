@@ -23,25 +23,38 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const supabase = useSupabase()
 
   useEffect(() => {
+    console.log('🔍 UserContext: Initializing...')
     let mounted = true
+    let timeoutReached = false
     
-    // 超时保护：2秒后强制结束loading
+    // 超时保护：10秒后强制结束loading
     const timeout = setTimeout(() => {
-      if (mounted) {
+      if (mounted && !timeoutReached) {
         console.warn('⚠️ User loading timeout, forcing loading=false')
+        timeoutReached = true
         setLoading(false)
       }
-    }, 2000)
+    }, 10000)
 
     // 获取当前用户
     async function loadUser() {
       try {
+        console.log('📡 UserContext: Fetching user...')
+        const startTime = Date.now()
+        
         const { data: { user }, error } = await supabase.auth.getUser()
         
-        if (!mounted) return
+        const elapsed = Date.now() - startTime
+        console.log(`📬 UserContext: User fetch completed in ${elapsed}ms`, { hasUser: !!user, hasError: !!error })
+        
+        if (!mounted) {
+          console.log('🚫 UserContext: Component unmounted, ignoring results')
+          return
+        }
         
         if (error) {
-          console.error('❌ Failed to get user:', error)
+          console.error('❌ UserContext: Failed to get user:', error)
+          console.error('❌ UserContext: Error details:', JSON.stringify(error))
           setUser(null)
           setProfile(null)
           return
@@ -51,29 +64,42 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         
         // 如果有用户，获取profile
         if (user) {
+          console.log('👤 UserContext: User found, fetching profile for:', user.id)
+          
+          const profileStartTime = Date.now()
           const { data: profileData, error: profileError } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', user.id)
             .single()
           
-          if (!mounted) return
+          const profileElapsed = Date.now() - profileStartTime
+          console.log(`📬 UserContext: Profile fetch completed in ${profileElapsed}ms`, { hasProfile: !!profileData, hasError: !!profileError })
+          
+          if (!mounted) {
+            console.log('🚫 UserContext: Component unmounted after profile fetch')
+            return
+          }
           
           if (profileError) {
-            console.error('❌ Failed to get profile:', profileError)
+            console.error('❌ UserContext: Failed to get profile:', profileError)
+            console.error('❌ UserContext: Profile error details:', JSON.stringify(profileError))
           }
           
           setProfile(profileData || null)
         } else {
+          console.log('👤 UserContext: No user logged in')
           setProfile(null)
         }
       } catch (error) {
         if (!mounted) return
-        console.error('❌ Exception loading user:', error)
+        console.error('❌ UserContext: Exception loading user:', error)
+        console.error('❌ UserContext: Exception details:', JSON.stringify(error, Object.getOwnPropertyNames(error)))
         setUser(null)
         setProfile(null)
       } finally {
-        if (mounted) {
+        if (mounted && !timeoutReached) {
+          console.log('✅ UserContext: Loading complete')
           clearTimeout(timeout)
           setLoading(false)
         }
