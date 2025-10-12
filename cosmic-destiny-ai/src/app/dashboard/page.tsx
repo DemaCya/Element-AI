@@ -1,17 +1,12 @@
 'use client'
 
 import React, { useEffect, useState, Suspense, useCallback } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useSupabase } from '@/contexts/SupabaseContext'
 import { useUser } from '@/contexts/UserContext'
 import { Button } from '@/components/ui/button'
-
-// 强制动态渲染
-// 强制动态渲染 - Vercel部署触发
-export const dynamic = 'force-dynamic'
 import Navigation from '@/components/Navigation'
 import BirthForm from '@/components/BirthForm'
-import DebugInfo from '@/components/DebugInfo'
 import { Calendar, FileText, CreditCard, User, LogOut, Sparkles } from 'lucide-react'
 
 interface UserReport {
@@ -23,81 +18,18 @@ interface UserReport {
   created_at: string
 }
 
-// 使用useSearchParams的组件
 function DashboardContent() {
   const { user, profile, signOut, loading: authLoading } = useUser()
   const [reports, setReports] = useState<UserReport[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const router = useRouter()
-  const searchParams = useSearchParams()
   const supabase = useSupabase()
 
-  useEffect(() => {
-    // Listen for open birth form event from navigation
-    const handleOpenBirthForm = () => {
-      setShowForm(true)
-    }
-
-    window.addEventListener('openBirthForm', handleOpenBirthForm)
-
-    return () => {
-      window.removeEventListener('openBirthForm', handleOpenBirthForm)
-    }
-  }, [])
-
-  // 测试Supabase连接
-  useEffect(() => {
-    const testConnection = async () => {
-      try {
-        console.log('🔍 测试Supabase连接...')
-        const { data, error } = await supabase.from('user_reports').select('count').limit(1)
-        if (error) {
-          console.error('❌ Supabase连接测试失败:', error)
-          console.error('错误详情:', {
-            message: error.message,
-            details: error.details,
-            hint: error.hint,
-            code: error.code
-          })
-          
-          // 如果是CORS错误，提供解决建议
-          if (error.message.includes('Load failed') || error.message.includes('CORS')) {
-            console.error('🚨 这可能是CORS问题！请检查Supabase Dashboard设置：')
-            console.error('1. 进入 Settings → API')
-            console.error('2. 在 Site URL 中添加你的Vercel域名')
-            console.error('3. 在 Additional Redirect URLs 中添加你的域名')
-          }
-        } else {
-          console.log('✅ Supabase连接测试成功:', data)
-        }
-      } catch (err) {
-        console.error('❌ Supabase连接异常:', err)
-      }
-    }
-    
-    if (user) {
-      testConnection()
-    }
-  }, [user, supabase])
-
-  // Dashboard只负责显示报告列表，不再处理报告生成
-
   const fetchReports = useCallback(async () => {
-    if (!user) {
-      console.log('📊 Dashboard: No user, skipping fetchReports')
-      setLoading(false)
-      return
-    }
-
-    // 避免重复请求
-    if (loading) {
-      console.log('📊 Dashboard: Already loading, skipping duplicate request')
-      return
-    }
+    if (!user) return
 
     try {
-      console.log('📊 Dashboard: Fetching reports for user:', user.id)
       const { data, error } = await supabase
         .from('user_reports')
         .select('*')
@@ -105,46 +37,30 @@ function DashboardContent() {
         .order('created_at', { ascending: false })
 
       if (error) {
-        console.error('❌ Dashboard: Error fetching reports:', error)
-        console.error('Error details:', {
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-          code: error.code
-        })
-        setLoading(false)
+        console.error('Error fetching reports:', error)
         return
       }
 
-      console.log('✅ Dashboard: Fetched reports:', data?.length, 'reports')
       setReports(data || [])
     } catch (error) {
-      console.error('❌ Dashboard: Exception while fetching reports:', error)
+      console.error('Exception while fetching reports:', error)
     } finally {
       setLoading(false)
     }
-  }, [user, supabase, loading]) // 添加 loading 到依赖项
+  }, [user, supabase])
 
   useEffect(() => {
-    console.log('🔍 Dashboard useEffect triggered:', { authLoading, userId: user?.id, hasUser: !!user })
-
-    // 更快的重定向逻辑，不等待authLoading完成
     if (!authLoading && !user) {
-      console.log('🔀 Dashboard: No user, redirecting to auth')
       router.push('/auth')
       return
     }
 
-    // 只要用户存在就开始获取报告，不等待authLoading
     if (user) {
-      console.log('👤 Dashboard: User found, fetching reports')
       fetchReports()
     }
-  }, [user, authLoading, fetchReports, router]) // 保持依赖项完整
+  }, [user, authLoading, fetchReports, router])
 
-  // 处理从dashboard直接创建报告的情况
   const handleBirthFormSubmit = async (birthData: any) => {
-    // 重定向到专门的报告生成页面
     const params = new URLSearchParams({
       birthDate: birthData.birthDate,
       birthTime: birthData.birthTime || '',
@@ -161,24 +77,6 @@ function DashboardContent() {
     router.push(`/report?id=${reportId}`)
   }
 
-  // 添加查看日志的辅助函数（开发调试用）
-  const viewLogs = () => {
-    const logs = JSON.parse(localStorage.getItem('reportCreationLogs') || '[]')
-    console.log('=== 持久化日志 ===')
-    logs.forEach((log: any) => {
-      console.log(`[${log.timestamp}] ${log.message}`, log.data)
-    })
-    return logs
-  }
-
-  // 在window对象上添加查看日志的方法（开发调试用）
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      (window as any).viewReportLogs = viewLogs
-    }
-  }, [])
-
-  // 更智能的loading逻辑 - 如果有用户数据但还在加载，显示简化的loading
   if (authLoading || (loading && user)) {
     return (
       <div className="cosmic-bg min-h-screen flex items-center justify-center">
@@ -193,12 +91,11 @@ function DashboardContent() {
   }
 
   if (!user) {
-    return null // Will redirect to auth
+    return null
   }
 
   return (
     <div className="cosmic-bg min-h-screen">
-      <DebugInfo />
       <Navigation user={user} profile={profile} />
 
       <div className="container mx-auto px-4 py-8">

@@ -23,7 +23,7 @@ The application is built with Next.js 15 using the App Router architecture and s
 All development commands enforce UTC timezone to ensure consistent Bazi calculations:
 
 ```bash
-# Development server with UTC timezone
+# Development server with UTC timezone and Turbopack
 npm run dev
 
 # Build for production with Turbopack (UTC enforced)
@@ -39,13 +39,13 @@ npm run type-check
 npm run lint
 npm run lint:fix
 
-# Code formatting
+# Code formatting with Prettier
 npm run format
 
-# Bundle analysis
+# Bundle analysis with @next/bundle-analyzer
 npm run analyze
 
-# Deploy to production
+# Deploy to production (build + Vercel deploy)
 npm run deploy
 ```
 
@@ -56,9 +56,11 @@ The project currently uses manual testing through browser interaction. No automa
 
 ### Core Services
 
-- **BaziService** (`src/services/baziService.ts:4`): Handles Bazi calculations using the `@aharris02/bazi-calculator-by-alvamind` library. Includes fallback mock data generation for testing and comprehensive timezone handling.
+- **BaziService** (`src/services/baziService.ts:4`): Handles Bazi calculations using the `@aharris02/bazi-calculator-by-alvamind` library. Includes fallback mock data generation for testing, comprehensive timezone handling, and detailed analysis mapping including day master strength, favorable elements, eight mansions analysis, and luck pillars.
 
 - **GeminiService** (`src/services/geminiService.ts:4`): Manages AI report generation using Google's Gemini 2.5 Flash model for personality, career, relationship, health, and life path analysis. Supports both preview (500-800 words) and comprehensive (3000+ words) reports.
+
+- **PaymentService** (`src/services/paymentService.ts`): Handles payment processing for premium report upgrades.
 
 - **StarSystem** (`src/components/StarSystem.tsx:11`): Three.js-based 3D visualization of the five elements (五行) orbiting around a central star with responsive design.
 
@@ -72,9 +74,9 @@ The application uses three main tables:
 ### Authentication & User Management
 
 - Uses Supabase Auth for user authentication
-- User context managed through `UserContext` (`src/contexts/UserContext.tsx`)
+- User context managed through `UserContext` (`src/contexts/UserContext.tsx`) and `SupabaseContext` (`src/contexts/SupabaseContext.tsx`)
 - Authentication flow with modal-based login/registration
-- Singleton Supabase client pattern to prevent multiple instances (`src/lib/supabase/client.ts`)
+- Singleton Supabase client pattern to prevent multiple instances (`src/lib/supabase/client.ts`) with creation count tracking and reset functionality
 
 ### Logging System
 
@@ -136,27 +138,33 @@ src/
 ## Architecture Patterns
 
 ### Static Export Configuration
-- Uses `output: 'export'` for static site generation
-- Optimized for Vercel deployment
-- Image optimization disabled for static builds
-- Trailing slash handling configured
+- Uses `output: 'export'` for static site generation with `trailingSlash: true`
+- Optimized for Vercel deployment with security headers and CSP policies
+- Image optimization disabled for static builds (`unoptimized: true`)
+- Bundle optimization with experimental package imports for `lucide-react` and `three`
+- Comprehensive security headers including HSTS, XSS protection, and permissions policies
 
 ### Singleton Pattern for Supabase
-- Global client instance to prevent multiple connections
-- Creation count tracking for debugging
-- Reset functionality for testing scenarios
+- Global client instance to prevent multiple connections with `createClient()` function
+- Creation count tracking for debugging via `getClientStats()`
+- Reset functionality for testing scenarios via `resetClient()`
+- Specialized logging with emoji indicators via `logger.supabase()`
 
 ### Error Handling & Fallbacks
 - Mock Bazi data generation when calculator library fails
 - Graceful degradation for missing dependencies
-- Comprehensive logging for debugging issues
+- Comprehensive logging for debugging issues with persistent cross-navigation logging
+- Fallback to 12:00 PM when birth time is unknown for accurate Bazi calculations
 
 ## Important Notes
 
 - The application uses Chinese language throughout the UI
-- Timezone handling is critical for accurate Bazi calculations (UTC enforced)
-- The 3D star system uses Three.js with responsive design
+- Timezone handling is critical for accurate Bazi calculations (UTC enforced across all commands)
+- The 3D star system uses Three.js with responsive design and cosmic theme colors
 - All AI-generated content includes upsell prompts for full reports
 - Mock data generation is available for testing when dependencies are missing
-- Persistent logging system helps debug issues across page navigation
+- Persistent logging system helps debug issues across page navigation via `window.cosmicLogger`
 - Static export deployment requires careful handling of dynamic features
+- Tailwind CSS includes custom cosmic theme colors and animations
+- All environment variables are required for proper functionality
+- The project uses React 19 with Next.js 15 and TypeScript 5
