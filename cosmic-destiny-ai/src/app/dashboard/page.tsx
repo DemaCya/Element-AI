@@ -61,53 +61,11 @@ function DashboardContent() {
 
     async function fetchReports() {
       try {
-        console.log('📡 Dashboard: Sending query to fetch reports...')
-        console.log('🔍 Dashboard: Supabase client check', {
-          hasSupabase: !!supabase,
-          hasFrom: typeof supabase?.from === 'function',
-          userId: user!.id
-        })
-        
-        // 检查auth状态
-        console.log('🔐 Dashboard: Checking auth status...')
-        const { data: { session } } = await supabase.auth.getSession()
-        console.log('🔐 Dashboard: Session status:', {
-          hasSession: !!session,
-          hasAccessToken: !!session?.access_token,
-          userId: session?.user?.id
-        })
-        
-        if (!session) {
-          console.error('❌ Dashboard: No active session!')
-          setReports([])
-          setLoadingReports(false)
-          return
-        }
+        console.log('📡 Dashboard: Starting to fetch reports for user:', user!.id)
         
         const startTime = Date.now()
         
-        console.log('⏱️ Dashboard: Building query...')
-        console.log('🔍 Dashboard: Supabase instance details:', {
-          hasSupabase: !!supabase,
-          supabaseType: typeof supabase,
-          hasFrom: typeof supabase?.from === 'function'
-        })
-        
-        console.log('⏱️ Dashboard: Query built, starting execution...')
-        
-        // 先做一个简单的连接测试
-        console.log('🔌 Dashboard: Testing connection with count query...')
-        try {
-          const testResult = await supabase
-            .from('user_reports')
-            .select('*', { count: 'exact', head: true })
-            .eq('user_id', user!.id)
-          console.log('✅ Dashboard: Connection test passed', { count: testResult.count })
-        } catch (testError) {
-          console.error('❌ Dashboard: Connection test failed:', testError)
-        }
-        
-        console.log('📊 Dashboard: Starting main query...')
+        console.log('📊 Dashboard: Executing query...')
         const { data, error } = await supabase
           .from('user_reports')
           .select('*')
