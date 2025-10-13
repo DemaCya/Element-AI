@@ -68,6 +68,22 @@ function DashboardContent() {
           userId: user!.id
         })
         
+        // 检查auth状态
+        console.log('🔐 Dashboard: Checking auth status...')
+        const { data: { session } } = await supabase.auth.getSession()
+        console.log('🔐 Dashboard: Session status:', {
+          hasSession: !!session,
+          hasAccessToken: !!session?.access_token,
+          userId: session?.user?.id
+        })
+        
+        if (!session) {
+          console.error('❌ Dashboard: No active session!')
+          setReports([])
+          setLoadingReports(false)
+          return
+        }
+        
         const startTime = Date.now()
         
         console.log('⏱️ Dashboard: Building query...')
@@ -77,38 +93,28 @@ function DashboardContent() {
           hasFrom: typeof supabase?.from === 'function'
         })
         
-        const query = supabase
+        console.log('⏱️ Dashboard: Query built, starting execution...')
+        
+        // 先做一个简单的连接测试
+        console.log('🔌 Dashboard: Testing connection with count query...')
+        try {
+          const testResult = await supabase
+            .from('user_reports')
+            .select('*', { count: 'exact', head: true })
+            .eq('user_id', user!.id)
+          console.log('✅ Dashboard: Connection test passed', { count: testResult.count })
+        } catch (testError) {
+          console.error('❌ Dashboard: Connection test failed:', testError)
+        }
+        
+        console.log('📊 Dashboard: Starting main query...')
+        const { data, error } = await supabase
           .from('user_reports')
           .select('*')
           .eq('user_id', user!.id)
           .order('created_at', { ascending: false })
         
-        console.log('⏱️ Dashboard: Query built, starting execution...')
-        console.log('🔍 Dashboard: Query object:', { hasQuery: !!query, queryType: typeof query })
-        
-        // 添加10秒超时保护（增加到10秒）
-        let timeoutId: any
-        const queryPromise = Promise.resolve(query).then((result: any) => {
-          console.log('✅ Dashboard: Query promise resolved')
-          return result
-        }).catch((err: any) => {
-          console.error('❌ Dashboard: Query promise rejected:', err)
-          throw err
-        })
-        
-        const timeoutPromise = new Promise((_, reject) => {
-          timeoutId = setTimeout(() => {
-            console.warn('⚠️ Dashboard: Query timeout after 10s')
-            reject(new Error('Query timeout'))
-          }, 10000)
-        })
-        
-        console.log('🏁 Dashboard: Starting Promise.race...')
-        const result = await Promise.race([queryPromise, timeoutPromise]) as any
-        clearTimeout(timeoutId)
-        console.log('✅ Dashboard: Promise.race completed')
-        
-        const { data, error } = result
+        console.log('✅ Dashboard: Query completed')
 
         const elapsed = Date.now() - startTime
         console.log(`📬 Dashboard: Query completed in ${elapsed}ms`)
