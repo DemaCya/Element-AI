@@ -222,8 +222,8 @@ ${!report.is_paid ? `
             <Button
               variant="ghost"
               onClick={() => {
-                console.log('🔙 Report: Navigating back to dashboard (hard refresh)')
-                window.location.href = '/dashboard'
+                console.log('🔙 Report: Navigating back to dashboard')
+                router.push('/dashboard')
               }}
               className="text-purple-300 hover:text-purple-200"
             >

@@ -11,7 +11,11 @@ let globalSupabaseClient: ReturnType<typeof createSupabaseClient<Database>> | nu
 export function createClient() {
   // 如果已有客户端，直接返回（同一个页面会话内）
   if (globalSupabaseClient) {
-    console.log('🔄 Supabase: Using existing client instance')
+    console.log('🔄 Supabase: Using existing client instance', {
+      hasAuth: !!globalSupabaseClient.auth,
+      hasFrom: typeof globalSupabaseClient.from === 'function',
+      clientId: (globalSupabaseClient as any)._clientId || 'unknown'
+    })
     return globalSupabaseClient
   }
   
@@ -32,6 +36,9 @@ export function createClient() {
   }
 
   try {
+    // 生成一个简单的客户端ID用于调试
+    const clientId = 'client_' + Date.now()
+    
     // 使用标准的 createClient，适合客户端静态应用
     globalSupabaseClient = createSupabaseClient<Database>(supabaseUrl, supabaseAnonKey, {
       auth: {
@@ -41,7 +48,15 @@ export function createClient() {
         storage: typeof window !== 'undefined' ? window.localStorage : undefined
       }
     })
-    console.log('✅ Supabase: Client created successfully (standard JS client)')
+    
+    // 存储客户端ID用于调试
+    ;(globalSupabaseClient as any)._clientId = clientId
+    
+    console.log('✅ Supabase: Client created successfully (standard JS client)', {
+      clientId,
+      hasAuth: !!globalSupabaseClient.auth,
+      hasFrom: typeof globalSupabaseClient.from === 'function'
+    })
   } catch (error) {
     console.error('❌ Supabase: Failed to create client:', error)
     throw error

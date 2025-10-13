@@ -71,25 +71,42 @@ function DashboardContent() {
         const startTime = Date.now()
         
         console.log('⏱️ Dashboard: Building query...')
+        console.log('🔍 Dashboard: Supabase instance details:', {
+          hasSupabase: !!supabase,
+          supabaseType: typeof supabase,
+          hasFrom: typeof supabase?.from === 'function'
+        })
+        
         const query = supabase
           .from('user_reports')
           .select('*')
           .eq('user_id', user!.id)
           .order('created_at', { ascending: false })
         
-        console.log('⏱️ Dashboard: Executing query...')
+        console.log('⏱️ Dashboard: Query built, starting execution...')
+        console.log('🔍 Dashboard: Query object:', { hasQuery: !!query, queryType: typeof query })
         
-        // 添加5秒超时保护
-        const queryPromise = query
-        const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => {
-            console.warn('⚠️ Dashboard: Query timeout after 5s')
+        // 添加10秒超时保护（增加到10秒）
+        let timeoutId: any
+        const queryPromise = Promise.resolve(query).then((result: any) => {
+          console.log('✅ Dashboard: Query promise resolved')
+          return result
+        }).catch((err: any) => {
+          console.error('❌ Dashboard: Query promise rejected:', err)
+          throw err
+        })
+        
+        const timeoutPromise = new Promise((_, reject) => {
+          timeoutId = setTimeout(() => {
+            console.warn('⚠️ Dashboard: Query timeout after 10s')
             reject(new Error('Query timeout'))
-          }, 5000)
-        )
+          }, 10000)
+        })
         
+        console.log('🏁 Dashboard: Starting Promise.race...')
         const result = await Promise.race([queryPromise, timeoutPromise]) as any
-        console.log('⏱️ Dashboard: Query execution returned')
+        clearTimeout(timeoutId)
+        console.log('✅ Dashboard: Promise.race completed')
         
         const { data, error } = result
 
