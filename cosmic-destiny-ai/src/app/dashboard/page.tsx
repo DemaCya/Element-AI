@@ -78,7 +78,17 @@ function DashboardContent() {
           .order('created_at', { ascending: false })
         
         console.log('⏱️ Dashboard: Executing query...')
-        const result = await query
+        
+        // 添加5秒超时保护
+        const queryPromise = query
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => {
+            console.warn('⚠️ Dashboard: Query timeout after 5s')
+            reject(new Error('Query timeout'))
+          }, 5000)
+        )
+        
+        const result = await Promise.race([queryPromise, timeoutPromise]) as any
         console.log('⏱️ Dashboard: Query execution returned')
         
         const { data, error } = result

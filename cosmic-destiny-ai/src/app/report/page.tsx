@@ -221,7 +221,10 @@ ${!report.is_paid ? `
           <div className="flex items-center justify-between">
             <Button
               variant="ghost"
-              onClick={() => router.push('/dashboard')}
+              onClick={() => {
+                console.log('🔙 Report: Navigating back to dashboard (hard refresh)')
+                window.location.href = '/dashboard'
+              }}
               className="text-purple-300 hover:text-purple-200"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />

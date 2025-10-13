@@ -49,10 +49,33 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         const startTime = Date.now()
         
         console.log('⏱️ UserContext: Calling supabase.auth.getUser()...')
-        const result = await supabase.auth.getUser()
-        console.log('⏱️ UserContext: supabase.auth.getUser() returned')
         
-        const { data: { user }, error } = result
+        // 添加3秒超时保护：如果3秒内没返回，直接从localStorage读取session
+        const getUserPromise = supabase.auth.getUser()
+        const timeoutPromise = new Promise((resolve) => 
+          setTimeout(() => {
+            console.warn('⚠️ UserContext: getUser() timeout, trying getSession() instead')
+            resolve(supabase.auth.getSession())
+          }, 3000)
+        )
+        
+        const result = await Promise.race([getUserPromise, timeoutPromise]) as any
+        console.log('⏱️ UserContext: Auth call returned')
+        
+        // 处理两种可能的返回格式
+        let user = null
+        let error = null
+        
+        if (result.data?.user) {
+          user = result.data.user
+        } else if (result.data?.session?.user) {
+          user = result.data.session.user
+          console.log('📝 UserContext: Got user from session instead')
+        }
+        
+        if (result.error) {
+          error = result.error
+        }
         
         const elapsed = Date.now() - startTime
         console.log(`📬 UserContext: User fetch completed in ${elapsed}ms`, { hasUser: !!user, hasError: !!error })
