@@ -1,12 +1,12 @@
-import { createBrowserClient } from '@supabase/ssr'
+import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { Database } from '@/lib/database.types'
 
 // 全局单例客户端（在整个应用生命周期中只创建一次）
-let globalSupabaseClient: ReturnType<typeof createBrowserClient<Database>> | null = null
+let globalSupabaseClient: ReturnType<typeof createSupabaseClient<Database>> | null = null
 
 /**
  * 创建Supabase客户端（单例模式）
- * 在静态导出模式下，每次页面刷新都会重新创建，这是正常的
+ * 使用标准的 @supabase/supabase-js 包，适合静态导出模式
  */
 export function createClient() {
   // 如果已有客户端，直接返回（同一个页面会话内）
@@ -15,7 +15,7 @@ export function createClient() {
     return globalSupabaseClient
   }
   
-  console.log('🏗️ Supabase: Creating new client instance...')
+  console.log('🏗️ Supabase: Creating new client instance (standard JS client)...')
   
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -32,8 +32,16 @@ export function createClient() {
   }
 
   try {
-    globalSupabaseClient = createBrowserClient<Database>(supabaseUrl, supabaseAnonKey)
-    console.log('✅ Supabase: Client created successfully')
+    // 使用标准的 createClient，适合客户端静态应用
+    globalSupabaseClient = createSupabaseClient<Database>(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        storage: typeof window !== 'undefined' ? window.localStorage : undefined
+      }
+    })
+    console.log('✅ Supabase: Client created successfully (standard JS client)')
   } catch (error) {
     console.error('❌ Supabase: Failed to create client:', error)
     throw error
