@@ -111,7 +111,7 @@ function DashboardContent() {
       mounted = false
       clearTimeout(timeout)
     }
-  }, [user, authLoading, supabase, router])
+  }, [user, authLoading]) // supabase和router是稳定的，不需要作为依赖
 
   const handleBirthFormSubmit = async (birthData: any) => {
     const params = new URLSearchParams({

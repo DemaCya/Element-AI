@@ -40,45 +40,17 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     async function loadUser() {
       try {
         console.log('📡 UserContext: Fetching user...')
-        console.log('🔍 UserContext: Supabase client check', {
-          hasSupabase: !!supabase,
-          hasAuth: !!supabase?.auth,
-          hasGetUser: typeof supabase?.auth?.getUser === 'function'
-        })
         
         const startTime = Date.now()
         
-        console.log('⏱️ UserContext: Calling supabase.auth.getUser()...')
+        // 直接使用getSession()，因为在静态部署中更可靠
+        console.log('⏱️ UserContext: Calling supabase.auth.getSession()...')
+        const { data: { session }, error } = await supabase.auth.getSession()
         
-        // 添加3秒超时保护：如果3秒内没返回，直接从localStorage读取session
-        const getUserPromise = supabase.auth.getUser()
-        const timeoutPromise = new Promise((resolve) => 
-          setTimeout(() => {
-            console.warn('⚠️ UserContext: getUser() timeout, trying getSession() instead')
-            resolve(supabase.auth.getSession())
-          }, 3000)
-        )
-        
-        const result = await Promise.race([getUserPromise, timeoutPromise]) as any
-        console.log('⏱️ UserContext: Auth call returned')
-        
-        // 处理两种可能的返回格式
-        let user = null
-        let error = null
-        
-        if (result.data?.user) {
-          user = result.data.user
-        } else if (result.data?.session?.user) {
-          user = result.data.session.user
-          console.log('📝 UserContext: Got user from session instead')
-        }
-        
-        if (result.error) {
-          error = result.error
-        }
+        const user = session?.user || null
         
         const elapsed = Date.now() - startTime
-        console.log(`📬 UserContext: User fetch completed in ${elapsed}ms`, { hasUser: !!user, hasError: !!error })
+        console.log(`📬 UserContext: Session fetch completed in ${elapsed}ms`, { hasUser: !!user, hasError: !!error })
         
         if (!mounted) {
           console.log('🚫 UserContext: Component unmounted, ignoring results')
