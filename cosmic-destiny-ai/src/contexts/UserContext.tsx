@@ -40,9 +40,19 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     async function loadUser() {
       try {
         console.log('📡 UserContext: Fetching user...')
+        console.log('🔍 UserContext: Supabase client check', {
+          hasSupabase: !!supabase,
+          hasAuth: !!supabase?.auth,
+          hasGetUser: typeof supabase?.auth?.getUser === 'function'
+        })
+        
         const startTime = Date.now()
         
-        const { data: { user }, error } = await supabase.auth.getUser()
+        console.log('⏱️ UserContext: Calling supabase.auth.getUser()...')
+        const result = await supabase.auth.getUser()
+        console.log('⏱️ UserContext: supabase.auth.getUser() returned')
+        
+        const { data: { user }, error } = result
         
         const elapsed = Date.now() - startTime
         console.log(`📬 UserContext: User fetch completed in ${elapsed}ms`, { hasUser: !!user, hasError: !!error })
