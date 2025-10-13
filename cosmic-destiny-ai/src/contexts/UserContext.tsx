@@ -43,25 +43,30 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         
         const startTime = Date.now()
         
-        // 直接使用getSession()，因为在静态部署中更可靠
+        // 先尝试getSession()（快速，从localStorage读取）
         console.log('⏱️ UserContext: Calling supabase.auth.getSession()...')
-        const { data: { session }, error } = await supabase.auth.getSession()
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
         
-        const user = session?.user || null
+        let user = session?.user || null
         
         const elapsed = Date.now() - startTime
-        console.log(`📬 UserContext: Session fetch completed in ${elapsed}ms`, { hasUser: !!user, hasError: !!error })
+        console.log(`📬 UserContext: Session fetch completed in ${elapsed}ms`, { hasSession: !!session, hasError: !!sessionError })
+        
+        // 如果getSession()没有返回用户，尝试getUser()（从服务器验证）
+        if (!user && !sessionError) {
+          console.log('⏱️ UserContext: No session found, trying getUser()...')
+          const getUserStart = Date.now()
+          const { data, error: getUserError } = await supabase.auth.getUser()
+          const getUserElapsed = Date.now() - getUserStart
+          console.log(`📬 UserContext: getUser() completed in ${getUserElapsed}ms`, { hasUser: !!data?.user })
+          
+          if (data?.user) {
+            user = data.user
+          }
+        }
         
         if (!mounted) {
           console.log('🚫 UserContext: Component unmounted, ignoring results')
-          return
-        }
-        
-        if (error) {
-          console.error('❌ UserContext: Failed to get user:', error)
-          console.error('❌ UserContext: Error details:', JSON.stringify(error))
-          setUser(null)
-          setProfile(null)
           return
         }
         

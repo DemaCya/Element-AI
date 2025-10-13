@@ -46,19 +46,6 @@ export function createClient() {
         autoRefreshToken: true,
         detectSessionInUrl: true,
         storage: typeof window !== 'undefined' ? window.localStorage : undefined
-      },
-      global: {
-        headers: {
-          'X-Client-Info': 'cosmic-destiny-ai'
-        }
-      },
-      db: {
-        schema: 'public'
-      },
-      realtime: {
-        params: {
-          eventsPerSecond: 10
-        }
       }
     })
     
