@@ -1,6 +1,5 @@
 import type { NextConfig } from "next";
 
-// 确保使用UTC时区，与腾讯云开发环境保持一致
 process.env.TZ = 'UTC';
 
 // 默认使用静态模式，适合Vercel自动部署
