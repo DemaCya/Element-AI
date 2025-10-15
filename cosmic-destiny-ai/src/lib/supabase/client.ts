@@ -1,13 +1,22 @@
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { Database } from '@/lib/database.types'
 
+// 在全局范围内声明一个变量来缓存客户端
+// @ts-ignore
+let supabaseSingleton: ReturnType<typeof createSupabaseClient<Database>> = null
+
 /**
- * 创建Supabase客户端
- * 这个函数现在每次被调用都会创建一个新的客户端实例。
- * 单例管理已移至 SupabaseProvider 中，以获得更可靠的React生命周期行为。
+ * 创建Supabase客户端（使用更强大的单例模式）
+ * 即使在React组件树被意外重新挂载时，也能确保只有一个客户端实例。
  */
 export function createClient() {
-  console.log('🏗️ Supabase: createClient function invoked...')
+  // 如果单例已存在，直接返回
+  if (supabaseSingleton) {
+    console.log('🔄 Supabase: Using existing singleton client instance')
+    return supabaseSingleton
+  }
+
+  console.log('🏗️ Supabase: createClient function invoked (creating singleton)...')
   
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -46,6 +55,8 @@ export function createClient() {
       hasFrom: typeof supabaseClient.from === 'function'
     })
 
+    // 将新创建的客户端存为单例
+    supabaseSingleton = supabaseClient
     return supabaseClient
   } catch (error) {
     console.error('❌ Supabase: Failed to create client:', error)
