@@ -335,9 +335,6 @@ ${!report.is_paid ? `
                         Unlock Full Report Now
                       </span>
                     </Button>
-                    <p className="text-sm text-gray-400 mt-4">
-                      One-time payment, lifetime access
-                    </p>
                   </div>
                 </div>
               </>
