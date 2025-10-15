@@ -76,8 +76,7 @@ export async function POST(request: NextRequest) {
     const checkoutResult = await CreemPaymentService.createCheckout({
       reportId: report.id,
       userId: user.id,
-      userEmail: user.email,
-      requestId: `report_${report.id}_${Date.now()}`
+      userEmail: user.email
     })
 
     if (!checkoutResult.success) {
