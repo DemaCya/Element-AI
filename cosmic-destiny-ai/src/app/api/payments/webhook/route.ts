@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
-import { geminiService } from '@/services/geminiService'
 import type { Database } from '@/lib/database.types'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
+
+type Payment = Database['public']['Tables']['payments']['Row']
+type UserReport = Database['public']['Tables']['user_reports']['Row']
 
 // Create Supabase admin client for server-side operations
 const supabaseAdmin = createClient<Database>(
@@ -53,7 +55,6 @@ export async function POST(request: NextRequest) {
  * 1. Find the payment record
  * 2. Update payment status
  * 3. Unlock the report
- * 4. Generate full report (if needed)
  */
 async function handlePaymentSuccess(data: any) {
   try {
@@ -67,11 +68,15 @@ async function handlePaymentSuccess(data: any) {
     })
 
     // Find payment record
-    const { data: payment } = await supabaseAdmin
+    const { data: payment, error: paymentError } = await supabaseAdmin
       .from('payments')
       .select('*')
       .eq('checkout_id', checkout_id)
-      .single()
+      .maybeSingle() as { data: Payment | null, error: any }
+
+    if (paymentError) {
+      console.error('[Webhook] Error fetching payment:', paymentError)
+    }
 
     // Check if already processed (idempotency)
     if (payment?.status === 'completed') {
@@ -83,6 +88,7 @@ async function handlePaymentSuccess(data: any) {
     if (payment) {
       await supabaseAdmin
         .from('payments')
+        // @ts-expect-error - Supabase type inference issue with update
         .update({
           status: 'completed',
           order_id: order_id
@@ -91,53 +97,24 @@ async function handlePaymentSuccess(data: any) {
     }
 
     // Get the report
-    const { data: report } = await supabaseAdmin
+    const { data: report, error: reportError } = await supabaseAdmin
       .from('user_reports')
       .select('*')
       .eq('id', reportId)
-      .single()
+      .maybeSingle() as { data: UserReport | null, error: any }
 
-    if (!report) {
-      console.error('[Webhook] Report not found:', reportId)
+    if (reportError || !report) {
+      console.error('[Webhook] Report not found:', reportId, reportError)
       return
     }
 
-    // Generate full report if not already generated (optional)
-    let fullReport = report.full_report
-    const hasGeminiKey = !!process.env.NEXT_PUBLIC_GEMINI_API_KEY && 
-                         process.env.NEXT_PUBLIC_GEMINI_API_KEY !== 'your_gemini_api_key'
-
-    if (!fullReport && hasGeminiKey) {
-      console.log('[Webhook] Generating full report with Gemini...')
-      
-      try {
-        fullReport = await geminiService.generateFullReport({
-          name: report.name,
-          birthDate: report.birth_date,
-          birthTime: report.birth_time,
-          birthLocation: report.birth_location,
-          timezone: report.timezone,
-          isTimeKnown: report.is_time_known
-        })
-        console.log('[Webhook] Full report generated successfully')
-      } catch (error) {
-        console.error('[Webhook] Failed to generate report:', error)
-        console.log('[Webhook] Will mark as paid anyway, report can be generated later')
-      }
-    } else if (!hasGeminiKey) {
-      console.log('[Webhook] Gemini API key not configured, skipping report generation')
-      console.log('[Webhook] Report will be marked as paid, but no content generated yet')
-    }
-
-    // Unlock the report (with or without full content)
-    const updateData: any = { is_paid: true }
-    if (fullReport) {
-      updateData.full_report = fullReport
-    }
-
+    // Unlock the report
+    // Note: Full report generation happens on-demand when user views the report
+    // This keeps the webhook fast and reliable
     await supabaseAdmin
       .from('user_reports')
-      .update(updateData)
+      // @ts-expect-error - Supabase type inference issue with update
+      .update({ is_paid: true })
       .eq('id', reportId)
 
     console.log('[Webhook] Report unlocked successfully')
