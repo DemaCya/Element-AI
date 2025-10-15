@@ -327,10 +327,13 @@ ${!report.is_paid ? `
                     </p>
                     <Button
                       onClick={handleUpgrade}
-                      className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-3 text-lg"
+                      className="relative overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 text-lg font-semibold rounded-lg shadow-lg transition-all duration-300 ease-out hover:shadow-2xl hover:shadow-purple-500/50 hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 active:shadow-lg group"
                     >
-                      <Zap className="w-5 h-5 mr-2" />
-                      Unlock Full Report Now
+                      <span className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                      <span className="relative flex items-center justify-center">
+                        <Zap className="w-5 h-5 mr-2 group-hover:animate-pulse" />
+                        Unlock Full Report Now
+                      </span>
                     </Button>
                     <p className="text-sm text-gray-400 mt-4">
                       One-time payment, lifetime access
