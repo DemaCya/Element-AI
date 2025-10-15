@@ -123,20 +123,41 @@ function ReportContent() {
   }, [user, authLoading, fetchReport, router]) // 保持依赖项完整
 
   const handleUpgrade = async () => {
+    if (!report?.id) {
+      alert('Report not found')
+      return
+    }
+
     try {
-      // 模拟升级过程（静态模式）
-      console.log('模拟升级报告...')
+      console.log('[Report] Creating payment checkout for report:', report.id)
+      setLoading(true)
       
-      // 模拟延迟
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      // Call API to create checkout session
+      const response = await fetch('/api/payments/create-checkout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          reportId: report.id
+        })
+      })
+
+      const data = await response.json()
+
+      if (!data.success || !data.checkoutUrl) {
+        throw new Error(data.error || 'Failed to create payment session')
+      }
+
+      console.log('[Report] Checkout created, redirecting to:', data.checkoutUrl)
       
-      // 更新报告状态为已付费
-      setReport(prev => prev ? { ...prev, is_paid: true } : null)
+      // Redirect to Creem checkout page
+      window.location.href = data.checkoutUrl
       
-      alert('报告已升级为完整版！')
     } catch (error) {
-      console.error('Error upgrading report:', error)
-      alert('Failed to upgrade report. Please try again.')
+      console.error('[Report] Error creating checkout:', error)
+      alert('Failed to start payment process. Please try again.')
+      setLoading(false)
     }
   }
 
@@ -294,26 +315,25 @@ ${!report.is_paid ? `
                   </div>
                 </div>
                 
-                {/* 升级提示卡片 */}
+                {/* Upgrade Card */}
                 <div className="bg-gradient-to-r from-purple-900/50 via-pink-900/50 to-purple-900/50 backdrop-blur-sm rounded-lg p-8 border border-purple-500/30">
                   <div className="text-center">
                     <Sparkles className="w-12 h-12 text-purple-400 mx-auto mb-4" />
                     <h3 className="text-2xl font-bold text-white mb-4">
-                      解锁您的完整命理报告
+                      Unlock Your Complete Destiny Report
                     </h3>
                     <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
-                      预览仅展示了您命理分析的一小部分。完整报告包含深度人格分析、详细职业规划、
-                      全面感情指导、人生使命解读和个性化健康养生方案，总计超过3000字的专属内容。
+                      The preview shows only a glimpse of your destiny analysis. The full report includes in-depth personality insights, detailed career guidance, comprehensive relationship advice, life purpose interpretation, and personalized health recommendations - over 3,000 words of content tailored exclusively for you.
                     </p>
                     <Button
                       onClick={handleUpgrade}
                       className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8 py-3 text-lg"
                     >
                       <Zap className="w-5 h-5 mr-2" />
-                      立即解锁完整报告
+                      Unlock Full Report Now
                     </Button>
                     <p className="text-sm text-gray-400 mt-4">
-                      一次付费，终身查看
+                      One-time payment, lifetime access
                     </p>
                   </div>
                 </div>
@@ -337,17 +357,6 @@ ${!report.is_paid ? `
             <p className="text-gray-400 text-sm mb-4">
               Generated on {new Date(report.created_at).toLocaleDateString()}
             </p>
-            {!report.is_paid && (
-              <div className="bg-gradient-to-r from-purple-600/20 to-indigo-600/20 rounded-lg p-6 border border-purple-500/30">
-                <h3 className="text-xl font-bold text-white mb-2">Unlock Full Report</h3>
-                <p className="text-gray-300 mb-4">
-                  Get access to detailed predictions, monthly forecasts, and personalized recommendations
-                </p>
-                <Button variant="cosmic">
-                  Upgrade to Premium - $19.99
-                </Button>
-              </div>
-            )}
           </div>
         </div>
       </div>

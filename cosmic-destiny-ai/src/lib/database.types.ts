@@ -82,34 +82,49 @@ export interface Database {
           id: string
           user_id: string
           report_id: string
+          checkout_id: string
+          order_id?: string
+          customer_id?: string
           amount: number
           currency: string
-          status: 'pending' | 'completed' | 'failed'
+          status: 'pending' | 'completed' | 'failed' | 'refunded'
           payment_provider: string
           transaction_id?: string
+          metadata?: any
           created_at: string
+          updated_at?: string
         }
         Insert: {
           id?: string
           user_id: string
           report_id: string
+          checkout_id: string
+          order_id?: string
+          customer_id?: string
           amount: number
           currency: string
-          status?: 'pending' | 'completed' | 'failed'
-          payment_provider: string
+          status?: 'pending' | 'completed' | 'failed' | 'refunded'
+          payment_provider?: string
           transaction_id?: string
+          metadata?: any
           created_at?: string
+          updated_at?: string
         }
         Update: {
           id?: string
           user_id?: string
           report_id?: string
+          checkout_id?: string
+          order_id?: string
+          customer_id?: string
           amount?: number
           currency?: string
-          status?: 'pending' | 'completed' | 'failed'
+          status?: 'pending' | 'completed' | 'failed' | 'refunded'
           payment_provider?: string
           transaction_id?: string
+          metadata?: any
           created_at?: string
+          updated_at?: string
         }
       }
     }

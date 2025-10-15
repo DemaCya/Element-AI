@@ -1,233 +1,97 @@
-import { createClient } from '@/lib/supabase/client'
+/**
+ * Creem Payment Service - Simplified MVP Version
+ * 
+ * This service handles creating checkout sessions with Creem.
+ * Payment verification is done via webhook, not here.
+ */
 
-interface PaymentData {
+const CREEM_API_BASE = 'https://api.creem.io/v1'
+const CREEM_API_KEY = process.env.CREEM_API_KEY || process.env.CREEM_API_KEY_TEST || ''
+const CREEM_PRODUCT_ID = process.env.CREEM_PRODUCT_ID || ''
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+
+interface CreateCheckoutParams {
   reportId: string
-  amount: number
-  currency: string
   userId: string
-  userEmail: string
+  userEmail?: string
 }
 
-interface PaymentResult {
+interface CheckoutResult {
   success: boolean
-  paymentId?: string
+  checkoutUrl?: string
+  checkoutId?: string
   error?: string
 }
 
-export class PaymentService {
-  private static readonly CREEM_API_KEY = process.env.NEXT_PUBLIC_CREEM_API_KEY || ''
-  private static readonly CREEM_SECRET_KEY = process.env.CREEM_SECRET_KEY || ''
-
-  static async createPayment(paymentData: PaymentData): Promise<PaymentResult> {
+export class CreemPaymentService {
+  /**
+   * Create a Creem checkout session
+   * This redirects the user to Creem's payment page
+   */
+  static async createCheckout(params: CreateCheckoutParams): Promise<CheckoutResult> {
     try {
-      // For now, create a placeholder payment record
-      // This will be replaced with actual Creem integration
-      const supabase = createClient() as any
-
-      const { data, error } = await supabase
-        .from('payments')
-        .insert({
-          report_id: paymentData.reportId,
-          user_id: paymentData.userId,
-          amount: paymentData.amount,
-          currency: paymentData.currency,
-          status: 'pending',
-          payment_method: 'creem',
-          created_at: new Date().toISOString()
-        } as any)
-        .select()
-        .single()
-
-      if (error) {
-        console.error('Error creating payment record:', error)
-        return { success: false, error: 'Failed to create payment record' }
+      // Validate configuration
+      if (!CREEM_API_KEY) {
+        console.error('[Creem] API key not configured')
+        return {
+          success: false,
+          error: 'Payment system not configured. Please contact support.'
+        }
       }
 
-      // Simulate payment process (replace with actual Creem integration)
-      const paymentResult = await this.simulateCreemPayment(paymentData, (data as any).id)
+      if (!CREEM_PRODUCT_ID) {
+        console.error('[Creem] Product ID not configured')
+        return {
+          success: false,
+          error: 'Product not configured. Please contact support.'
+        }
+      }
 
-      if (paymentResult.success) {
-        // Update payment record to completed
-        await supabase
-          .from('payments')
-          .update({
-            status: 'completed',
-            payment_id: paymentResult.paymentId,
-            updated_at: new Date().toISOString()
-          } as any)
-          .eq('id', (data as any).id)
+      console.log('[Creem] Creating checkout for report:', params.reportId)
 
-        // Update user report to paid
-        await supabase
-          .from('user_reports')
-          .update({
-            is_paid: true,
-            updated_at: new Date().toISOString()
-          } as any)
-          .eq('id', paymentData.reportId)
+      // Call Creem API
+      const response = await fetch(`${CREEM_API_BASE}/checkouts`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': CREEM_API_KEY
+        },
+        body: JSON.stringify({
+          product_id: CREEM_PRODUCT_ID,
+          request_id: params.reportId, // Use reportId to track this payment
+          success_url: `${APP_URL}/payment/success`,
+          cancel_url: `${APP_URL}/payment/cancel`,
+          customer_email: params.userEmail
+        })
+      })
 
-        return { success: true, paymentId: paymentResult.paymentId }
-      } else {
-        // Update payment record to failed
-        await supabase
-          .from('payments')
-          .update({
-            status: 'failed',
-            error_message: paymentResult.error,
-            updated_at: new Date().toISOString()
-          } as any)
-          .eq('id', (data as any).id)
+      if (!response.ok) {
+        const errorText = await response.text()
+        console.error('[Creem] API error:', response.status, errorText)
+        return {
+          success: false,
+          error: 'Failed to create payment session. Please try again.'
+        }
+      }
 
-        return { success: false, error: paymentResult.error }
+      const data = await response.json()
+
+      console.log('[Creem] Checkout created:', data.checkout_id)
+
+      return {
+        success: true,
+        checkoutUrl: data.checkout_url,
+        checkoutId: data.checkout_id
       }
 
     } catch (error) {
-      console.error('Payment processing error:', error)
-      return { success: false, error: 'Payment processing failed' }
-    }
-  }
-
-  private static async simulateCreemPayment(paymentData: PaymentData, paymentRecordId: string): Promise<PaymentResult> {
-    // This is a placeholder for Creem integration
-    // In a real implementation, this would:
-    // 1. Create a payment session with Creem
-    // 2. Redirect user to Creem payment page
-    // 3. Handle webhook for payment completion
-    // 4. Verify payment with Creem API
-
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1000))
-
-    // Simulate successful payment (in real implementation, this would be based on Creem's response)
-    const isSuccess = Math.random() > 0.1 // 90% success rate for demo
-
-    if (isSuccess) {
-      return {
-        success: true,
-        paymentId: `creem_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-      }
-    } else {
+      console.error('[Creem] Error creating checkout:', error)
       return {
         success: false,
-        error: 'Payment failed. Please try again.'
+        error: 'Failed to create payment session. Please try again.'
       }
-    }
-  }
-
-  static async verifyPayment(paymentId: string): Promise<PaymentResult> {
-    try {
-      const supabase = createClient() as any
-
-      const { data, error } = await supabase
-        .from('payments')
-        .select('*')
-        .eq('payment_id', paymentId)
-        .single()
-
-      if (error || !data) {
-        return { success: false, error: 'Payment not found' }
-      }
-
-      if ((data as any).status === 'completed') {
-        return { success: true, paymentId: (data as any).payment_id }
-      } else if ((data as any).status === 'failed') {
-        return { success: false, error: (data as any).error_message || 'Payment failed' }
-      } else {
-        return { success: false, error: 'Payment is still processing' }
-      }
-
-    } catch (error) {
-      console.error('Payment verification error:', error)
-      return { success: false, error: 'Verification failed' }
-    }
-  }
-
-  static async createPaymentSession(reportId: string, userId: string): Promise<{
-    success: boolean
-    sessionId?: string
-    checkoutUrl?: string
-    error?: string
-  }> {
-    try {
-      const supabase = createClient() as any
-
-      // Get report details
-      const { data: report, error: reportError } = await supabase
-        .from('user_reports')
-        .select('*')
-        .eq('id', reportId)
-        .eq('user_id', userId)
-        .single()
-
-      if (reportError || !report) {
-        return { success: false, error: 'Report not found' }
-      }
-
-      // Get user email
-      const { data: userData, error: userError } = await supabase.auth.getUser()
-      if (userError || !userData.user?.email) {
-        return { success: false, error: 'User not found' }
-      }
-
-      // Create payment data
-      const paymentData: PaymentData = {
-        reportId,
-        amount: 19.99, // Fixed price
-        currency: 'USD',
-        userId,
-        userEmail: userData.user.email
-      }
-
-      // For now, return simulated checkout URL
-      // This will be replaced with actual Creem checkout URL
-      const sessionId = `cs_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
-      const checkoutUrl = `${window.location.origin}/api/checkout?session_id=${sessionId}`
-
-      return {
-        success: true,
-        sessionId,
-        checkoutUrl
-      }
-
-    } catch (error) {
-      console.error('Payment session creation error:', error)
-      return { success: false, error: 'Failed to create payment session' }
-    }
-  }
-
-  static async handleWebhook(payload: any): Promise<void> {
-    try {
-      // This would handle Creem webhooks for payment completion
-      // For now, we'll simulate webhook processing
-
-      const { event, data } = payload
-
-      if (event === 'payment.completed') {
-        const supabase = createClient() as any
-
-        // Update payment record
-        await supabase
-          .from('payments')
-          .update({
-            status: 'completed',
-            payment_id: (data as any).payment_id,
-            updated_at: new Date().toISOString()
-          } as any)
-          .eq('id', (data as any).metadata.payment_record_id)
-
-        // Update user report to paid
-        await supabase
-          .from('user_reports')
-          .update({
-            is_paid: true,
-            updated_at: new Date().toISOString()
-          } as any)
-          .eq('id', (data as any).metadata.report_id)
-      }
-
-    } catch (error) {
-      console.error('Webhook handling error:', error)
-      throw error
     }
   }
 }
+
+export default CreemPaymentService

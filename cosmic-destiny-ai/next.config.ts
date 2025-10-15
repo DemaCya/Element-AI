@@ -2,10 +2,11 @@ import type { NextConfig } from "next";
 
 process.env.TZ = 'UTC';
 
-// 默认使用静态模式，适合Vercel自动部署
-const isStatic = true;
+// 使用动态服务器模式以支持 API 路由和支付功能
+// 注意：支付功能需要运行在 Node.js 服务器上
+const isStatic = false;
 
-console.log(`🚀 部署模式: STATIC (默认)`);
+console.log(`🚀 部署模式: DYNAMIC (支持 API 和支付)`);
 
 const nextConfig: NextConfig = {
   // 静态导出配置，适合Vercel自动部署
@@ -69,7 +70,7 @@ const nextConfig: NextConfig = {
             },
             {
               key: 'Content-Security-Policy',
-              value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.vercel.live; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co;",
+              value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.vercel.live; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co https://api.creem.io https://checkout.creem.io; frame-src https://checkout.creem.io;",
             },
           ] : []),
         ],
