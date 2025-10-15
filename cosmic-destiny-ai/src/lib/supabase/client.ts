@@ -1,26 +1,13 @@
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { Database } from '@/lib/database.types'
 
-// 全局单例客户端（在整个应用生命周期中只创建一次）
-let globalSupabaseClient: ReturnType<typeof createSupabaseClient<Database>> | null = null
-
 /**
- * 创建Supabase客户端（单例模式）
- * 使用标准的 @supabase/supabase-js 包，适合静态导出模式
+ * 创建Supabase客户端
+ * 这个函数现在每次被调用都会创建一个新的客户端实例。
+ * 单例管理已移至 SupabaseProvider 中，以获得更可靠的React生命周期行为。
  */
 export function createClient() {
-  // 如果已有客户端，直接返回（同一个页面会话内）
-  if (globalSupabaseClient) {
-    console.log('🔄 Supabase: Using existing client instance', {
-      hasAuth: !!globalSupabaseClient.auth,
-      hasFrom: typeof globalSupabaseClient.from === 'function',
-      clientId: (globalSupabaseClient as any)._clientId || 'unknown'
-    })
-    return globalSupabaseClient
-  }
-  
-  console.log('🏗️ Supabase: Creating new client instance (standard JS client)...')
-  console.log('🏗️ Supabase: Called from:', new Error().stack?.split('\n')[2]?.trim())
+  console.log('🏗️ Supabase: createClient function invoked...')
   
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -41,7 +28,7 @@ export function createClient() {
     const clientId = 'client_' + Date.now()
     
     // 使用标准的 createClient，适合客户端静态应用
-    globalSupabaseClient = createSupabaseClient<Database>(supabaseUrl, supabaseAnonKey, {
+    const supabaseClient = createSupabaseClient<Database>(supabaseUrl, supabaseAnonKey, {
       auth: {
         persistSession: true,
         autoRefreshToken: true,
@@ -51,17 +38,17 @@ export function createClient() {
     })
     
     // 存储客户端ID用于调试
-    ;(globalSupabaseClient as any)._clientId = clientId
+    ;(supabaseClient as any)._clientId = clientId
     
-    console.log('✅ Supabase: Client created successfully (standard JS client)', {
+    console.log('✅ Supabase: New client instance created successfully', {
       clientId,
-      hasAuth: !!globalSupabaseClient.auth,
-      hasFrom: typeof globalSupabaseClient.from === 'function'
+      hasAuth: !!supabaseClient.auth,
+      hasFrom: typeof supabaseClient.from === 'function'
     })
+
+    return supabaseClient
   } catch (error) {
     console.error('❌ Supabase: Failed to create client:', error)
     throw error
   }
-  
-  return globalSupabaseClient
 }
