@@ -52,8 +52,8 @@ export async function GET() {
         body: JSON.stringify({
           product_id: CREEM_PRODUCT_ID,
           request_id: `test_${Date.now()}`,
-          success_url: `${APP_URL || 'http://localhost:3000'}/payment/success`,
-          cancel_url: `${APP_URL || 'http://localhost:3000'}/payment/cancel`,
+          success_url: `${APP_URL || 'http://localhost:3000'}/payment/success`
+          // 注意：Creem API 不接受 cancel_url 参数
         })
       })
 
