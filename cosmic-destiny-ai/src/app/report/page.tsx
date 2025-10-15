@@ -223,12 +223,8 @@ ${!report.is_paid ? `
               variant="ghost"
               onClick={() => {
                 console.log('🔙 Report: Back button clicked')
-                console.log('🔙 Report: Current URL:', window.location.href)
-                console.log('🔙 Report: Target URL:', window.location.origin + '/dashboard')
-                console.log('🔙 Report: Navigating back to dashboard (hard refresh)')
-                console.log('🔙 Report: About to set window.location.href...')
-                window.location.href = '/dashboard'
-                console.log('🔙 Report: window.location.href set (this may not log due to page unload)')
+                console.log('🔙 Report: Using Next.js router.push() for client-side navigation')
+                router.push('/dashboard')
               }}
               className="text-purple-300 hover:text-purple-200"
             >
