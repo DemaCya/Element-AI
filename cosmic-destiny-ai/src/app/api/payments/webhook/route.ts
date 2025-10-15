@@ -8,17 +8,26 @@ export const dynamic = 'force-dynamic'
 type Payment = Database['public']['Tables']['payments']['Row']
 type UserReport = Database['public']['Tables']['user_reports']['Row']
 
-// Create Supabase admin client for server-side operations
-const supabaseAdmin = createClient<Database>(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false
-    }
+// Create Supabase admin client - lazy initialization to avoid build-time errors
+function getSupabaseAdmin() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error('Supabase environment variables not configured')
   }
-)
+  
+  return createClient<Database>(
+    supabaseUrl,
+    supabaseKey,
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    }
+  )
+}
 
 /**
  * POST /api/payments/webhook
@@ -66,6 +75,8 @@ async function handlePaymentSuccess(data: any) {
       order_id,
       report_id: reportId
     })
+
+    const supabaseAdmin = getSupabaseAdmin()
 
     // Find payment record
     const { data: payment, error: paymentError } = await supabaseAdmin
