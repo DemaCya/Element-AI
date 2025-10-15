@@ -10,9 +10,9 @@ console.log(`🚀 部署模式: STATIC (默认)`);
 
 const nextConfig: NextConfig = {
   // 静态导出配置，适合Vercel自动部署
-  output: 'export',
-  trailingSlash: true,
-  skipTrailingSlashRedirect: true,
+  // output: 'export', // 注释掉此行以启用默认的Node.js服务器模式
+  // trailingSlash: true, // 在非静态模式下通常不需要
+  // skipTrailingSlashRedirect: true, // 在非静态模式下通常不需要
   
   // ESLint配置
   eslint: {
@@ -25,7 +25,7 @@ const nextConfig: NextConfig = {
 
   // Image optimization
   images: {
-    unoptimized: true, // 静态模式时需要禁用图片优化
+    unoptimized: false, // 在Node.js服务器模式下启用图片优化
     formats: ['image/webp', 'image/avif'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
