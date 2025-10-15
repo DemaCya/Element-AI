@@ -1,22 +1,25 @@
 import { createClient as createSupabaseClient } from '@supabase/supabase-js'
 import { Database } from '@/lib/database.types'
 
-// 在全局范围内声明一个变量来缓存客户端
-// @ts-ignore
-let supabaseSingleton: ReturnType<typeof createSupabaseClient<Database>> = null
+// 在 window 对象上定义一个全局变量来缓存客户端
+declare global {
+  interface Window {
+    supabase_client_singleton: ReturnType<typeof createSupabaseClient<Database>>
+  }
+}
 
 /**
- * 创建Supabase客户端（使用更强大的单例模式）
- * 即使在React组件树被意外重新挂载时，也能确保只有一个客户端实例。
+ * 创建一个真正的全局Supabase客户端单例
+ * 将客户端附加到 `window` 对象，以确保即使模块作用域被意外重置，它也能持久存在。
  */
 export function createClient() {
-  // 如果单例已存在，直接返回
-  if (supabaseSingleton) {
-    console.log('🔄 Supabase: Using existing singleton client instance')
-    return supabaseSingleton
+  // 如果单例已经存在于window对象上，直接返回
+  if (typeof window !== 'undefined' && window.supabase_client_singleton) {
+    console.log('🔄 Supabase: Using existing global singleton client from window object')
+    return window.supabase_client_singleton
   }
 
-  console.log('🏗️ Supabase: createClient function invoked (creating singleton)...')
+  console.log('🏗️ Supabase: createClient function invoked (creating global singleton)...')
   
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -36,7 +39,7 @@ export function createClient() {
     // 生成一个简单的客户端ID用于调试
     const clientId = 'client_' + Date.now()
     
-    // 使用标准的 createClient，适合客户端静态应用
+    // 使用标准的 createClient
     const supabaseClient = createSupabaseClient<Database>(supabaseUrl, supabaseAnonKey, {
       auth: {
         persistSession: true,
@@ -49,14 +52,17 @@ export function createClient() {
     // 存储客户端ID用于调试
     ;(supabaseClient as any)._clientId = clientId
     
-    console.log('✅ Supabase: New client instance created successfully', {
+    console.log('✅ Supabase: New global singleton client created successfully', {
       clientId,
       hasAuth: !!supabaseClient.auth,
       hasFrom: typeof supabaseClient.from === 'function'
     })
 
-    // 将新创建的客户端存为单例
-    supabaseSingleton = supabaseClient
+    // 将新创建的客户端存储到window对象上
+    if (typeof window !== 'undefined') {
+      window.supabase_client_singleton = supabaseClient
+    }
+    
     return supabaseClient
   } catch (error) {
     console.error('❌ Supabase: Failed to create client:', error)
