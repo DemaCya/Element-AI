@@ -62,17 +62,26 @@ function DashboardContent() {
     async function fetchReports() {
       try {
         console.log('📡 Dashboard: Starting to fetch reports for user:', user!.id)
+        console.log('📡 Dashboard: Supabase client check:', {
+          hasSupabase: !!supabase,
+          hasFrom: typeof supabase?.from === 'function'
+        })
         
         const startTime = Date.now()
         
-        console.log('📊 Dashboard: Executing query...')
-        const { data, error } = await supabase
+        console.log('📊 Dashboard: About to execute query...')
+        console.log('📊 Dashboard: Building query chain...')
+        
+        const query = supabase
           .from('user_reports')
           .select('*')
           .eq('user_id', user!.id)
           .order('created_at', { ascending: false })
         
-        console.log('✅ Dashboard: Query completed')
+        console.log('📊 Dashboard: Query built, now executing...')
+        const { data, error } = await query
+        
+        console.log('✅ Dashboard: Query execution returned')
 
         const elapsed = Date.now() - startTime
         console.log(`📬 Dashboard: Query completed in ${elapsed}ms`)

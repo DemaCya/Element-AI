@@ -20,6 +20,7 @@ export function createClient() {
   }
   
   console.log('🏗️ Supabase: Creating new client instance (standard JS client)...')
+  console.log('🏗️ Supabase: Called from:', new Error().stack?.split('\n')[2]?.trim())
   
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY

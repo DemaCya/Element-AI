@@ -45,6 +45,11 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         
         // 先尝试getSession()（快速，从localStorage读取）
         console.log('⏱️ UserContext: Calling supabase.auth.getSession()...')
+        console.log('⏱️ UserContext: Supabase client check:', {
+          hasSupabase: !!supabase,
+          hasAuth: !!supabase?.auth,
+          hasGetSession: typeof supabase?.auth?.getSession === 'function'
+        })
         const { data: { session }, error: sessionError } = await supabase.auth.getSession()
         
         let user = session?.user || null
@@ -77,11 +82,15 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
           console.log('👤 UserContext: User found, fetching profile for:', user.id)
           
           const profileStartTime = Date.now()
-          const { data: profileData, error: profileError } = await supabase
+          console.log('📊 UserContext: Building profile query...')
+          const profileQuery = supabase
             .from('profiles')
             .select('*')
             .eq('id', user.id)
             .single()
+          
+          console.log('📊 UserContext: Executing profile query...')
+          const { data: profileData, error: profileError } = await profileQuery
           
           const profileElapsed = Date.now() - profileStartTime
           console.log(`📬 UserContext: Profile fetch completed in ${profileElapsed}ms`, { hasProfile: !!profileData, hasError: !!profileError })
