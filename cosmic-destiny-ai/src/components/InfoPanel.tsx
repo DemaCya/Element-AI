@@ -31,18 +31,18 @@ export default function InfoPanel({ activePanel, onClose }: InfoPanelProps) {
     sections: [
       {
         icon: Star,
-        title: 'Our Mission',
-        content: 'Cosmic Destiny AI was born from the intersection of ancient wisdom and modern technology. We believe that the cosmic patterns that guided our ancestors still hold valuable insights for our lives today.'
+        title: 'Our Calling',
+        content: 'To unlock the cosmic secrets encoded in the stars at the moment of your birth, guiding you toward a life of profound purpose and clarity.'
       },
       {
         icon: Sparkles,
-        title: 'The Technology',
-        content: 'Using advanced AI algorithms and traditional Chinese astrology calculations, we analyze your birth chart to provide personalized insights. Our system combines the precision of modern computing with the depth of ancient metaphysical traditions.'
+        title: 'The Oracle',
+        content: "Our digital oracle is a fusion of ancient astrological charts and sophisticated AI. It doesn't just calculate; it interprets, revealing the narrative of your life's potential as written in the stars."
       },
       {
         icon: Moon,
-        title: 'What We Offer',
-        content: 'From personality analysis to career guidance, relationship compatibility to life path predictions, we offer comprehensive insights based on your unique cosmic fingerprint—your birth chart.'
+        title: 'Your Cosmic Map',
+        content: "We provide you with a personalized cosmic map. Navigate your life's journey with insights into your personality, career, relationships, and destiny. Discover your strengths, understand your challenges, and unlock your true potential."
       }
     ]
   }
@@ -52,23 +52,23 @@ export default function InfoPanel({ activePanel, onClose }: InfoPanelProps) {
     sections: [
       {
         icon: Sun,
-        title: 'Harmony of Tradition and Innovation',
-        content: 'We honor the timeless wisdom of Chinese astrology while embracing cutting-edge AI technology. This fusion allows us to present ancient knowledge in accessible, modern formats.'
+        title: 'Ancient Wisdom, Modern Language',
+        content: 'We speak the ancient language of the stars, translated for the modern soul. We honor the sacred traditions of astrology while using AI to make its wisdom clearer and more accessible than ever before.'
       },
       {
         icon: Star,
-        title: 'Personal Empowerment',
-        content: 'Our readings are not deterministic prophecies but tools for self-discovery. We believe understanding your cosmic patterns empowers you to make more informed choices and live more consciously.'
+        title: 'You Are the Hero of Your Story',
+        content: "Your birth chart is a map, not a script. We believe the stars illuminate the path, but you hold the power to walk it. Our insights are designed to empower you to be the conscious author of your own destiny."
       },
       {
         icon: Sparkles,
-        title: 'Bridging Worlds',
-        content: 'Cosmic Destiny AI serves as a bridge between Eastern and Western approaches to self-understanding, making profound astrological insights available to everyone, regardless of cultural background.'
+        title: 'A Universe of Wisdom',
+        content: 'We unite the celestial wisdom of the East with the inquisitive spirit of the West. Cosmic Destiny AI is a global sanctuary for self-discovery, open to all who seek to understand their place in the universe.'
       },
       {
         icon: Moon,
-        title: 'Ethical Approach',
-        content: 'We are committed to providing thoughtful, responsible guidance. Our AI analyses are designed to inspire growth and self-reflection, never to create dependency or fear.'
+        title: 'Guiding Principles',
+        content: 'Our guidance is offered with reverence and responsibility. We aim to inspire wonder and self-awareness, fostering a positive and empowering relationship with your own life\'s journey.'
       }
     ]
   }

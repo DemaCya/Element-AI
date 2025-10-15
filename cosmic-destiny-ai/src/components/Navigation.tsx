@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect, useRef } from 'react'
-import { Menu, X, User, LogIn, FileText, History, LogOut, ChevronDown } from 'lucide-react'
+import { Menu, X, User, LogIn, LogOut, ChevronDown } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
@@ -92,33 +92,6 @@ export default function Navigation({ user, profile }: NavigationProps) {
                           <User className="w-4 h-4" />
                           <span>Dashboard</span>
                         </Link>
-
-                        <button
-                          onClick={() => {
-                            setShowUserDropdown(false)
-                            // Navigate to dashboard and open birth form
-                            router.push('/dashboard')
-                            setTimeout(() => {
-                              const event = new CustomEvent('openBirthForm')
-                              window.dispatchEvent(event)
-                            }, 100)
-                          }}
-                          className="flex items-center gap-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors w-full text-left"
-                        >
-                          <FileText className="w-4 h-4" />
-                          <span>Switch Account</span>
-                        </button>
-
-                        <button
-                          onClick={() => {
-                            setShowUserDropdown(false)
-                            router.push('/dashboard')
-                          }}
-                          className="flex items-center gap-3 px-3 py-2 text-gray-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors w-full text-left"
-                        >
-                          <History className="w-4 h-4" />
-                          <span>View History</span>
-                        </button>
 
                         <div className="border-t border-purple-500/20 my-2"></div>
 
