@@ -10,6 +10,13 @@ const CREEM_API_KEY = process.env.CREEM_API_KEY || process.env.CREEM_API_KEY_TES
 const CREEM_PRODUCT_ID = process.env.CREEM_PRODUCT_ID || ''
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
+// Helper to mask API key for logging
+const maskApiKey = (key: string) => {
+  if (!key) return 'Not Set'
+  if (key.length <= 8) return '********'
+  return `${key.slice(0, 4)}...${key.slice(-4)}`
+}
+
 interface CreateCheckoutParams {
   reportId: string
   userId: string
@@ -30,12 +37,20 @@ export class CreemPaymentService {
    */
   static async createCheckout(params: CreateCheckoutParams): Promise<CheckoutResult> {
     try {
+      // Log configuration
+      console.log('[Creem] Initializing checkout with config:', {
+        apiKeySet: maskApiKey(CREEM_API_KEY),
+        productIdSet: CREEM_PRODUCT_ID ? 'Set' : 'Not Set',
+        appUrl: APP_URL
+      })
+
+
       // Validate configuration
       if (!CREEM_API_KEY) {
         console.error('[Creem] API key not configured')
         return {
           success: false,
-          error: 'Payment system not configured. Please contact support.'
+          error: 'Payment system not configured: Missing API Key. Please contact support.'
         }
       }
 
@@ -43,7 +58,7 @@ export class CreemPaymentService {
         console.error('[Creem] Product ID not configured')
         return {
           success: false,
-          error: 'Product not configured. Please contact support.'
+          error: 'Payment system not configured: Missing Product ID. Please contact support.'
         }
       }
 
@@ -60,17 +75,25 @@ export class CreemPaymentService {
           product_id: CREEM_PRODUCT_ID,
           request_id: params.reportId, // Use reportId to track this payment
           success_url: `${APP_URL}/payment/success`,
-          customer_email: params.userEmail
+          customer_email: params.userEmail,
           // 注意：Creem API 不支持 cancel_url 参数 
         })
       })
 
       if (!response.ok) {
-        const errorText = await response.text()
-        console.error('[Creem] API error:', response.status, errorText)
+        const errorBody = await response.json().catch(() => response.text())
+        console.error('[Creem] API error:', {
+          status: response.status,
+          statusText: response.statusText,
+          body: errorBody
+        })
+        const errorMessage = typeof errorBody === 'object' && errorBody !== null && 'error' in errorBody && typeof errorBody.error === 'string'
+          ? errorBody.error
+          : 'Failed to create payment session. Please check server logs.'
+
         return {
           success: false,
-          error: 'Failed to create payment session. Please try again.'
+          error: `Creem API Error: ${errorMessage}`
         }
       }
 
@@ -88,7 +111,7 @@ export class CreemPaymentService {
       console.error('[Creem] Error creating checkout:', error)
       return {
         success: false,
-        error: 'Failed to create payment session. Please try again.'
+        error: 'An unexpected error occurred while creating the payment session. Please try again.'
       }
     }
   }

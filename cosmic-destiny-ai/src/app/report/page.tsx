@@ -146,7 +146,9 @@ function ReportContent() {
       const data = await response.json()
 
       if (!data.success || !data.checkoutUrl) {
-        throw new Error(data.error || 'Failed to create payment session')
+        console.error('[Report] Failed to create checkout session:', data.error)
+        const errorMessage = data.error || 'Failed to create payment session'
+        throw new Error(errorMessage)
       }
 
       console.log('[Report] Checkout created, redirecting to:', data.checkoutUrl)
@@ -156,7 +158,8 @@ function ReportContent() {
       
     } catch (error) {
       console.error('[Report] Error creating checkout:', error)
-      alert('Failed to start payment process. Please try again.')
+      const displayError = error instanceof Error ? error.message : 'An unknown error occurred.'
+      alert(`Failed to start payment process. Please try again.\n\nError: ${displayError}`)
       setLoading(false)
     }
   }
