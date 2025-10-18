@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClientForRoute } from '@/lib/supabase/server'
 import { CreemPaymentService } from '@/services/paymentService'
 
 export const runtime = 'nodejs'
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     console.log('[Payment] ========== Create Checkout Request ==========')
     console.log('[Payment] Timestamp:', new Date().toISOString())
     
-    const supabase = await createClient()
+    const supabase = createClientForRoute(request)
 
     // Check authentication
     console.log('[Payment] Checking authentication...')
