@@ -61,7 +61,7 @@ export class CreemPaymentService {
           request_id: params.reportId, // Use reportId to track this payment
           success_url: `${APP_URL}/payment/success`,
           customer_email: params.userEmail
-          // 注意：Creem API 不支持 cancel_url 参数
+          // 注意：Creem API 不支持 cancel_url 参数 
         })
       })
 
