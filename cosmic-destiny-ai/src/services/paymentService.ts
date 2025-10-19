@@ -124,7 +124,25 @@ export class CreemPaymentService {
       }
 
     } catch (error) {
-      console.error('[Creem] Error creating checkout:', error)
+      console.error('--- [Creem] UNEXPECTED FETCH ERROR ---');
+      console.error('[Creem] This indicates a potential network issue or a problem with the fetch call itself.');
+      
+      if (error instanceof Error) {
+        console.error('[Creem] Error Name:', error.name);
+        console.error('[Creem] Error Message:', error.message);
+        console.error('[Creem] Error Stack:', error.stack);
+      } else {
+        console.error('[Creem] Caught a non-Error object:', error);
+      }
+      
+      try {
+        console.error('[Creem] Serialized Error:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
+      } catch (e) {
+        console.error('[Creem] Could not serialize the error object.');
+      }
+      
+      console.error('--- [Creem] END UNEXPECTED FETCH ERROR ---');
+
       return {
         success: false,
         error: 'An unexpected error occurred while creating the payment session. Please try again.'
