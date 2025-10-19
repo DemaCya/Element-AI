@@ -82,13 +82,15 @@ export class CreemPaymentService {
 
       const body = {
         product_id: CREEM_PRODUCT_ID,
-        request_id: params.reportId, // Use reportId to track this payment
-        success_url: `${APP_URL}/payment/success`,
-        customer_email: params.userEmail,
-        // 注意：Creem API 不支持 cancel_url 参数
+        // --- FINAL DEBUGGING STEP ---
+        // Temporarily removing optional parameters to isolate the issue.
+        // If this works, the problem is with one of the parameters below.
+        // request_id: params.reportId,
+        // success_url: `${APP_URL}/payment/success`,
+        // customer_email: params.userEmail,
       }
 
-      console.log('[Creem] Sending request to Creem with body:', JSON.stringify(body, null, 2));
+      console.log('[Creem] Sending MINIMAL request to Creem with body:', JSON.stringify(body, null, 2));
 
       // Call Creem API
       const response = await fetch(`${CREEM_API_BASE}/checkouts`, {
