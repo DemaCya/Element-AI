@@ -1,28 +1,20 @@
 'use client'
 
-import React, { createContext, useContext, useMemo } from 'react'
+import React, { createContext, useContext, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { SupabaseClient } from '@supabase/supabase-js'
 import { Database } from '@/lib/database.types'
 
-interface SupabaseContextType {
+type SupabaseContextType = {
   supabase: SupabaseClient<Database>
 }
 
 const SupabaseContext = createContext<SupabaseContextType | undefined>(undefined)
 
 export function SupabaseProvider({ children }: { children: React.ReactNode }) {
-  console.log('🏗️ SupabaseProvider: Component rendering...')
-  
-  // 使用 useMemo 确保只创建一次客户端，避免每次渲染都调用
-  const supabase = useMemo(() => {
-    console.log('🏗️ SupabaseProvider: useMemo callback executing (creating client)...')
-    const client = createClient()
-    console.log('✅ SupabaseProvider: Client created and memoized')
-    return client
-  }, [])
+  // The client is lightweight and created once per component lifecycle.
+  const [supabase] = useState(() => createClient())
 
-  console.log('🏗️ SupabaseProvider: Providing context to children')
   return (
     <SupabaseContext.Provider value={{ supabase }}>
       {children}
@@ -37,6 +29,3 @@ export function useSupabase() {
   }
   return context.supabase
 }
-
-// 导出创建客户端的函数
-export { createClient }
