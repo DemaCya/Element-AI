@@ -8,11 +8,12 @@
 // --- Environment Configuration ---
 const IS_TEST_MODE = process.env.CREEM_MODE === 'test'
 
-// The Creem API uses the same base URL for both test and production modes.
-// The mode is determined by the API key used.
-const CREEM_API_BASE = 'https://api.creem.io/v1'
+// Base URLs now correctly use the official test endpoint
+const CREEM_API_BASE_PROD = 'https://api.creem.io/v1'
+const CREEM_API_BASE_TEST = 'https://test-api.creem.io/v1' // Correct endpoint from official docs
 
 // Select configuration based on mode
+const CREEM_API_BASE = IS_TEST_MODE ? CREEM_API_BASE_TEST : CREEM_API_BASE_PROD
 const CREEM_API_KEY = IS_TEST_MODE 
   ? process.env.CREEM_API_KEY_TEST || '' 
   : process.env.CREEM_API_KEY || ''
@@ -82,15 +83,13 @@ export class CreemPaymentService {
 
       const body = {
         product_id: CREEM_PRODUCT_ID,
-        // --- FINAL DEBUGGING STEP ---
-        // Temporarily removing optional parameters to isolate the issue.
-        // If this works, the problem is with one of the parameters below.
-        // request_id: params.reportId,
-        // success_url: `${APP_URL}/payment/success`,
-        // customer_email: params.userEmail,
+        // Restore optional parameters now that the root cause is fixed.
+        request_id: params.reportId,
+        success_url: `${APP_URL}/payment/success`,
+        customer_email: params.userEmail,
       }
 
-      console.log('[Creem] Sending MINIMAL request to Creem with body:', JSON.stringify(body, null, 2));
+      console.log('[Creem] Sending request to Creem with body:', JSON.stringify(body, null, 2));
 
       // Call Creem API
       const response = await fetch(`${CREEM_API_BASE}/checkouts`, {
