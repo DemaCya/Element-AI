@@ -8,12 +8,11 @@
 // --- Environment Configuration ---
 const IS_TEST_MODE = process.env.CREEM_MODE === 'test'
 
-// Base URLs
-const CREEM_API_BASE_PROD = 'https://api.creem.io/v1'
-const CREEM_API_BASE_TEST = process.env.CREEM_API_BASE_TEST || 'https://api.test.creem.io/v1' // Default test URL, can be overridden
+// The Creem API uses the same base URL for both test and production modes.
+// The mode is determined by the API key used.
+const CREEM_API_BASE = 'https://api.creem.io/v1'
 
 // Select configuration based on mode
-const CREEM_API_BASE = IS_TEST_MODE ? CREEM_API_BASE_TEST : CREEM_API_BASE_PROD
 const CREEM_API_KEY = IS_TEST_MODE 
   ? process.env.CREEM_API_KEY_TEST || '' 
   : process.env.CREEM_API_KEY || ''
