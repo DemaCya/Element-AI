@@ -80,6 +80,16 @@ export class CreemPaymentService {
 
       console.log('[Creem] Creating checkout for report:', params.reportId)
 
+      const body = {
+        product_id: CREEM_PRODUCT_ID,
+        request_id: params.reportId, // Use reportId to track this payment
+        success_url: `${APP_URL}/payment/success`,
+        customer_email: params.userEmail,
+        // 注意：Creem API 不支持 cancel_url 参数
+      }
+
+      console.log('[Creem] Sending request to Creem with body:', JSON.stringify(body, null, 2));
+
       // Call Creem API
       const response = await fetch(`${CREEM_API_BASE}/checkouts`, {
         method: 'POST',
@@ -87,13 +97,7 @@ export class CreemPaymentService {
           'Content-Type': 'application/json',
           'x-api-key': CREEM_API_KEY
         },
-        body: JSON.stringify({
-          product_id: CREEM_PRODUCT_ID,
-          request_id: params.reportId, // Use reportId to track this payment
-          success_url: `${APP_URL}/payment/success`,
-          customer_email: params.userEmail,
-          // 注意：Creem API 不支持 cancel_url 参数 
-        })
+        body: JSON.stringify(body)
       })
 
       if (!response.ok) {
