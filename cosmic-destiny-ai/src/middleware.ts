@@ -2,6 +2,17 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
+  console.log(`[Middleware] Running for path: ${request.nextUrl.pathname}`)
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.error('[Middleware] CRITICAL: Supabase environment variables are not set.')
+    // Let the request pass through to fail at the route handler, but the log here is key.
+    return NextResponse.next()
+  }
+
   let response = NextResponse.next({
     request: {
       headers: request.headers,
@@ -9,8 +20,8 @@ export async function middleware(request: NextRequest) {
   })
 
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    supabaseUrl,
+    supabaseAnonKey,
     {
       cookies: {
         get(name: string) {
@@ -54,8 +65,14 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // Refresh session if expired - important for server-side calls
-  await supabase.auth.getUser()
+  console.log('[Middleware] Attempting to refresh user session...')
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (user) {
+    console.log(`[Middleware] Session refresh successful. User ID: ${user.id}`)
+  } else {
+    console.log('[Middleware] No active user session found after refresh attempt.')
+  }
 
   return response
 }
