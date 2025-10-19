@@ -5,9 +5,22 @@
  * Payment verification is done via webhook, not here.
  */
 
-const CREEM_API_BASE = 'https://api.creem.io/v1'
-const CREEM_API_KEY = process.env.CREEM_API_KEY || process.env.CREEM_API_KEY_TEST || ''
-const CREEM_PRODUCT_ID = process.env.CREEM_PRODUCT_ID || ''
+// --- Environment Configuration ---
+const IS_TEST_MODE = process.env.CREEM_MODE === 'test'
+
+// Base URLs
+const CREEM_API_BASE_PROD = 'https://api.creem.io/v1'
+const CREEM_API_BASE_TEST = process.env.CREEM_API_BASE_TEST || 'https://api.test.creem.io/v1' // Default test URL, can be overridden
+
+// Select configuration based on mode
+const CREEM_API_BASE = IS_TEST_MODE ? CREEM_API_BASE_TEST : CREEM_API_BASE_PROD
+const CREEM_API_KEY = IS_TEST_MODE 
+  ? process.env.CREEM_API_KEY_TEST || '' 
+  : process.env.CREEM_API_KEY || ''
+const CREEM_PRODUCT_ID = IS_TEST_MODE 
+  ? process.env.CREEM_PRODUCT_ID_TEST || '' 
+  : process.env.CREEM_PRODUCT_ID || ''
+
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
 
 // Helper to mask API key for logging
