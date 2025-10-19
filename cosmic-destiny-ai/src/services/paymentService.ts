@@ -21,7 +21,11 @@ const CREEM_PRODUCT_ID = IS_TEST_MODE
   ? process.env.CREEM_PRODUCT_ID_TEST || '' 
   : process.env.CREEM_PRODUCT_ID || ''
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL ||
+  (process.env.VERCEL_URL
+    ? `https://${process.env.VERCEL_URL}`
+    : 'http://localhost:3000')
 
 // Helper to mask API key for logging
 const maskApiKey = (key: string) => {
