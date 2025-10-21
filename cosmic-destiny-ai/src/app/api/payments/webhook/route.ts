@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
  * 2. Update payment status
  * 3. Unlock the report
  */
-async function handlePaymentSuccess(data: any) {
+async function handlePaymentSuccess(data: any): Promise<void> {
   try {
     const { checkout_id, order_id, request_id, customer_email, amount_total } = data
     const reportId = request_id // We use reportId as request_id
