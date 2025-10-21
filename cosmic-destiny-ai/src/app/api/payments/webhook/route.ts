@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/database.types'
+import { PostgrestSingleResponse } from '@supabase/supabase-js'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -81,11 +82,11 @@ async function handlePaymentSuccess(data: any): Promise<void> {
     // --- 新逻辑：不再依赖预先创建的支付记录 ---
 
     // 1. 获取报告和用户信息
-    const { data: report, error: reportError } = await supabaseAdmin
+    const { data: report, error: reportError }: PostgrestSingleResponse<UserReport> = await supabaseAdmin
       .from('user_reports')
       .select('*')
       .eq('id', reportId)
-      .maybeSingle()
+      .single()
 
     if (reportError || !report) {
       console.error('[Webhook] Report not found or failed to fetch:', { reportId, error: reportError })
@@ -101,7 +102,7 @@ async function handlePaymentSuccess(data: any): Promise<void> {
 
     // 2. 解锁报告
     const { error: updateReportError } = await supabaseAdmin
-      .from('user_reports')
+      .from<'user_reports'>('user_reports')
       .update({ is_paid: true, updated_at: new Date().toISOString() })
       .eq('id', reportId)
 
@@ -116,7 +117,7 @@ async function handlePaymentSuccess(data: any): Promise<void> {
     // 3. 创建或更新支付记录
     // 使用 upsert 保证数据一致性，如果记录已存在则更新，不存在则创建
     const { error: paymentError } = await supabaseAdmin
-      .from('payments')
+      .from<'payments'>('payments')
       .upsert({
         checkout_id: checkout_id, // 主键/唯一键
         user_id: report.user_id,
