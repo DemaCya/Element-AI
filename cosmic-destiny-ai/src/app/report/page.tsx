@@ -37,7 +37,7 @@ function ReportContent() {
   const [isVerifying, setIsVerifying] = useState(false) // 新增状态，用于验证支付
   const supabase = useSupabase()
 
-  const fetchReport = useCallback(async (isRetry = false) => {
+  const fetchReport = useCallback(async (isRetry = false): Promise<CosmicReport | null> => {
     const reportId = searchParams.get('id')
     
     // 只有在第一次加载时才记录日志
@@ -49,13 +49,13 @@ function ReportContent() {
       console.log('❌ Report: No report ID, redirecting to dashboard')
       setLoading(false)
       router.push('/dashboard')
-      return
+      return null // 返回 null 表示失败
     }
     
     if (!user) {
       // 只有在第一次加载时才记录日志
       if (!isRetry) console.log('⏳ Report: No user yet, waiting...')
-      return
+      return null // 返回 null 表示失败
     }
 
     try {
