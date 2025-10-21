@@ -83,7 +83,7 @@ async function handlePaymentSuccess(data: any): Promise<void> {
     // 1. 获取报告和用户信息
     const { data: report, error: reportError } = await supabaseAdmin
       .from('user_reports')
-      .select('*, user:users(*)')
+      .select('*')
       .eq('id', reportId)
       .maybeSingle()
 
