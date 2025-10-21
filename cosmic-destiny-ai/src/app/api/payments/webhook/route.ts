@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/lib/database.types'
 
 export const runtime = 'nodejs'
@@ -9,7 +9,7 @@ type Payment = Database['public']['Tables']['payments']['Row']
 type UserReport = Database['public']['Tables']['user_reports']['Row']
 
 // Create Supabase admin client - lazy initialization to avoid build-time errors
-function getSupabaseAdmin() {
+function getSupabaseAdmin(): SupabaseClient<Database> {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
   
@@ -81,11 +81,11 @@ async function handlePaymentSuccess(data: any): Promise<void> {
     // --- 新逻辑：不再依赖预先创建的支付记录 ---
 
     // 1. 获取报告和用户信息
-    const { data: report, error: reportError } = (await supabaseAdmin
+    const { data: report, error: reportError } = await supabaseAdmin
       .from('user_reports')
       .select('*')
       .eq('id', reportId)
-      .maybeSingle()) as { data: UserReport | null; error: any }
+      .maybeSingle()
 
     if (reportError || !report) {
       console.error('[Webhook] Report not found or failed to fetch:', { reportId, error: reportError })
