@@ -2,15 +2,13 @@
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import Logo from '@/components/Logo'
+import { Suspense } from 'react'
 
 /**
- * Payment Success Page - Simplified MVP Version
- * 
- * Shows a success message after payment.
- * Webhook handles the actual payment verification and report unlocking.
- * User can go to dashboard to view their unlocked report.
+ * Main content of the success page.
+ * This component uses useSearchParams, so it must be wrapped in Suspense.
  */
-export default function PaymentSuccessPage() {
+function SuccessContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const reportId = searchParams.get('report_id')
@@ -93,5 +91,22 @@ export default function PaymentSuccessPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+/**
+ * Payment Success Page - Simplified MVP Version
+ * 
+ * This page wraps the main content in a Suspense boundary to allow
+ * the use of `useSearchParams` without causing build errors.
+ */
+export default function PaymentSuccessPage() {
+  // A simple fallback UI. You can style this to match your app's theme.
+  const fallback = <div className="min-h-screen bg-black flex items-center justify-center text-white">Loading...</div>
+
+  return (
+    <Suspense fallback={fallback}>
+      <SuccessContent />
+    </Suspense>
   )
 }
