@@ -57,25 +57,20 @@ function ReportContent() {
       console.log('🔍 Report: Starting to fetch report with ID:', reportId, 'for user:', user.id)
       setLoading(true)
       
-      // 添加超时保护
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Query timeout')), 10000)
-      )
-      
-      const queryPromise = supabase
+      console.log(`⏱️ Report: Starting Supabase query at ${new Date().toISOString()}`)
+      const queryStartTime = Date.now()
+
+      const { data, error } = await supabase
         .from('user_reports')
         .select('*')
         .eq('id', reportId)
         .eq('user_id', user.id)
         .single()
       
-      console.log('📡 Report: Query sent, waiting for response...')
+      const queryEndTime = Date.now()
+      console.log(`⏱️ Report: Supabase query finished at ${new Date().toISOString()}`)
+      console.log(`⏱️ Report: Query duration: ${queryEndTime - queryStartTime} ms`)
       
-      const { data, error } = await Promise.race([
-        queryPromise,
-        timeoutPromise
-      ]) as any
-
       console.log('📬 Report: Response received', { hasData: !!data, hasError: !!error })
 
       if (error) {
