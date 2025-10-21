@@ -34,12 +34,16 @@ function ReportContent() {
   const { user, loading: authLoading } = useUser()
   const [report, setReport] = useState<CosmicReport | null>(null)
   const [loading, setLoading] = useState(true)
+  const [isVerifying, setIsVerifying] = useState(false) // 新增状态，用于验证支付
   const supabase = useSupabase()
 
-  const fetchReport = useCallback(async () => {
+  const fetchReport = useCallback(async (isRetry = false) => {
     const reportId = searchParams.get('id')
     
-    console.log('📄 Report: fetchReport called with:', { reportId, userId: user?.id })
+    // 只有在第一次加载时才记录日志
+    if (!isRetry) {
+      console.log('📄 Report: fetchReport called with:', { reportId, userId: user?.id })
+    }
     
     if (!reportId) {
       console.log('❌ Report: No report ID, redirecting to dashboard')
@@ -49,13 +53,17 @@ function ReportContent() {
     }
     
     if (!user) {
-      console.log('⏳ Report: No user yet, waiting...')
+      // 只有在第一次加载时才记录日志
+      if (!isRetry) console.log('⏳ Report: No user yet, waiting...')
       return
     }
 
     try {
-      console.log('🔍 Report: Starting to fetch report with ID:', reportId, 'for user:', user.id)
-      setLoading(true)
+      // 第一次加载时显示全屏加载动画
+      if (!isRetry) {
+        console.log('🔍 Report: Starting to fetch report with ID:', reportId, 'for user:', user.id)
+        setLoading(true)
+      }
       
       console.log(`⏱️ Report: Starting Supabase query at ${new Date().toISOString()}`)
       const queryStartTime = Date.now()
@@ -74,31 +82,45 @@ function ReportContent() {
       console.log('📬 Report: Response received', { hasData: !!data, hasError: !!error })
 
       if (error) {
-        console.error('❌ Report: Error fetching report:', error)
-        console.error('❌ Report: Error details:', JSON.stringify(error))
-        alert('无法加载报告，将返回控制台。错误：' + error.message)
-        setLoading(false)
-        router.push('/dashboard')
-        return
+        if (!isRetry) {
+          console.error('❌ Report: Error fetching report:', error)
+          console.error('❌ Report: Error details:', JSON.stringify(error))
+          alert('无法加载报告，将返回控制台。错误：' + error.message)
+          router.push('/dashboard')
+        }
+        return null // 在重试时返回 null 表示失败
       }
 
       if (!data) {
-        console.error('❌ Report: No data returned')
-        alert('报告不存在或您无权访问')
-        setLoading(false)
-        router.push('/dashboard')
-        return
+        if (!isRetry) {
+          console.error('❌ Report: No data returned')
+          alert('报告不存在或您无权访问')
+          router.push('/dashboard')
+        }
+        return null // 在重试时返回 null
       }
 
-      console.log('✅ Report: Report fetched successfully', data)
+      // 只有在第一次加载时才记录成功日志
+      if (!isRetry) {
+        console.log('✅ Report: Report fetched successfully', data)
+      }
+      
       setReport(data)
-      setLoading(false)
+      return data // 返回获取到的报告数据
+
     } catch (error) {
-      console.error('❌ Report: Exception while fetching report:', error)
-      console.error('❌ Report: Exception details:', JSON.stringify(error, Object.getOwnPropertyNames(error)))
-      alert('加载报告时出错，将返回控制台。错误：' + (error instanceof Error ? error.message : String(error)))
-      setLoading(false)
-      router.push('/dashboard')
+      if (!isRetry) {
+        console.error('❌ Report: Exception while fetching report:', error)
+        console.error('❌ Report: Exception details:', JSON.stringify(error, Object.getOwnPropertyNames(error)))
+        alert('加载报告时出错，将返回控制台。错误：' + (error instanceof Error ? error.message : String(error)))
+        router.push('/dashboard')
+      }
+      return null // 在重试时返回 null
+    } finally {
+      // 确保只有在非重试的主流程中才停止全屏加载
+      if (!isRetry) {
+        setLoading(false)
+      }
     }
   }, [searchParams, user, supabase, router])
 
@@ -112,10 +134,36 @@ function ReportContent() {
     }
 
     if (user && !authLoading) {
-      console.log('👤 Report: User found, fetching report')
-      fetchReport()
+      console.log('👤 Report: User found, starting initial fetch')
+      fetchReport().then(fetchedReport => {
+        // 如果报告存在且未支付，则开始轮询验证
+        if (fetchedReport && !fetchedReport.is_paid) {
+          console.log('⏳ Report: Report is unpaid, starting payment verification polling...')
+          setIsVerifying(true)
+          
+          let attempts = 0
+          const maxAttempts = 5 // 最多尝试5次
+
+          const interval = setInterval(async () => {
+            attempts++
+            console.log(`🔄 Report: Polling attempt #${attempts}`)
+            
+            const updatedReport = await fetchReport(true) // true表示是重试
+            
+            if (updatedReport?.is_paid || attempts >= maxAttempts) {
+              clearInterval(interval)
+              setIsVerifying(false)
+              if (updatedReport?.is_paid) {
+                console.log('✅ Report: Payment verified via polling!')
+              } else {
+                console.log('❌ Report: Polling finished, report is still unpaid.')
+              }
+            }
+          }, 2000) // 每2秒钟轮询一次
+        }
+      })
     }
-  }, [user, authLoading, fetchReport, router]) // 保持依赖项完整
+  }, [user, authLoading, fetchReport, router])
 
   const handleUpgrade = async () => {
     if (!report?.id) {
@@ -194,6 +242,14 @@ function ReportContent() {
   const getReportContent = () => {
     if (!report) return ''
     
+    // 如果正在验证支付，插入一个提示
+    if (isVerifying) {
+      return `# 正在验证支付状态...
+      
+## 请稍候
+我们正在确认您的支付信息，这通常需要几秒钟。页面将自动刷新。`
+    }
+
     // 如果有预览报告且未付费，显示预览
     if (!report.is_paid && report.preview_report) {
       return report.preview_report
