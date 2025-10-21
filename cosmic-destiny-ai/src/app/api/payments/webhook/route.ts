@@ -81,11 +81,11 @@ async function handlePaymentSuccess(data: any): Promise<void> {
     // --- 新逻辑：不再依赖预先创建的支付记录 ---
 
     // 1. 获取报告和用户信息
-    const { data: report, error: reportError } = await supabaseAdmin
+    const { data: report, error: reportError } = (await supabaseAdmin
       .from('user_reports')
       .select('*')
       .eq('id', reportId)
-      .maybeSingle()
+      .maybeSingle()) as { data: UserReport | null; error: any }
 
     if (reportError || !report) {
       console.error('[Webhook] Report not found or failed to fetch:', { reportId, error: reportError })
