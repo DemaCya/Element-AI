@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Logo from '@/components/Logo'
 
 /**
@@ -12,6 +12,17 @@ import Logo from '@/components/Logo'
  */
 export default function PaymentSuccessPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const reportId = searchParams.get('report_id')
+
+  const handleViewReport = () => {
+    if (reportId) {
+      router.push(`/report?id=${reportId}`)
+    } else {
+      // Fallback if report_id is not in the URL
+      router.push('/dashboard')
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-900 via-blue-900 to-black text-white">
@@ -57,10 +68,10 @@ export default function PaymentSuccessPage() {
 
               <div className="space-y-4">
                 <button
-                  onClick={() => router.push('/dashboard')}
+                  onClick={handleViewReport}
                   className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold py-4 px-8 rounded-lg hover:from-purple-600 hover:to-pink-600 transition-all shadow-lg"
                 >
-                  View My Reports
+                  View Full Report
                 </button>
 
                 <button

@@ -85,7 +85,7 @@ export class CreemPaymentService {
         product_id: CREEM_PRODUCT_ID,
         // Restore optional parameters now that the root cause is fixed.
         request_id: params.reportId,
-        success_url: `${APP_URL}/payment/success`,
+        success_url: `${APP_URL}/payment/success?report_id=${params.reportId}`,
         // The API rejected this parameter, so it's removed.
         // customer_email: params.userEmail,
       }
