@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
  */
 async function handlePaymentSuccess(data: any) {
   try {
-    const { checkout_id, order_id, request_id } = data
+    const { checkout_id, order_id, request_id, customer_email, amount_total } = data
     const reportId = request_id // We use reportId as request_id
 
     console.log('[Webhook] Payment success:', {
@@ -78,60 +78,72 @@ async function handlePaymentSuccess(data: any) {
 
     const supabaseAdmin = getSupabaseAdmin()
 
-    // Find payment record
-    const { data: payment, error: paymentError } = await supabaseAdmin
-      .from('payments')
-      .select('*')
-      .eq('checkout_id', checkout_id)
-      .maybeSingle() as { data: Payment | null, error: any }
+    // --- 新逻辑：不再依赖预先创建的支付记录 ---
 
-    if (paymentError) {
-      console.error('[Webhook] Error fetching payment:', paymentError)
-    }
-
-    // Check if already processed (idempotency)
-    if (payment?.status === 'completed') {
-      console.log('[Webhook] Already processed, skipping')
-      return
-    }
-
-    // Update payment status
-    if (payment) {
-      await supabaseAdmin
-        .from('payments')
-        // @ts-expect-error - Supabase type inference issue with update
-        .update({
-          status: 'completed',
-          order_id: order_id
-        })
-        .eq('id', payment.id)
-    }
-
-    // Get the report
+    // 1. 获取报告和用户信息
     const { data: report, error: reportError } = await supabaseAdmin
       .from('user_reports')
-      .select('*')
+      .select('*, user:users(*)')
       .eq('id', reportId)
-      .maybeSingle() as { data: UserReport | null, error: any }
+      .maybeSingle()
 
     if (reportError || !report) {
-      console.error('[Webhook] Report not found:', reportId, reportError)
+      console.error('[Webhook] Report not found or failed to fetch:', { reportId, error: reportError })
+      // 如果报告不存在，我们无法继续，但仍需返回成功以免Creem重试
+      return
+    }
+    
+    // 幂等性检查：如果报告已经支付，则跳过
+    if (report.is_paid) {
+      console.log('[Webhook] Report already marked as paid. Skipping.', { reportId })
       return
     }
 
-    // Unlock the report
-    // Note: Full report generation happens on-demand when user views the report
-    // This keeps the webhook fast and reliable
-    await supabaseAdmin
+    // 2. 解锁报告
+    const { error: updateReportError } = await supabaseAdmin
       .from('user_reports')
-      // @ts-expect-error - Supabase type inference issue with update
-      .update({ is_paid: true })
+      .update({ is_paid: true, updated_at: new Date().toISOString() })
       .eq('id', reportId)
 
-    console.log('[Webhook] Report unlocked successfully')
+    if (updateReportError) {
+      console.error('[Webhook] CRITICAL: Failed to unlock report! This needs manual intervention.', { reportId, error: updateReportError })
+      // 抛出错误，让Creem重试
+      throw new Error(`Failed to unlock report ${reportId}`)
+    }
+
+    console.log('[Webhook] Report unlocked successfully:', { reportId })
+
+    // 3. 创建或更新支付记录
+    // 使用 upsert 保证数据一致性，如果记录已存在则更新，不存在则创建
+    const { error: paymentError } = await supabaseAdmin
+      .from('payments')
+      .upsert({
+        checkout_id: checkout_id, // 主键/唯一键
+        user_id: report.user_id,
+        report_id: report.id,
+        amount: amount_total ? amount_total / 100 : 19.99, // Creem通常以分为单位
+        currency: 'usd',
+        status: 'completed',
+        payment_provider: 'creem',
+        order_id: order_id,
+        metadata: {
+          customer_email: customer_email,
+          webhook_received_at: new Date().toISOString()
+        }
+      }, {
+        onConflict: 'checkout_id'
+      })
+
+    if (paymentError) {
+      console.error('[Webhook] Warning: Failed to create or update payment record. Report was unlocked.', { checkout_id, reportId, error: paymentError })
+      // 这不是致命错误，因为报告已经解锁，所以我们不抛出错误
+    } else {
+      console.log('[Webhook] Payment record created/updated successfully:', { checkout_id })
+    }
 
   } catch (error) {
     console.error('[Webhook] Error processing payment:', error)
+    // 将错误向上抛出，以便Vercel记录并让Creem重试
     throw error
   }
 }

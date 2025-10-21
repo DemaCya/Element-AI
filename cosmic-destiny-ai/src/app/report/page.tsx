@@ -85,7 +85,7 @@ function ReportContent() {
         if (!isRetry) {
           console.error('❌ Report: Error fetching report:', error)
           console.error('❌ Report: Error details:', JSON.stringify(error))
-          alert('无法加载报告，将返回控制台。错误：' + error.message)
+          alert('Could not load report, returning to dashboard. Error: ' + error.message)
           router.push('/dashboard')
         }
         return null // 在重试时返回 null 表示失败
@@ -94,7 +94,7 @@ function ReportContent() {
       if (!data) {
         if (!isRetry) {
           console.error('❌ Report: No data returned')
-          alert('报告不存在或您无权访问')
+          alert('Report not found or you do not have permission to view it')
           router.push('/dashboard')
         }
         return null // 在重试时返回 null
@@ -112,7 +112,7 @@ function ReportContent() {
       if (!isRetry) {
         console.error('❌ Report: Exception while fetching report:', error)
         console.error('❌ Report: Exception details:', JSON.stringify(error, Object.getOwnPropertyNames(error)))
-        alert('加载报告时出错，将返回控制台。错误：' + (error instanceof Error ? error.message : String(error)))
+        alert('Error loading report, returning to dashboard. Error: ' + (error instanceof Error ? error.message : String(error)))
         router.push('/dashboard')
       }
       return null // 在重试时返回 null
@@ -244,10 +244,10 @@ function ReportContent() {
     
     // 如果正在验证支付，插入一个提示
     if (isVerifying) {
-      return `# 正在验证支付状态...
+      return `# Verifying Payment Status...
       
-## 请稍候
-我们正在确认您的支付信息，这通常需要几秒钟。页面将自动刷新。`
+## Please Wait
+We are confirming your payment information. This usually takes a few seconds. The page will refresh automatically.`
     }
 
     // 如果有预览报告且未付费，显示预览
@@ -261,30 +261,30 @@ function ReportContent() {
     }
     
     // 如果没有报告内容，显示默认内容
-    return `# 您的命理概览
+    return `# Your Astrological Overview
 
-## 出生信息
-- 出生日期：${report.birth_date}
-- 出生时间：${report.birth_time || '未知'}
-- 性别：${report.gender === 'male' ? '男' : '女'}
-- 时区：${report.timezone}
+## Birth Information
+- Birth Date: ${report.birth_date}
+- Birth Time: ${report.birth_time || 'Unknown'}
+- Gender: ${report.gender === 'male' ? 'Male' : 'Female'}
+- Timezone: ${report.timezone}
 
-## 报告状态
-${report.is_paid ? '✅ 完整版报告' : '📋 预览版报告'}
+## Report Status
+${report.is_paid ? '✅ Full Report' : '📋 Preview Report'}
 
 ${!report.is_paid ? `
 
-**想要了解更多详细内容吗？**
+**Want to unlock more details?**
 
-完整报告包含：
-- 深度人格分析和成长建议
-- 详细职业规划和财富策略  
-- 全面感情分析和最佳配对
-- 人生使命和关键转折点
-- 个性化健康养生方案
-- 以及更多专属于您的命理指导...
+The full report includes:
+- In-depth personality analysis and growth advice
+- Detailed career planning and wealth strategies  
+- Comprehensive relationship analysis and best matches
+- Life mission and key turning points
+- Personalized health and wellness plan
+- And much more guidance tailored to your destiny...
 
-立即解锁完整报告，开启您的命运探索之旅！` : ''}`
+Unlock the full report now to begin your journey of cosmic discovery!` : ''}`
   }
 
   return (
