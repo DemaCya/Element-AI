@@ -10,7 +10,7 @@ type Payment = Database['public']['Tables']['payments']['Row']
 type UserReport = Database['public']['Tables']['user_reports']['Row']
 
 // Create Supabase admin client - lazy initialization to avoid build-time errors
-function getSupabaseAdmin(): SupabaseClient<Database> {
+function getSupabaseAdmin(): any {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
   
@@ -18,7 +18,7 @@ function getSupabaseAdmin(): SupabaseClient<Database> {
     throw new Error('Supabase environment variables not configured')
   }
   
-  return createClient<Database>(
+  return createClient(
     supabaseUrl,
     supabaseKey,
     {
@@ -102,7 +102,7 @@ async function handlePaymentSuccess(data: any): Promise<void> {
 
     // 2. 解锁报告
     const { error: updateReportError } = await supabaseAdmin
-      .from<'user_reports'>('user_reports')
+      .from('user_reports')
       .update({ is_paid: true, updated_at: new Date().toISOString() })
       .eq('id', reportId)
 
@@ -117,7 +117,7 @@ async function handlePaymentSuccess(data: any): Promise<void> {
     // 3. 创建或更新支付记录
     // 使用 upsert 保证数据一致性，如果记录已存在则更新，不存在则创建
     const { error: paymentError } = await supabaseAdmin
-      .from<'payments'>('payments')
+      .from('payments')
       .upsert({
         checkout_id: checkout_id, // 主键/唯一键
         user_id: report.user_id,
