@@ -141,7 +141,7 @@ export async function POST(request: NextRequest) {
 
     if (paymentError) {
       console.error('[Payment] Failed to store payment record:', paymentError)
-      // Don't fail the request, checkout is already created
+      // Don't fail the request, checkout is already created 
     }
 
     console.log('[Payment] Checkout created successfully:', {
