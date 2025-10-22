@@ -126,11 +126,7 @@ async function handlePaymentSuccess(data: any): Promise<void> {
         currency: 'usd',
         status: 'completed',
         payment_provider: 'creem',
-        order_id: order_id,
-        metadata: {
-          customer_email: customer_email,
-          webhook_received_at: new Date().toISOString()
-        }
+        order_id: order_id
       }, {
         onConflict: 'checkout_id'
       })
