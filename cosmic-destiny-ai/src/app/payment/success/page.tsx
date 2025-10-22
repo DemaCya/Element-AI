@@ -15,7 +15,7 @@ function SuccessContent() {
 
   const handleViewReport = () => {
     if (reportId) {
-      router.push(`/report?id=${reportId}`)
+      router.push(`/report?id=${reportId}&from=payment`)
     } else {
       // Fallback if report_id is not in the URL
       router.push('/dashboard')

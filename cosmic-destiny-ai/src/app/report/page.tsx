@@ -136,13 +136,16 @@ function ReportContent() {
     if (user && !authLoading) {
       console.log('👤 Report: User found, starting initial fetch')
       fetchReport().then(fetchedReport => {
-        // 如果报告存在且未支付，则开始轮询验证
-        if (fetchedReport && !fetchedReport.is_paid) {
-          console.log('⏳ Report: Report is unpaid, starting payment verification polling...')
+        // 检查是否从支付成功页面跳转过来（通过URL参数判断）
+        const fromPayment = searchParams.get('from') === 'payment'
+        
+        // 只有在从支付页面跳转过来且报告未支付时，才进行支付验证轮询
+        if (fetchedReport && !fetchedReport.is_paid && fromPayment) {
+          console.log('⏳ Report: Coming from payment, starting payment verification polling...')
           setIsVerifying(true)
           
           let attempts = 0
-          const maxAttempts = 5 // 最多尝试5次
+          const maxAttempts = 10 // 增加尝试次数，因为支付处理可能需要更长时间
 
           const interval = setInterval(async () => {
             attempts++
@@ -159,11 +162,11 @@ function ReportContent() {
                 console.log('❌ Report: Polling finished, report is still unpaid.')
               }
             }
-          }, 2000) // 每2秒钟轮询一次
+          }, 3000) // 每3秒钟轮询一次，给支付处理更多时间
         }
       })
     }
-  }, [user, authLoading, fetchReport, router])
+  }, [user, authLoading, fetchReport, router, searchParams])
 
   const handleUpgrade = async () => {
     if (!report?.id) {
