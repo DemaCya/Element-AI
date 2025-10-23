@@ -39,30 +39,6 @@ function ReportContent() {
   const [pageLoadId] = useState(() => `page-load-${Date.now()}`) // 用于追踪日志
   const supabase = useSupabase()
 
-  useEffect(() => {
-    const handleVisibilityChange = () => {
-      console.log(`[${pageLoadId}] 👁️ Visibility changed to: ${document.visibilityState} at ${new Date().toISOString()}`);
-      // 当页面从后台切换回前台时，重新获取报告
-      if (document.visibilityState === 'visible') {
-        console.log(`[${pageLoadId}] 🔄 Page became visible, re-fetching report to ensure data is fresh.`);
-        fetchReport();
-      }
-    }
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    }
-  }, [pageLoadId, fetchReport]); // 添加 fetchReport 作为依赖项
-
-  useEffect(() => {
-    const logPrefix = `[${pageLoadId}]`
-    console.log(`${logPrefix} 🟢 ReportContent MOUNTED.`)
-    return () => {
-      console.log(`${logPrefix} 🔴 ReportContent UNMOUNTED.`)
-    }
-  }, [pageLoadId])
-
   const fetchReport = useCallback(async (isRetry = false): Promise<CosmicReport | null> => {
     const reportId = searchParams.get('id')
     const logPrefix = `[${pageLoadId}]`
@@ -150,6 +126,30 @@ function ReportContent() {
       }
     }
   }, [searchParams, user?.id, supabase, router, pageLoadId])
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      console.log(`[${pageLoadId}] 👁️ Visibility changed to: ${document.visibilityState} at ${new Date().toISOString()}`);
+      // 当页面从后台切换回前台时，重新获取报告
+      if (document.visibilityState === 'visible') {
+        console.log(`[${pageLoadId}] 🔄 Page became visible, re-fetching report to ensure data is fresh.`);
+        fetchReport();
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    }
+  }, [pageLoadId, fetchReport]); // 添加 fetchReport 作为依赖项
+
+  useEffect(() => {
+    const logPrefix = `[${pageLoadId}]`
+    console.log(`${logPrefix} 🟢 ReportContent MOUNTED.`)
+    return () => {
+      console.log(`${logPrefix} 🔴 ReportContent UNMOUNTED.`)
+    }
+  }, [pageLoadId])
 
   useEffect(() => {
     const logPrefix = `[${pageLoadId}]`
