@@ -43,7 +43,11 @@ export async function POST(request: NextRequest) {
     const payload = await request.json()
     const { event, data } = payload
 
-    console.log('[Webhook] Received event:', event)
+    console.log('[Webhook] ========== Webhook Received ==========')
+    console.log(`[Webhook] Timestamp: ${new Date().toISOString()}`)
+    console.log('[Webhook] Event Type:', event)
+    console.log('[Webhook] Full Payload:', JSON.stringify(payload, null, 2))
+
 
     // Only handle successful payments for MVP
     if (event === 'payment.success' || event === 'payment.completed') {
@@ -71,17 +75,32 @@ async function handlePaymentSuccess(data: any): Promise<void> {
     const { checkout_id, order_id, request_id, customer_email, amount_total } = data
     const reportId = request_id // We use reportId as request_id
 
-    console.log('[Webhook] Payment success:', {
+    console.log('[Webhook] Processing payment.success event with data:', {
       checkout_id,
       order_id,
       report_id: reportId
     })
+
+    // --- 关键诊断：检查环境变量 ---
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    console.log('[Webhook] Supabase Env Check:', {
+      isUrlSet: !!supabaseUrl,
+      isServiceKeySet: !!supabaseKey,
+    })
+
+    if (!supabaseUrl || !supabaseKey) {
+      console.error('[Webhook] CRITICAL: Supabase server environment variables are not set!')
+      // 抛出错误，让 Vercel 记录下来，并让 Creem 重试
+      throw new Error('Supabase environment variables are not configured on the server.')
+    }
 
     const supabaseAdmin = getSupabaseAdmin()
 
     // --- 新逻辑：不再依赖预先创建的支付记录 ---
 
     // 1. 获取报告和用户信息
+    console.log(`[Webhook] Step 1: Fetching report with ID: ${reportId}`)
     const { data: report, error: reportError }: PostgrestSingleResponse<UserReport> = await supabaseAdmin
       .from('user_reports')
       .select('*')
@@ -94,13 +113,16 @@ async function handlePaymentSuccess(data: any): Promise<void> {
       return
     }
     
+    console.log(`[Webhook] Report found:`, { reportId: report.id, is_paid: report.is_paid })
+
     // 幂等性检查：如果报告已经支付，则跳过
     if (report.is_paid) {
-      console.log('[Webhook] Report already marked as paid. Skipping.', { reportId })
+      console.log('[Webhook] Idempotency Check: Report already marked as paid. Skipping.', { reportId })
       return
     }
 
     // 2. 解锁报告
+    console.log(`[Webhook] Step 2: Attempting to unlock report with ID: ${reportId}`)
     const { error: updateReportError } = await supabaseAdmin
       .from('user_reports')
       .update({ is_paid: true, updated_at: new Date().toISOString() })
@@ -115,6 +137,7 @@ async function handlePaymentSuccess(data: any): Promise<void> {
     console.log('[Webhook] Report unlocked successfully:', { reportId })
 
     // 3. 创建或更新支付记录
+    console.log(`[Webhook] Step 3: Upserting payment record for checkout_id: ${checkout_id}`)
     // 使用 upsert 保证数据一致性，如果记录已存在则更新，不存在则创建
     const { error: paymentError } = await supabaseAdmin
       .from('payments')
@@ -138,8 +161,10 @@ async function handlePaymentSuccess(data: any): Promise<void> {
       console.log('[Webhook] Payment record created/updated successfully:', { checkout_id })
     }
 
+    console.log('[Webhook] ========== Webhook Processing Finished ==========')
+
   } catch (error) {
-    console.error('[Webhook] Error processing payment:', error)
+    console.error('[Webhook] Uncaught error in handlePaymentSuccess:', error)
     // 将错误向上抛出，以便Vercel记录并让Creem重试
     throw error
   }
