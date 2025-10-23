@@ -55,22 +55,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     let mounted = true
     let timeoutReached = false
     
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        logger.info('App is visible again. Forcing a check of the Supabase session.');
-        supabase.auth.getSession().then(({ data: { session } }) => {
-          logger.info('Manual session check on visibilitychange', { 
-            hasSession: !!session,
-            userId: session?.user?.id,
-          });
-        });
-      } else {
-        logger.info('App is hidden.');
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
     // 超时保护：10秒后强制结束loading
     const timeout = setTimeout(() => {
       if (mounted && !timeoutReached) {
@@ -221,7 +205,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       mounted = false
       clearTimeout(timeout)
       subscription.unsubscribe()
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
     }
   }, [supabase])
 
