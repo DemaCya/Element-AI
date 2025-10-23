@@ -133,7 +133,7 @@ function ReportContent() {
         setLoading(false)
       }
     }
-  }, [searchParams, user, supabase, router, pageLoadId])
+  }, [searchParams, user?.id, supabase, router, pageLoadId])
 
   useEffect(() => {
     const logPrefix = `[${pageLoadId}]`
@@ -200,7 +200,7 @@ function ReportContent() {
         }
       })
     }
-  }, [user, authLoading, fetchReport, router, searchParams, pageLoadId])
+  }, [user?.id, authLoading, fetchReport, router, searchParams, pageLoadId])
 
   const handleUpgrade = async () => {
     if (!report?.id) {

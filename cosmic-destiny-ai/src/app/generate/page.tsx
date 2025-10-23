@@ -90,7 +90,7 @@ function GenerateReportContent() {
       // Start generating report
       generateReport()
     }
-  }, [user, authLoading, router, searchParams])
+  }, [user?.id, authLoading, router, searchParams])
 
   const generateReport = async () => {
     setIsGenerating(true)
