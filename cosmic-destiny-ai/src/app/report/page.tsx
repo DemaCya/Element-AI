@@ -6,7 +6,6 @@ import { useUser } from '@/contexts/UserContext'
 import { useSupabase } from '@/contexts/SupabaseContext'
 import { Button } from '@/components/ui/button'
 import DebugInfo from '@/components/DebugInfo'
-import usePageVisibility from '@/hooks/usePageVisibility'
 
 // 强制动态渲染
 export const dynamic = 'force-dynamic'
@@ -39,15 +38,6 @@ function ReportContent() {
   const [isVerifying, setIsVerifying] = useState(false) // 新增状态，用于验证支付
   const [pageLoadId] = useState(() => `page-load-${Date.now()}`) // 用于追踪日志
   const supabase = useSupabase()
-  const isVisible = usePageVisibility()
-
-  useEffect(() => {
-    console.log(`Page visibility changed. Is visible: ${isVisible}`);
-    if (isVisible && supabase) {
-      console.log('Page is visible, checking Supabase connection status.');
-      // You can add more checks here, for example, verifying the real-time connection status
-    }
-  }, [isVisible, supabase]);
 
   useEffect(() => {
     const logPrefix = `[${pageLoadId}]`

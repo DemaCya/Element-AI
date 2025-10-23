@@ -27,18 +27,21 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const isVisible = usePageVisibility()
 
   useEffect(() => {
-    console.log(`Page visibility changed in UserContext. Is visible: ${isVisible}`);
     if (isVisible && supabase) {
-      console.log('Page is visible in UserContext, checking Supabase auth status.');
-      supabase.auth.getSession().then(({ data: { session } }) => {
-        console.log('Current session in UserContext:', session);
-        if (session?.user?.id !== user?.id) {
-          console.log('User session mismatch, reloading user.');
-          // Potentially reload user or refresh session here
+      logger.info('UserContext: Page is visible, refreshing session to ensure connection is active.');
+      
+      const refresh = async () => {
+        const { data, error } = await supabase.auth.refreshSession();
+        if (error) {
+          logger.error('UserContext: Error refreshing session on visibility change:', error);
+        } else {
+          logger.info('UserContext: Session refreshed successfully on visibility change.', { hasSession: !!data.session });
         }
-      });
+      };
+
+      refresh();
     }
-  }, [isVisible, supabase, user?.id]);
+  }, [isVisible, supabase]);
 
   const refreshProfile = async () => {
     if (!user) {
