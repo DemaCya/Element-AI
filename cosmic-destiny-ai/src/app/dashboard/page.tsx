@@ -7,7 +7,7 @@ import { useUser } from '@/contexts/UserContext'
 import { Button } from '@/components/ui/button'
 import Navigation from '@/components/Navigation'
 import BirthForm from '@/components/BirthForm'
-import { Calendar, FileText, CreditCard, User, LogOut, Sparkles } from 'lucide-react'
+import { Calendar, FileText, CreditCard, User, Sparkles } from 'lucide-react'
 
 interface UserReport {
   id: string
@@ -19,7 +19,7 @@ interface UserReport {
 }
 
 function DashboardContent() {
-  const { user, profile, signOut, loading: authLoading } = useUser()
+  const { user, profile, loading: authLoading } = useUser()
   const supabase = useSupabase()
   const router = useRouter()
   
@@ -179,14 +179,6 @@ function DashboardContent() {
                   <p className="text-gray-400">{user.email}</p>
                 </div>
               </div>
-              <Button
-                variant="outline"
-                onClick={signOut}
-                className="text-red-400 border-red-400 hover:bg-red-400/10"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Sign Out
-              </Button>
             </div>
           </div>
 
