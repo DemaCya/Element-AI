@@ -72,6 +72,8 @@ export async function POST(request: NextRequest) {
  * 3. Unlock the report
  */
 async function handlePaymentSuccess(data: any): Promise<void> {
+  const startTime = Date.now()
+  console.log(`[Webhook] [${startTime}] ========== handlePaymentSuccess START ==========`)
   try {
     const checkout_id = data.id
     const order_id = data.order?.id
@@ -79,11 +81,11 @@ async function handlePaymentSuccess(data: any): Promise<void> {
     const amount_total = data.order?.amount_paid
 
     if (!checkout_id || !reportId) {
-      console.error('[Webhook] Missing checkout_id or request_id in payload', { data })
+      console.error(`[Webhook] [${startTime}] Missing checkout_id or request_id in payload`, { data })
       return
     }
 
-    console.log('[Webhook] Processing checkout.completed event with data:', {
+    console.log(`[Webhook] [${startTime}] Processing checkout.completed event with data:`, {
       checkout_id,
       order_id,
       report_id: reportId
@@ -108,44 +110,52 @@ async function handlePaymentSuccess(data: any): Promise<void> {
     // --- 新逻辑：不再依赖预先创建的支付记录 ---
 
     // 1. 获取报告和用户信息
-    console.log(`[Webhook] Step 1: Fetching report with ID: ${reportId}`)
+    console.log(`[Webhook] [${startTime}] Step 1: Fetching report with ID: ${reportId}`)
+    const fetchReportStart = Date.now()
     const { data: report, error: reportError }: PostgrestSingleResponse<UserReport> = await supabaseAdmin
       .from('user_reports')
       .select('*')
       .eq('id', reportId)
       .single()
+    const fetchReportEnd = Date.now()
+    console.log(`[Webhook] [${startTime}] Report fetch duration: ${fetchReportEnd - fetchReportStart}ms`)
 
     if (reportError || !report) {
-      console.error('[Webhook] Report not found or failed to fetch:', { reportId, error: reportError })
+      console.error(`[Webhook] [${startTime}] Report not found or failed to fetch:`, { reportId, error: reportError })
       // 如果报告不存在，我们无法继续，但仍需返回成功以免Creem重试
       return
     }
     
-    console.log(`[Webhook] Report found:`, { reportId: report.id, is_paid: report.is_paid })
+    console.log(`[Webhook] [${startTime}] Report found:`, { reportId: report.id, is_paid: report.is_paid })
 
     // 幂等性检查：如果报告已经支付，则跳过
     if (report.is_paid) {
-      console.log('[Webhook] Idempotency Check: Report already marked as paid. Skipping.', { reportId })
+      console.log(`[Webhook] [${startTime}] Idempotency Check: Report already marked as paid. Skipping.`, { reportId })
       return
     }
 
     // 2. 解锁报告
-    console.log(`[Webhook] Step 2: Attempting to unlock report with ID: ${reportId}`)
+    console.log(`[Webhook] [${startTime}] Step 2: Attempting to unlock report with ID: ${reportId}`)
+    const updateReportStart = Date.now()
     const { error: updateReportError } = await supabaseAdmin
       .from('user_reports')
       .update({ is_paid: true, updated_at: new Date().toISOString() })
       .eq('id', reportId)
+    const updateReportEnd = Date.now()
+    console.log(`[Webhook] [${startTime}] Report unlock duration: ${updateReportEnd - updateReportStart}ms`)
+
 
     if (updateReportError) {
-      console.error('[Webhook] CRITICAL: Failed to unlock report! This needs manual intervention.', { reportId, error: updateReportError })
+      console.error(`[Webhook] [${startTime}] CRITICAL: Failed to unlock report! This needs manual intervention.`, { reportId, error: updateReportError })
       // 抛出错误，让Creem重试
       throw new Error(`Failed to unlock report ${reportId}`)
     }
 
-    console.log('[Webhook] Report unlocked successfully:', { reportId })
+    console.log(`[Webhook] [${startTime}] Report unlocked successfully:`, { reportId })
 
     // 3. 创建或更新支付记录
-    console.log(`[Webhook] Step 3: Upserting payment record for checkout_id: ${checkout_id}`)
+    console.log(`[Webhook] [${startTime}] Step 3: Upserting payment record for checkout_id: ${checkout_id}`)
+    const upsertPaymentStart = Date.now()
     // 使用 upsert 保证数据一致性，如果记录已存在则更新，不存在则创建
     const { error: paymentError } = await supabaseAdmin
       .from('payments')
@@ -161,18 +171,22 @@ async function handlePaymentSuccess(data: any): Promise<void> {
       }, {
         onConflict: 'checkout_id'
       })
+    const upsertPaymentEnd = Date.now()
+    console.log(`[Webhook] [${startTime}] Payment record upsert duration: ${upsertPaymentEnd - upsertPaymentStart}ms`)
 
     if (paymentError) {
-      console.error('[Webhook] Warning: Failed to create or update payment record. Report was unlocked.', { checkout_id, reportId, error: paymentError })
+      console.error(`[Webhook] [${startTime}] Warning: Failed to create or update payment record. Report was unlocked.`, { checkout_id, reportId, error: paymentError })
       // 这不是致命错误，因为报告已经解锁，所以我们不抛出错误
     } else {
-      console.log('[Webhook] Payment record created/updated successfully:', { checkout_id })
+      console.log(`[Webhook] [${startTime}] Payment record created/updated successfully:`, { checkout_id })
     }
 
-    console.log('[Webhook] ========== Webhook Processing Finished ==========')
+    const endTime = Date.now()
+    console.log(`[Webhook] [${startTime}] ========== Webhook Processing Finished in ${endTime - startTime}ms ==========`)
 
   } catch (error) {
-    console.error('[Webhook] Uncaught error in handlePaymentSuccess:', error)
+    const errorTime = Date.now()
+    console.error(`[Webhook] [${startTime}] Uncaught error in handlePaymentSuccess after ${errorTime - startTime}ms:`, error)
     // 将错误向上抛出，以便Vercel记录并让Creem重试
     throw error
   }

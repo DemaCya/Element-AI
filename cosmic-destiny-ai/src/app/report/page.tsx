@@ -35,18 +35,28 @@ function ReportContent() {
   const [report, setReport] = useState<CosmicReport | null>(null)
   const [loading, setLoading] = useState(true)
   const [isVerifying, setIsVerifying] = useState(false) // 新增状态，用于验证支付
+  const [pageLoadId] = useState(() => `page-load-${Date.now()}`) // 用于追踪日志
   const supabase = useSupabase()
+
+  useEffect(() => {
+    const logPrefix = `[${pageLoadId}]`
+    console.log(`${logPrefix} 🟢 ReportContent MOUNTED.`)
+    return () => {
+      console.log(`${logPrefix} 🔴 ReportContent UNMOUNTED.`)
+    }
+  }, [pageLoadId])
 
   const fetchReport = useCallback(async (isRetry = false): Promise<CosmicReport | null> => {
     const reportId = searchParams.get('id')
+    const logPrefix = `[${pageLoadId}]`
     
     // 只有在第一次加载时才记录日志
     if (!isRetry) {
-      console.log('📄 Report: fetchReport called with:', { reportId, userId: user?.id })
+      console.log(`${logPrefix} 📄 Report: fetchReport called with:`, { reportId, userId: user?.id })
     }
     
     if (!reportId) {
-      console.log('❌ Report: No report ID, redirecting to dashboard')
+      console.log(`${logPrefix} ❌ Report: No report ID, redirecting to dashboard`)
       setLoading(false)
       router.push('/dashboard')
       return null // 返回 null 表示失败
@@ -54,18 +64,18 @@ function ReportContent() {
     
     if (!user) {
       // 只有在第一次加载时才记录日志
-      if (!isRetry) console.log('⏳ Report: No user yet, waiting...')
+      if (!isRetry) console.log(`${logPrefix} ⏳ Report: No user yet, waiting...`)
       return null // 返回 null 表示失败
     }
 
     try {
       // 第一次加载时显示全屏加载动画
       if (!isRetry) {
-        console.log('🔍 Report: Starting to fetch report with ID:', reportId, 'for user:', user.id)
+        console.log(`${logPrefix} 🔍 Report: Starting to fetch report with ID:`, reportId, 'for user:', user.id)
         setLoading(true)
       }
       
-      console.log(`⏱️ Report: Starting Supabase query at ${new Date().toISOString()}`)
+      console.log(`${logPrefix} ⏱️ Report: Starting Supabase query at ${new Date().toISOString()}`)
       const queryStartTime = Date.now()
 
       const { data, error } = await supabase
@@ -76,15 +86,15 @@ function ReportContent() {
         .single()
       
       const queryEndTime = Date.now()
-      console.log(`⏱️ Report: Supabase query finished at ${new Date().toISOString()}`)
-      console.log(`⏱️ Report: Query duration: ${queryEndTime - queryStartTime} ms`)
+      console.log(`${logPrefix} ⏱️ Report: Supabase query finished at ${new Date().toISOString()}`)
+      console.log(`${logPrefix} ⏱️ Report: Query duration: ${queryEndTime - queryStartTime} ms`)
       
-      console.log('📬 Report: Response received', { hasData: !!data, hasError: !!error })
+      console.log(`${logPrefix} 📬 Report: Response received`, { hasData: !!data, hasError: !!error, is_paid: data?.is_paid })
 
       if (error) {
         if (!isRetry) {
-          console.error('❌ Report: Error fetching report:', error)
-          console.error('❌ Report: Error details:', JSON.stringify(error))
+          console.error(`${logPrefix} ❌ Report: Error fetching report:`, error)
+          console.error(`${logPrefix} ❌ Report: Error details:`, JSON.stringify(error))
           alert('Could not load report, returning to dashboard. Error: ' + error.message)
           router.push('/dashboard')
         }
@@ -93,7 +103,7 @@ function ReportContent() {
 
       if (!data) {
         if (!isRetry) {
-          console.error('❌ Report: No data returned')
+          console.error(`${logPrefix} ❌ Report: No data returned`)
           alert('Report not found or you do not have permission to view it')
           router.push('/dashboard')
         }
@@ -102,7 +112,7 @@ function ReportContent() {
 
       // 只有在第一次加载时才记录成功日志
       if (!isRetry) {
-        console.log('✅ Report: Report fetched successfully', data)
+        console.log(`${logPrefix} ✅ Report: Report fetched successfully`, data)
       }
       
       setReport(data)
@@ -110,8 +120,8 @@ function ReportContent() {
 
     } catch (error) {
       if (!isRetry) {
-        console.error('❌ Report: Exception while fetching report:', error)
-        console.error('❌ Report: Exception details:', JSON.stringify(error, Object.getOwnPropertyNames(error)))
+        console.error(`${logPrefix} ❌ Report: Exception while fetching report:`, error)
+        console.error(`${logPrefix} ❌ Report: Exception details:`, JSON.stringify(error, Object.getOwnPropertyNames(error)))
         alert('Error loading report, returning to dashboard. Error: ' + (error instanceof Error ? error.message : String(error)))
         router.push('/dashboard')
       }
@@ -122,51 +132,74 @@ function ReportContent() {
         setLoading(false)
       }
     }
-  }, [searchParams, user, supabase, router])
+  }, [searchParams, user, supabase, router, pageLoadId])
 
   useEffect(() => {
-    console.log('🔍 Report useEffect triggered:', { authLoading, userId: user?.id, hasUser: !!user })
+    const logPrefix = `[${pageLoadId}]`
+    console.log(`${logPrefix} 🔍 Report useEffect triggered:`, { authLoading, userId: user?.id, hasUser: !!user, reportId: searchParams.get('id'), url: window.location.href })
     
     if (!authLoading && !user) {
-      console.log('🔀 Report: No user, redirecting to auth')
+      console.log(`${logPrefix} 🔀 Report: No user and not loading, redirecting to auth`)
       router.push('/auth')
       return
     }
 
     if (user && !authLoading) {
-      console.log('👤 Report: User found, starting initial fetch')
+      console.log(`${logPrefix} 👤 Report: User found, starting initial fetch`)
       fetchReport().then(fetchedReport => {
         // 检查是否从支付成功页面跳转过来（通过URL参数判断）
         const fromPayment = searchParams.get('from') === 'payment'
         
+        console.log(`${logPrefix} Initial fetch completed.`, {
+            isPaid: fetchedReport?.is_paid,
+            fromPayment: fromPayment
+        });
+        
         // 只有在从支付页面跳转过来且报告未支付时，才进行支付验证轮询
         if (fetchedReport && !fetchedReport.is_paid && fromPayment) {
-          console.log('⏳ Report: Coming from payment, starting payment verification polling...')
+          console.log(`${logPrefix} ✅ Report: Conditions met. Starting payment verification polling...`)
           setIsVerifying(true)
           
           let attempts = 0
-          const maxAttempts = 10 // 增加尝试次数，因为支付处理可能需要更长时间
+          const maxAttempts = 15 // 增加到15次 (45秒)
+          const initialDelay = 1000 // 第一次检查延迟1秒
+          const intervalTime = 3000 // 后续每3秒检查一次
 
-          const interval = setInterval(async () => {
+          const pollingLogic = async () => {
             attempts++
-            console.log(`🔄 Report: Polling attempt #${attempts}`)
+            console.log(`${logPrefix} 🔄 Report: Polling attempt #${attempts}`)
             
             const updatedReport = await fetchReport(true) // true表示是重试
             
-            if (updatedReport?.is_paid || attempts >= maxAttempts) {
+            if (updatedReport?.is_paid) {
+                clearInterval(interval)
+                setIsVerifying(false)
+                console.log(`${logPrefix} ✅ Report: Payment verified via polling!`)
+            } else if (attempts >= maxAttempts) {
               clearInterval(interval)
               setIsVerifying(false)
-              if (updatedReport?.is_paid) {
-                console.log('✅ Report: Payment verified via polling!')
-              } else {
-                console.log('❌ Report: Polling finished, report is still unpaid.')
-              }
+              console.log(`${logPrefix} ❌ Report: Polling finished after ${maxAttempts} attempts, report is still unpaid.`)
+              alert("We couldn't confirm your payment automatically. Please wait a few minutes and refresh the page, or contact support if the issue persists.")
             }
-          }, 3000) // 每3秒钟轮询一次，给支付处理更多时间
+          };
+
+          let interval: NodeJS.Timeout;
+          // 第一次快速检查
+          setTimeout(() => {
+            pollingLogic();
+            // 然后设置定期检查
+            interval = setInterval(pollingLogic, intervalTime);
+          }, initialDelay);
+        } else {
+            console.log(`${logPrefix} ℹ️ Report: Conditions for polling not met.`, {
+                hasReport: !!fetchedReport,
+                isPaid: fetchedReport?.is_paid,
+                fromPayment: fromPayment
+            });
         }
       })
     }
-  }, [user, authLoading, fetchReport, router, searchParams])
+  }, [user, authLoading, fetchReport, router, searchParams, pageLoadId])
 
   const handleUpgrade = async () => {
     if (!report?.id) {
@@ -212,6 +245,7 @@ function ReportContent() {
 
 
   if (authLoading || loading) {
+    console.log(`[${pageLoadId}] 🌀 Showing loading screen. State:`, { authLoading, loading, isVerifying });
     return (
       <div className="cosmic-bg min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -223,6 +257,7 @@ function ReportContent() {
   }
 
   if (!user || !report) {
+    console.log(`[${pageLoadId}] ❓ No user or report, rendering null for redirect. State:`, { hasUser: !!user, hasReport: !!report });
     return null // Will redirect
   }
 
