@@ -122,8 +122,9 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    /*
     // Store payment record in database
-    const { error: paymentError } = await supabase
+    const { data: insertedPayment, error: paymentError } = await supabase
       .from('payments')
       .insert({
         user_id: user.id,
@@ -138,11 +139,15 @@ export async function POST(request: NextRequest) {
           created_at: new Date().toISOString()
         }
       })
+      .select()
 
     if (paymentError) {
       console.error('[Payment] Failed to store payment record:', paymentError)
       // Don't fail the request, checkout is already created 
+    } else {
+      console.log('[Payment] Successfully stored PENDING payment record:', insertedPayment);
     }
+    */
 
     console.log('[Payment] Checkout created successfully:', {
       reportId: report.id,

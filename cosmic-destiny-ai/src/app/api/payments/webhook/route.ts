@@ -155,20 +155,23 @@ async function handlePaymentSuccess(data: any): Promise<void> {
 
     // 3. 创建或更新支付记录
     console.log(`[Webhook] [${startTime}] Step 3: Upserting payment record for checkout_id: ${checkout_id}`)
+    const paymentDataForUpsert = {
+      checkout_id: checkout_id, // 主键/唯一键
+      user_id: report.user_id,
+      report_id: report.id,
+      amount: amount_total ? amount_total / 100 : 19.99, // Creem通常以分为单位
+      currency: 'usd',
+      status: 'completed',
+      payment_provider: 'creem',
+      order_id: order_id
+    };
+    console.log(`[Webhook] [${startTime}] Data for upsert:`, JSON.stringify(paymentDataForUpsert, null, 2));
+
     const upsertPaymentStart = Date.now()
     // 使用 upsert 保证数据一致性，如果记录已存在则更新，不存在则创建
     const { error: paymentError } = await supabaseAdmin
       .from('payments')
-      .upsert({
-        checkout_id: checkout_id, // 主键/唯一键
-        user_id: report.user_id,
-        report_id: report.id,
-        amount: amount_total ? amount_total / 100 : 19.99, // Creem通常以分为单位
-        currency: 'usd',
-        status: 'completed',
-        payment_provider: 'creem',
-        order_id: order_id
-      }, {
+      .upsert(paymentDataForUpsert, {
         onConflict: 'checkout_id'
       })
     const upsertPaymentEnd = Date.now()
