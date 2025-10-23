@@ -41,7 +41,8 @@ function getSupabaseAdmin(): any {
 export async function POST(request: NextRequest) {
   try {
     const payload = await request.json()
-    const { event, data } = payload
+    const event = payload.eventType
+    const data = payload.object
 
     console.log('[Webhook] ========== Webhook Received ==========')
     console.log(`[Webhook] Timestamp: ${new Date().toISOString()}`)
@@ -50,7 +51,7 @@ export async function POST(request: NextRequest) {
 
 
     // Only handle successful payments for MVP
-    if (event === 'payment.success' || event === 'payment.completed') {
+    if (event === 'checkout.completed') {
       await handlePaymentSuccess(data)
     }
 
@@ -72,10 +73,17 @@ export async function POST(request: NextRequest) {
  */
 async function handlePaymentSuccess(data: any): Promise<void> {
   try {
-    const { checkout_id, order_id, request_id, customer_email, amount_total } = data
-    const reportId = request_id // We use reportId as request_id
+    const checkout_id = data.id
+    const order_id = data.order?.id
+    const reportId = data.request_id // We use reportId as request_id
+    const amount_total = data.order?.amount_paid
 
-    console.log('[Webhook] Processing payment.success event with data:', {
+    if (!checkout_id || !reportId) {
+      console.error('[Webhook] Missing checkout_id or request_id in payload', { data })
+      return
+    }
+
+    console.log('[Webhook] Processing checkout.completed event with data:', {
       checkout_id,
       order_id,
       report_id: reportId
