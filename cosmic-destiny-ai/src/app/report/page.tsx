@@ -24,6 +24,7 @@ import {
   Globe
 } from 'lucide-react'
 import { Database } from '@/lib/database.types'
+import { PostgrestError } from '@supabase/supabase-js'
 
 type CosmicReport = Database['public']['Tables']['user_reports']['Row']
 
@@ -78,7 +79,7 @@ function ReportContent() {
       console.log(`${logPrefix} ⏱️ Report: Starting Supabase query at ${new Date().toISOString()}`)
       const queryStartTime = Date.now()
 
-      const { data, error } = await supabase
+      const { data, error }: { data: CosmicReport | null; error: PostgrestError | null } = await supabase
         .from('user_reports')
         .select('*')
         .eq('id', reportId)
