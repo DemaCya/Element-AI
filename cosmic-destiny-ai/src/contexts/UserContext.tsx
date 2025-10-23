@@ -5,7 +5,6 @@ import { useSupabase } from '@/contexts/SupabaseContext'
 import { User } from '@supabase/supabase-js'
 import { Database } from '@/lib/database.types'
 import { logger } from '@/lib/logger'
-import usePageVisibility from '@/hooks/usePageVisibility'
 
 type Profile = Database['public']['Tables']['profiles']['Row']
 
@@ -24,24 +23,6 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
   const supabase = useSupabase()
-  const isVisible = usePageVisibility()
-
-  useEffect(() => {
-    if (isVisible && supabase) {
-      logger.info('UserContext: Page is visible, refreshing session to ensure connection is active.');
-      
-      const refresh = async () => {
-        const { data, error } = await supabase.auth.refreshSession();
-        if (error) {
-          logger.error('UserContext: Error refreshing session on visibility change:', error);
-        } else {
-          logger.info('UserContext: Session refreshed successfully on visibility change.', { hasSession: !!data.session });
-        }
-      };
-
-      refresh();
-    }
-  }, [isVisible, supabase]);
 
   const refreshProfile = async () => {
     if (!user) {
@@ -74,6 +55,22 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     let mounted = true
     let timeoutReached = false
     
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        logger.info('App is visible again. Forcing a check of the Supabase session.');
+        supabase.auth.getSession().then(({ data: { session } }) => {
+          logger.info('Manual session check on visibilitychange', { 
+            hasSession: !!session,
+            userId: session?.user?.id,
+          });
+        });
+      } else {
+        logger.info('App is hidden.');
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     // 超时保护：10秒后强制结束loading
     const timeout = setTimeout(() => {
       if (mounted && !timeoutReached) {
@@ -224,6 +221,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       mounted = false
       clearTimeout(timeout)
       subscription.unsubscribe()
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     }
   }, [supabase])
 
