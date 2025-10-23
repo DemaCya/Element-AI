@@ -7,6 +7,7 @@ import { useUser } from '@/contexts/UserContext'
 import { Button } from '@/components/ui/button'
 import Navigation from '@/components/Navigation'
 import BirthForm from '@/components/BirthForm'
+import usePageVisibility from '@/hooks/usePageVisibility'
 import { Calendar, FileText, CreditCard, User, Sparkles } from 'lucide-react'
 
 interface UserReport {
@@ -22,6 +23,7 @@ function DashboardContent() {
   const { user, profile, loading: authLoading } = useUser()
   const supabase = useSupabase()
   const router = useRouter()
+  const isVisible = usePageVisibility()
   
   const [reports, setReports] = useState<UserReport[]>([])
   const [loadingReports, setLoadingReports] = useState(false)
@@ -33,6 +35,14 @@ function DashboardContent() {
     reportCount: reports.length,
     loadingReports
   });
+
+  useEffect(() => {
+    console.log(`Page visibility changed. Is visible: ${isVisible}`);
+    if (isVisible && supabase) {
+      console.log('Page is visible, checking Supabase connection status.');
+      // You can add more checks here, for example, verifying the real-time connection status
+    }
+  }, [isVisible, supabase]);
 
   useEffect(() => {
     const componentId = `dashboard-${Date.now()}`;

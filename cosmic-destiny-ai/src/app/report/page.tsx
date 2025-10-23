@@ -6,6 +6,7 @@ import { useUser } from '@/contexts/UserContext'
 import { useSupabase } from '@/contexts/SupabaseContext'
 import { Button } from '@/components/ui/button'
 import DebugInfo from '@/components/DebugInfo'
+import usePageVisibility from '@/hooks/usePageVisibility'
 
 // 强制动态渲染
 export const dynamic = 'force-dynamic'
@@ -38,6 +39,23 @@ function ReportContent() {
   const [isVerifying, setIsVerifying] = useState(false) // 新增状态，用于验证支付
   const [pageLoadId] = useState(() => `page-load-${Date.now()}`) // 用于追踪日志
   const supabase = useSupabase()
+  const isVisible = usePageVisibility()
+
+  useEffect(() => {
+    console.log(`Page visibility changed. Is visible: ${isVisible}`);
+    if (isVisible && supabase) {
+      console.log('Page is visible, checking Supabase connection status.');
+      // You can add more checks here, for example, verifying the real-time connection status
+    }
+  }, [isVisible, supabase]);
+
+  useEffect(() => {
+    const logPrefix = `[${pageLoadId}]`
+    console.log(`${logPrefix} 🟢 ReportContent MOUNTED.`)
+    return () => {
+      console.log(`${logPrefix} 🔴 ReportContent UNMOUNTED.`)
+    }
+  }, [pageLoadId])
 
   const fetchReport = useCallback(async (isRetry = false): Promise<CosmicReport | null> => {
     const reportId = searchParams.get('id')
@@ -128,30 +146,6 @@ function ReportContent() {
   }, [searchParams, user?.id, supabase, router, pageLoadId])
 
   useEffect(() => {
-    const handleVisibilityChange = () => {
-      console.log(`[${pageLoadId}] 👁️ Visibility changed to: ${document.visibilityState} at ${new Date().toISOString()}`);
-      // 当页面从后台切换回前台时，重新获取报告
-      if (document.visibilityState === 'visible') {
-        console.log(`[${pageLoadId}] 🔄 Page became visible, re-fetching report to ensure data is fresh.`);
-        fetchReport();
-      }
-    }
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    }
-  }, [pageLoadId, fetchReport]); // 添加 fetchReport 作为依赖项
-
-  useEffect(() => {
-    const logPrefix = `[${pageLoadId}]`
-    console.log(`${logPrefix} 🟢 ReportContent MOUNTED.`)
-    return () => {
-      console.log(`${logPrefix} 🔴 ReportContent UNMOUNTED.`)
-    }
-  }, [pageLoadId])
-
-  useEffect(() => {
     const logPrefix = `[${pageLoadId}]`
     console.log(`${logPrefix} 🔍 Report useEffect triggered:`, { authLoading, userId: user?.id, hasUser: !!user, reportId: searchParams.get('id'), url: window.location.href })
     
@@ -161,9 +155,8 @@ function ReportContent() {
       return
     }
 
-    // 只有在页面可见时才执行初次加载
-    if (user && !authLoading && document.visibilityState === 'visible') {
-      console.log(`${logPrefix} 👤 Report: User found and page is visible, starting initial fetch`)
+    if (user && !authLoading) {
+      console.log(`${logPrefix} 👤 Report: User found, starting initial fetch`)
       fetchReport().then(fetchedReport => {
         // 检查是否从支付成功页面跳转过来（通过URL参数判断）
         const fromPayment = searchParams.get('from') === 'payment'
@@ -216,12 +209,6 @@ function ReportContent() {
             });
         }
       })
-    } else {
-      console.log(`${logPrefix} ℹ️ Report: Skipping initial fetch because page is not visible or user not ready.`, {
-        isVisible: document.visibilityState === 'visible',
-        hasUser: !!user,
-        isAuthLoading: authLoading
-      });
     }
   }, [user?.id, authLoading, fetchReport, router, searchParams, pageLoadId])
 

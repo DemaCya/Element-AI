@@ -5,6 +5,7 @@ import { useSupabase } from '@/contexts/SupabaseContext'
 import { User } from '@supabase/supabase-js'
 import { Database } from '@/lib/database.types'
 import { logger } from '@/lib/logger'
+import usePageVisibility from '@/hooks/usePageVisibility'
 
 type Profile = Database['public']['Tables']['profiles']['Row']
 
@@ -23,6 +24,21 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [loading, setLoading] = useState(true)
   const supabase = useSupabase()
+  const isVisible = usePageVisibility()
+
+  useEffect(() => {
+    console.log(`Page visibility changed in UserContext. Is visible: ${isVisible}`);
+    if (isVisible && supabase) {
+      console.log('Page is visible in UserContext, checking Supabase auth status.');
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        console.log('Current session in UserContext:', session);
+        if (session?.user?.id !== user?.id) {
+          console.log('User session mismatch, reloading user.');
+          // Potentially reload user or refresh session here
+        }
+      });
+    }
+  }, [isVisible, supabase, user?.id]);
 
   const refreshProfile = async () => {
     if (!user) {
