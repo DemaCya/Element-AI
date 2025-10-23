@@ -40,6 +40,22 @@ function ReportContent() {
   const supabase = useSupabase()
 
   useEffect(() => {
+    const handleVisibilityChange = () => {
+      console.log(`[${pageLoadId}] 👁️ Visibility changed to: ${document.visibilityState} at ${new Date().toISOString()}`);
+      // 当页面从后台切换回前台时，重新获取报告
+      if (document.visibilityState === 'visible') {
+        console.log(`[${pageLoadId}] 🔄 Page became visible, re-fetching report to ensure data is fresh.`);
+        fetchReport();
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    }
+  }, [pageLoadId, fetchReport]); // 添加 fetchReport 作为依赖项
+
+  useEffect(() => {
     const logPrefix = `[${pageLoadId}]`
     console.log(`${logPrefix} 🟢 ReportContent MOUNTED.`)
     return () => {
@@ -145,8 +161,9 @@ function ReportContent() {
       return
     }
 
-    if (user && !authLoading) {
-      console.log(`${logPrefix} 👤 Report: User found, starting initial fetch`)
+    // 只有在页面可见时才执行初次加载
+    if (user && !authLoading && document.visibilityState === 'visible') {
+      console.log(`${logPrefix} 👤 Report: User found and page is visible, starting initial fetch`)
       fetchReport().then(fetchedReport => {
         // 检查是否从支付成功页面跳转过来（通过URL参数判断）
         const fromPayment = searchParams.get('from') === 'payment'
@@ -199,6 +216,12 @@ function ReportContent() {
             });
         }
       })
+    } else {
+      console.log(`${logPrefix} ℹ️ Report: Skipping initial fetch because page is not visible or user not ready.`, {
+        isVisible: document.visibilityState === 'visible',
+        hasUser: !!user,
+        isAuthLoading: authLoading
+      });
     }
   }, [user?.id, authLoading, fetchReport, router, searchParams, pageLoadId])
 
