@@ -5,6 +5,23 @@ import { toDate } from 'date-fns-tz';
 process.env.TZ = 'UTC';
 
 export class BaziService {
+  // 确保日期时间转换为UTC的辅助方法
+  private static ensureUtcDate(date: Date): Date {
+    // 方法1：使用toISOString()确保UTC时间
+    const isoString = date.toISOString()
+    const utcDate = new Date(isoString)
+    
+    // 验证转换是否正确
+    if (utcDate.toISOString() !== isoString) {
+      console.warn('⚠️ [BaziService] UTC转换可能有问题，使用备用方法')
+      // 备用方法：手动计算UTC时间
+      const utcTime = date.getTime() + (date.getTimezoneOffset() * 60000)
+      return new Date(utcTime)
+    }
+    
+    return utcDate
+  }
+
   // 生成模拟的八字数据（用于测试）
   static generateMockBaziData(birthData: BirthData): BaziData {
     const mockStems = ['甲', '乙', '丙', '丁', '戊', '己', '庚', '辛', '壬', '癸'];
@@ -93,25 +110,19 @@ export class BaziService {
       // 强制设置UTC时区环境
       process.env.TZ = 'UTC'
 
-      // 将用户输入的本地时间转换为UTC时间
       const birthDateLocal = toDate(birthDateTimeString, { timeZone: birthData.timeZone })
-      
-      // 创建UTC时间对象，确保传入BaziCalculator的是UTC时间
-      // 使用toISOString()确保时区信息正确传递
-      const birthDateUTC = new Date(birthDateLocal.toISOString())
-      console.log('🔮 [BaziService] 转换后的UTC时间:', birthDateUTC.toString())
-      console.log('🔮 [BaziService] 转换后的UTC时间ISO:', birthDateUTC.toISOString())
 
-      // Create bazi calculator instance
-      console.log('🔮 [BaziService] 创建BaziCalculator参数:')
-      console.log('- birthDate (UTC):', birthDateUTC)
-      console.log('- gender:', birthData.gender)
-      console.log('- timeZone:', birthData.timeZone)
-      console.log('- isTimeKnownInput:', birthData.isTimeKnownInput)
+      // 使用辅助方法确保UTC时间转换
+      const finalUtcDate = this.ensureUtcDate(birthDateLocal)
       
-      // 确保在UTC环境下创建BaziCalculator
-      // 传入UTC时间对象，确保时区一致性
-      const calculator = new BaziCalculator(birthDateUTC, birthData.gender, birthData.timeZone, birthData.isTimeKnownInput)
+      console.log('🔮 [BaziService] 原始本地时间:', birthDateLocal.toString())
+      console.log('🔮 [BaziService] 原始本地时间ISO:', birthDateLocal.toISOString())
+      console.log('🔮 [BaziService] 最终UTC时间:', finalUtcDate.toString())
+      console.log('🔮 [BaziService] 最终UTC时间ISO:', finalUtcDate.toISOString())
+      console.log('🔮 [BaziService] UTC时间戳:', finalUtcDate.getTime())
+      console.log('🔮 [BaziService] 时区偏移量:', finalUtcDate.getTimezoneOffset())
+      
+      const calculator = new BaziCalculator(finalUtcDate, birthData.gender, birthData.timeZone, birthData.isTimeKnownInput)
 
       console.log("🔮 [BaziService] calculator.toString():",calculator.toString())
       
