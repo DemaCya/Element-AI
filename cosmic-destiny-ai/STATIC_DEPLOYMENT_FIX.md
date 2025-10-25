@@ -34,17 +34,8 @@ const nextConfig: NextConfig = {
 ```typescript
 // Dashboard页面
 const handleBirthFormSubmit = async (birthData: any) => {
-  // 1. 客户端计算八字
-  const baziData = await BaziService.calculateBazi(birthData)
-  
-  // 2. 客户端生成报告
-  const report = generateMockReport(birthData, baziData)
-  
-  // 3. 客户端保存到Supabase
-  await supabase.from('user_reports').insert(reportData)
-  
-  // 4. 跳转到报告页面
-  router.push(`/report?id=${reportData.id}`)
+  // 1. 跳转到生成页面，由生成页面处理八字计算
+  router.push(`/generate?${params.toString()}`)
 }
 ```
 

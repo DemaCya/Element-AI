@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { BaziService } from '@/services/baziService'
 
 export const dynamic = 'force-dynamic'
 
@@ -349,15 +348,16 @@ export async function POST(request: NextRequest) {
 
     console.log('🚀 [API] Starting report generation with birthData:', birthData)
 
-    // Step 1: Calculate Bazi data
-    console.log('🔮 [API] Calculating Bazi data...')
-    const baziData = await BaziService.calculateBazi(birthData)
-    console.log('🔮 [API] Bazi calculation completed:', baziData)
-
-    // Step 2: Generate mock reports for now
+    // Generate mock reports (no Bazi calculation needed for API)
     console.log('📝 [API] Generating mock reports...')
-    const fullReport = generateMockReport(birthData, baziData)
-    const previewReport = generateMockPreviewReport(birthData, baziData)
+    const mockBaziData = {
+      dayMaster: '甲',
+      heavenlyStems: ['甲', '乙', '丙', '丁'],
+      earthlyBranches: ['子', '丑', '寅', '卯'],
+      elements: { wood: 2, fire: 1, earth: 1, metal: 1, water: 1 }
+    }
+    const fullReport = generateMockReport(birthData, mockBaziData)
+    const previewReport = generateMockPreviewReport(birthData, mockBaziData)
     console.log('📝 [API] Mock reports generated, full length:', fullReport.length, 'preview length:', previewReport.length)
     
     // 生成报告ID
@@ -368,7 +368,6 @@ export async function POST(request: NextRequest) {
       reportId,
       previewReport,
       fullReport,
-      baziData,
       message: '报告生成成功'
     })
   } catch (error) {
