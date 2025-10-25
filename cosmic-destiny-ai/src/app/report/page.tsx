@@ -15,8 +15,6 @@ import {
   Heart,
   Briefcase,
   Compass,
-  Download,
-  Share,
   Sparkles,
   Calendar,
   Clock,
@@ -343,16 +341,6 @@ Unlock the full report now to begin your journey of cosmic discovery!` : ''}`
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Dashboard
             </Button>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm">
-                <Download className="w-4 h-4 mr-2" />
-                Save
-              </Button>
-              <Button variant="outline" size="sm">
-                <Share className="w-4 h-4 mr-2" />
-                Share
-              </Button>
-            </div>
           </div>
         </div>
       </header>
