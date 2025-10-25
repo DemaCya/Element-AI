@@ -1,6 +1,45 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { BaziService } from '@/services/baziService'
 
-export const dynamic = 'force-static'
+export const dynamic = 'force-dynamic'
+
+// Extract preview report from full report (first 800-1000 characters)
+function extractPreviewFromFullReport(fullReport: string): string {
+  // Find a good breaking point around 800-1000 characters
+  const targetLength = 900
+  let preview = fullReport.substring(0, targetLength)
+  
+  // Try to break at a sentence or paragraph boundary
+  const lastSentenceEnd = Math.max(
+    preview.lastIndexOf('。'),
+    preview.lastIndexOf('！'),
+    preview.lastIndexOf('？'),
+    preview.lastIndexOf('\n\n')
+  )
+  
+  if (lastSentenceEnd > targetLength * 0.7) {
+    preview = preview.substring(0, lastSentenceEnd + 1)
+  }
+  
+  // Add preview ending
+  preview += `
+
+---
+
+**想要了解更多详细内容吗？**
+
+完整报告包含：
+- 深度人格分析和成长建议
+- 详细职业规划和财富策略  
+- 全面感情分析和最佳配对
+- 人生使命和关键转折点
+- 个性化健康养生方案
+- 以及更多专属于您的命理指导...
+
+立即解锁完整报告，开启您的命运探索之旅！`
+  
+  return preview
+}
 
 // 生成模拟预览报告（测试用，500-800字）
 function generateMockPreviewReport(birthData: any, baziData: any): string {
@@ -308,36 +347,36 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { birthData, reportName } = body
 
-    // 这里应该是真实的报告生成逻辑
-    // 包括调用Gemini API、数据库存储等
-    
-    // 模拟报告生成
-    const mockBaziData = {
-      dayMaster: '甲',
-      heavenlyStems: ['甲', '乙', '丙', '丁'],
-      earthlyBranches: ['子', '丑', '寅', '卯'],
-      elements: { wood: 2, fire: 1, earth: 1, metal: 1, water: 1 }
-    }
+    console.log('🚀 [API] Starting report generation with birthData:', birthData)
 
-    const previewReport = generateMockPreviewReport(birthData, mockBaziData)
+    // Step 1: Calculate Bazi data
+    console.log('🔮 [API] Calculating Bazi data...')
+    const baziData = await BaziService.calculateBazi(birthData)
+    console.log('🔮 [API] Bazi calculation completed:', baziData)
+
+    // Step 2: Generate mock reports for now
+    console.log('📝 [API] Generating mock reports...')
+    const fullReport = generateMockReport(birthData, baziData)
+    const previewReport = generateMockPreviewReport(birthData, baziData)
+    console.log('📝 [API] Mock reports generated, full length:', fullReport.length, 'preview length:', previewReport.length)
     
     // 生成报告ID
     const reportId = `report-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-    
-    // 这里应该保存到数据库
-    // await saveReportToDatabase(reportId, birthData, previewReport)
     
     return NextResponse.json({
       success: true,
       reportId,
       previewReport,
+      fullReport,
+      baziData,
       message: '报告生成成功'
     })
   } catch (error) {
-    console.error('Error generating report:', error)
+    console.error('❌ [API] Error generating report:', error)
     return NextResponse.json({
       error: 'Failed to generate report',
-      message: '报告生成失败，请稍后重试'
+      message: '报告生成失败，请稍后重试',
+      details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 })
   }
 }

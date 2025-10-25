@@ -6,6 +6,7 @@ import { useUser } from '@/contexts/UserContext'
 import { useSupabase } from '@/contexts/SupabaseContext'
 import { Button } from '@/components/ui/button'
 import { Sparkles, Calendar, Clock, Globe, User, AlertCircle, CheckCircle } from 'lucide-react'
+import { BaziService } from '@/services/baziService'
 
 // 强制动态渲染
 export const dynamic = 'force-dynamic'
@@ -118,24 +119,30 @@ function GenerateReportContent() {
 
       // Step 2: Calculate Bazi destiny
       await updateStepStatus(1, 'processing')
-      await new Promise(resolve => setTimeout(resolve, 1000)) // Simulate calculation time
       
-      // Here should call real Bazi calculation service
-      const baziData = {
-        heavenlyStems: ['甲', '乙', '丙', '丁'],
-        earthlyBranches: ['子', '丑', '寅', '卯'],
-        dayMaster: '甲',
-        elements: { wood: 2, fire: 1, earth: 1, metal: 1, water: 1 }
-      }
+      // Call real Bazi calculation service
+      const baziData = await BaziService.calculateBazi(birthData)
+      console.log('Bazi calculation completed:', baziData)
 
       await updateStepStatus(1, 'completed')
 
-      // Step 3: Generate report content
+      // Step 3: Generate report content (using mock for now)
       await updateStepStatus(2, 'processing')
-      await new Promise(resolve => setTimeout(resolve, 2000)) // Simulate AI generation time
       
-      const mockPreviewReport = generatePreviewReport(birthData, baziData)
-      const mockFullReport = generateFullReport(birthData, baziData)
+      // Print Bazi calculation results for verification
+      console.log('🔮 [Generate] Bazi Calculation Results:')
+      console.log('📊 [Generate] Heavenly Stems (天干):', baziData.heavenlyStems)
+      console.log('📊 [Generate] Earthly Branches (地支):', baziData.earthlyBranches)
+      console.log('👑 [Generate] Day Master (日主):', baziData.dayMaster)
+      console.log('⚖️ [Generate] Elements (五行):', baziData.elements)
+      console.log('🏛️ [Generate] Year Pillar (年柱):', baziData.yearPillar)
+      console.log('🏛️ [Generate] Month Pillar (月柱):', baziData.monthPillar)
+      console.log('🏛️ [Generate] Day Pillar (日柱):', baziData.dayPillar)
+      console.log('🏛️ [Generate] Hour Pillar (时柱):', baziData.hourPillar)
+      
+      // Generate mock reports for now
+      const fullReport = generateFullReport(birthData, baziData)
+      const previewReport = generatePreviewReport(birthData, baziData)
 
       await updateStepStatus(2, 'completed')
 
@@ -153,8 +160,8 @@ function GenerateReportContent() {
         is_time_known_input: birthData.isTimeKnownInput,
         is_paid: false,
         bazi_data: baziData,
-        full_report: mockFullReport,
-        preview_report: mockPreviewReport
+        full_report: fullReport,
+        preview_report: previewReport
       }
 
       const { data: reportData, error: reportError } = await supabase
@@ -196,6 +203,12 @@ function GenerateReportContent() {
 - 出生时间：${birthData.birthTime || '未知'}
 - 性别：${birthData.gender === 'male' ? '男' : '女'}
 - 时区：${birthData.timeZone}
+
+## 八字信息
+- 天干：${baziData.heavenlyStems.join('、')}
+- 地支：${baziData.earthlyBranches.join('、')}
+- 日主：${baziData.dayMaster}
+- 五行分布：木${baziData.elements.wood}、火${baziData.elements.fire}、土${baziData.elements.earth}、金${baziData.elements.metal}、水${baziData.elements.water}
 
 ## 核心性格特征
 基于您的八字分析，您的日主为${baziData.dayMaster}，这赋予了您独特的个性魅力。您是一个充满智慧和创造力的人，善于观察和思考，总能在细节中发现别人忽视的价值。您的内心深处有着对完美的追求，这使您在做事时格外认真细致。同时，您具有很强的直觉力和同理心，能够敏锐地感知他人的情绪变化。
