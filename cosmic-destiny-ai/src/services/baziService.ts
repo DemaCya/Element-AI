@@ -1,6 +1,9 @@
 import { BirthData, BaziData } from '@/types'
 import { toDate } from 'date-fns-tz';
 
+// 强制设置UTC时区，确保与腾讯云开发环境一致
+process.env.TZ = 'UTC';
+
 export class BaziService {
   // 生成模拟的八字数据（用于测试）
   static generateMockBaziData(birthData: BirthData): BaziData {
@@ -87,7 +90,11 @@ export class BaziService {
       console.log('🔮 [BaziService] 时区:', birthData.timeZone)
       console.log('🔮 [BaziService] 性别:', birthData.gender)
       
+      // 强制设置UTC时区环境
+      process.env.TZ = 'UTC'
+      
       // 检查当前环境的时区设置
+      console.log('🔮 [BaziService] 强制设置时区为UTC')
       console.log('🔮 [BaziService] 当前环境时区 TZ:', process.env.TZ)
       console.log('🔮 [BaziService] 当前系统时区偏移:', new Date().getTimezoneOffset())
       console.log('🔮 [BaziService] 当前时间UTC:', new Date().toISOString())
@@ -106,6 +113,15 @@ export class BaziService {
       console.log('🔮 [BaziService] 出生日期:', birthDate)
       console.log('🔮 [BaziService] 出生日期UTC:', birthDate.toISOString())
       console.log('🔮 [BaziService] 出生日期本地时间:', birthDate.toString())
+      
+      // 验证时区转换后的结果
+      console.log('🔮 [BaziService] 验证时区转换:')
+      console.log('- 原始输入时间字符串:', birthDateTimeString)
+      console.log('- 指定时区:', birthData.timeZone)
+      console.log('- 转换后的Date对象:', birthDate)
+      console.log('- 转换后的UTC时间:', birthDate.toISOString())
+      console.log('- 转换后的本地显示:', birthDate.toString())
+      console.log('- 转换后的UTC字符串:', birthDate.toUTCString())
 
       // Create bazi calculator instance
       console.log('🔮 [BaziService] 创建BaziCalculator参数:')
@@ -114,9 +130,18 @@ export class BaziService {
       console.log('- timeZone:', birthData.timeZone)
       console.log('- isTimeKnownInput:', birthData.isTimeKnownInput)
       
-      const calculator = new BaziCalculator(birthDate, birthData.gender, birthData.timeZone, birthData.isTimeKnownInput)
+      // 确保在UTC环境下创建BaziCalculator
+      // 这样可以确保与腾讯云开发环境的计算结果一致
+      const calculator = new BaziCalculator(birthDate, birthData.gender, 'UTC', birthData.isTimeKnownInput)
 
-      console.log("calculator.toString():",calculator.toString())
+      console.log("🔮 [BaziService] calculator.toString():",calculator.toString())
+      
+      // 验证计算器创建后的环境状态
+      console.log('🔮 [BaziService] 计算器创建后验证:')
+      console.log('- 当前进程时区:', process.env.TZ)
+      console.log('- 新Date()显示:', new Date().toString())
+      console.log('- 传入的birthDate:', birthDate.toString())
+      console.log('- birthDate UTC:', birthDate.toISOString())
       
       // Calculate comprehensive bazi analysis
       const analysis = calculator.getCompleteAnalysis();
