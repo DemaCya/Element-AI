@@ -8,7 +8,16 @@ import { Database } from '@/lib/database.types'
  * by managing session information in cookies, which are accessible on both the
  * client and the server.
  */
+
+let supabaseClient: ReturnType<typeof createBrowserClient<Database>> | null = null
+
 export function createClient() {
+  if (supabaseClient) {
+    return supabaseClient
+  }
+
+  console.log('%c[Supabase Client] Creating a new singleton instance.', 'color: orange; font-weight: bold;');
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
 
@@ -16,8 +25,9 @@ export function createClient() {
     throw new Error('Missing Supabase environment variables in the browser')
   }
 
-  return createBrowserClient<Database>(
+  supabaseClient = createBrowserClient<Database>(
     supabaseUrl,
     supabaseAnonKey
   )
+  return supabaseClient
 }

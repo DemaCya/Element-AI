@@ -168,19 +168,24 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
         if (event === 'SIGNED_IN' && session?.user) {
           logger.info(`${logPrefix} 🔑 SIGNED_IN event. User: ${session.user.id}`);
-          setUser(session.user)
-          const { data: profileData, error: profileError } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .single()
-          
-          if(profileError) {
-            logger.error(`${logPrefix} ❌ Error fetching profile on SIGNED_IN:`, profileError);
+          if (userChanged) {
+            setUser(session.user)
+            const { data: profileData, error: profileError } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', session.user.id)
+              .single()
+            
+            if(profileError) {
+              logger.error(`${logPrefix} ❌ Error fetching profile on SIGNED_IN:`, profileError);
+            } else {
+              logger.info(`${logPrefix} ✅ Profile fetched on SIGNED_IN.`);
+            }
+            setProfile(profileData || null)
           } else {
-            logger.info(`${logPrefix} ✅ Profile fetched on SIGNED_IN.`);
+            logger.info(`${logPrefix} 🔑 SIGNED_IN event for existing user, session refreshed. No data fetch needed.`);
+            setUser(session.user);
           }
-          setProfile(profileData || null)
 
         } else if (event === 'SIGNED_OUT') {
           logger.info(`${logPrefix} 🚪 SIGNED_OUT event.`);
@@ -206,42 +211,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       clearTimeout(timeout)
       subscription.unsubscribe()
     }
-  }, [supabase])
-
-  useEffect(() => {
-    const handleVisibilityChange = async () => {
-      logger.info(`[Visibility Change] Page visibility changed to: ${document.visibilityState}`);
-      if (document.visibilityState === 'visible') {
-        logger.info('[Visibility Change] Page is visible, checking Supabase session status...');
-        const { data, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          logger.error('[Visibility Change] Error getting session on visibility change:', error);
-          return;
-        }
-
-        logger.info('[Visibility Change] Session check on visibility change:', { hasSession: !!data.session });
-        
-        if (!data.session && user) {
-          logger.warn('[Visibility Change] App state has user, but Supabase session is null. Attempting to refresh.');
-          const { error: refreshError } = await supabase.auth.refreshSession();
-          if (refreshError) {
-            logger.error('[Visibility Change] Error refreshing session:', refreshError);
-          } else {
-            logger.info('[Visibility Change] Session refresh attempted.');
-          }
-        }
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    logger.info('[UserContext] Visibility change listener added.');
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      logger.info('[UserContext] Visibility change listener removed.');
-    };
-  }, [supabase, user]);
+  }, [supabase, user])
 
   const signOut = async () => {
     await supabase.auth.signOut()
