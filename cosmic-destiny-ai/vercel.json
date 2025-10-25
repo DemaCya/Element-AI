@@ -2,14 +2,5 @@
   "env": {
     "TZ": "UTC",
     "FORCE_UTC_TIMEZONE": "true"
-  },
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next",
-  "installCommand": "npm install",
-  "framework": "nextjs",
-  "functions": {
-    "src/app/api/**/*.ts": {
-      "runtime": "nodejs18.x"
-    }
   }
 }
