@@ -2,7 +2,7 @@ import { BirthData, BaziData } from '@/types'
 import { toDate } from 'date-fns-tz';
 
 // 强制设置UTC时区，确保与腾讯云开发环境一致
-// process.env.TZ = 'UTC';
+process.env.TZ = 'UTC';
 
 export class BaziService {
   // 生成模拟的八字数据（用于测试）
@@ -91,7 +91,7 @@ export class BaziService {
       console.log('🔮 [BaziService] 性别:', birthData.gender)
       
       // 强制设置UTC时区环境
-      // process.env.TZ = 'UTC'
+      process.env.TZ = 'UTC'
       
       // 检查时区格式和有效性
       try {
@@ -102,32 +102,32 @@ export class BaziService {
         console.error('🔮 [BaziService] 时区验证失败:', error)
       }
 
-      const birthDate = toDate(birthDateTimeString, { timeZone: birthData.timeZone })
-      console.log('🔮 [BaziService] 出生日期:', birthDate)
-      console.log('🔮 [BaziService] 出生日期UTC:', birthDate.toISOString())
-      console.log('🔮 [BaziService] 出生日期本地时间:', birthDate.toString())
-
-      // Create a new Date object with its local time values set to the UTC values of the original date.
-      // This is to bypass the issue where BaziCalculator might be using non-UTC methods.
-      const utcYear = birthDate.getUTCFullYear();
-      const utcMonth = birthDate.getUTCMonth();
-      const utcDay = birthDate.getUTCDate();
-      const utcHours = birthDate.getUTCHours();
-      const utcMinutes = birthDate.getUTCMinutes();
-      const utcSeconds = birthDate.getUTCSeconds();
+      // 将用户输入的本地时间转换为UTC时间
+      const birthDateLocal = toDate(birthDateTimeString, { timeZone: birthData.timeZone })
+      console.log('🔮 [BaziService] 用户本地时间:', birthDateLocal.toString())
+      console.log('🔮 [BaziService] 用户本地时间UTC表示:', birthDateLocal.toISOString())
       
-      const calculatorDate = new Date(utcYear, utcMonth, utcDay, utcHours, utcMinutes, utcSeconds);
+      // 创建UTC时间对象，确保传入BaziCalculator的是UTC时间
+      // 使用toISOString()确保时区信息正确传递
+      const birthDateUTC = new Date(birthDateLocal.toISOString())
+      console.log('🔮 [BaziService] 转换后的UTC时间:', birthDateUTC.toString())
+      console.log('🔮 [BaziService] 转换后的UTC时间ISO:', birthDateUTC.toISOString())
+      
+      // 验证时区转换的正确性
+      const timezoneOffset = birthDateLocal.getTimezoneOffset()
+      console.log('🔮 [BaziService] 时区偏移量 (分钟):', timezoneOffset)
+      console.log('🔮 [BaziService] 时区偏移量 (小时):', timezoneOffset / 60)
 
       // Create bazi calculator instance
       console.log('🔮 [BaziService] 创建BaziCalculator参数:')
-      console.log('- birthDate:', calculatorDate)
+      console.log('- birthDate (UTC):', birthDateUTC)
       console.log('- gender:', birthData.gender)
       console.log('- timeZone:', birthData.timeZone)
       console.log('- isTimeKnownInput:', birthData.isTimeKnownInput)
       
       // 确保在UTC环境下创建BaziCalculator
-      // 这样可以确保与腾讯云开发环境的计算结果一致
-      const calculator = new BaziCalculator(calculatorDate, birthData.gender, 'UTC', birthData.isTimeKnownInput)
+      // 传入UTC时间对象，确保时区一致性
+      const calculator = new BaziCalculator(birthDateUTC, birthData.gender, 'UTC', birthData.isTimeKnownInput)
 
       console.log("🔮 [BaziService] calculator.toString():",calculator.toString())
       
@@ -135,8 +135,8 @@ export class BaziService {
       console.log('🔮 [BaziService] 计算器创建后验证:')
       console.log('- 当前进程时区:', process.env.TZ)
       console.log('- 新Date()显示:', new Date().toString())
-      console.log('- 传入的birthDate:', calculatorDate.toString())
-      console.log('- birthDate UTC:', calculatorDate.toISOString())
+      console.log('- 传入的birthDate (UTC):', birthDateUTC.toString())
+      console.log('- birthDate UTC ISO:', birthDateUTC.toISOString())
       
       // Calculate comprehensive bazi analysis
       const analysis = calculator.getCompleteAnalysis();
