@@ -208,6 +208,41 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     }
   }, [supabase])
 
+  useEffect(() => {
+    const handleVisibilityChange = async () => {
+      logger.info(`[Visibility Change] Page visibility changed to: ${document.visibilityState}`);
+      if (document.visibilityState === 'visible') {
+        logger.info('[Visibility Change] Page is visible, checking Supabase session status...');
+        const { data, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          logger.error('[Visibility Change] Error getting session on visibility change:', error);
+          return;
+        }
+
+        logger.info('[Visibility Change] Session check on visibility change:', { hasSession: !!data.session });
+        
+        if (!data.session && user) {
+          logger.warn('[Visibility Change] App state has user, but Supabase session is null. Attempting to refresh.');
+          const { error: refreshError } = await supabase.auth.refreshSession();
+          if (refreshError) {
+            logger.error('[Visibility Change] Error refreshing session:', refreshError);
+          } else {
+            logger.info('[Visibility Change] Session refresh attempted.');
+          }
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    logger.info('[UserContext] Visibility change listener added.');
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      logger.info('[UserContext] Visibility change listener removed.');
+    };
+  }, [supabase, user]);
+
   const signOut = async () => {
     await supabase.auth.signOut()
     setUser(null)
