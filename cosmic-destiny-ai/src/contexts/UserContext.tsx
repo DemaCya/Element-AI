@@ -26,10 +26,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
   const refreshProfile = async () => {
     if (!user) {
-      logger.info('UserContext: refreshProfile called but no user is logged in.');
-      return;
+      logger.info('UserContext: refreshProfile called but no user is logged in.')
+      return
     }
-    logger.info(`UserContext: Manually refreshing profile for user: ${user.id}`);
+    
     try {
       const { data: profileData, error: profileError } = await supabase
         .from('profiles')
@@ -38,172 +38,125 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
         .single()
       
       if (profileError) {
-        logger.error('UserContext: Error refreshing profile:', profileError);
+        logger.error('UserContext: Error refreshing profile:', profileError)
+        // 即使profile查询失败，也不影响用户认证状态
+        setProfile(null)
       } else {
-        logger.info('UserContext: Profile refreshed successfully.', { hasProfile: !!profileData });
-        setProfile(profileData || null);
+        logger.info('UserContext: Profile refreshed successfully.')
+        setProfile(profileData || null)
       }
     } catch (error) {
-      logger.error('UserContext: Exception during profile refresh:', error);
+      logger.error('UserContext: Exception during profile refresh:', error)
+      setProfile(null)
     }
-  };
+  }
 
 
   useEffect(() => {
     const logPrefix = `[user-context-${Date.now()}]`
     logger.info(`${logPrefix} Initializing...`)
     let mounted = true
-    let timeoutReached = false
     
-    // 超时保护：10秒后强制结束loading
-    const timeout = setTimeout(() => {
-      if (mounted && !timeoutReached) {
-        logger.warn(`${logPrefix} ⚠️ User loading timeout, forcing loading=false`)
-        timeoutReached = true
-        setLoading(false)
-      }
-    }, 10000)
-
-    // 获取当前用户
-    async function loadUser() {
+    // 简化的认证流程
+    async function initializeAuth() {
       try {
-        logger.info(`${logPrefix} 📡 Fetching user...`)
+        logger.info(`${logPrefix} 📡 Checking authentication...`)
         
-        const startTime = Date.now()
-        
-        // 先尝试getSession()（快速，从localStorage读取）
-        logger.info(`${logPrefix} ⏱️ Calling supabase.auth.getSession()...`)
-        logger.info(`${logPrefix} ⏱️ Supabase client check:`, {
-          hasSupabase: !!supabase,
-          hasAuth: !!supabase?.auth,
-          hasGetSession: typeof supabase?.auth?.getSession === 'function'
-        })
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
-        
-        let user = session?.user || null
-        
-        const elapsed = Date.now() - startTime
-        logger.info(`${logPrefix} 📬 Session fetch completed in ${elapsed}ms`, { hasSession: !!session, hasError: !!sessionError })
-        
-        // 如果getSession()没有返回用户，尝试getUser()（从服务器验证）
-        if (!user && !sessionError) {
-          logger.info(`${logPrefix} ⏱️ No session found, trying getUser()...`)
-          const getUserStart = Date.now()
-          const { data, error: getUserError } = await supabase.auth.getUser()
-          const getUserElapsed = Date.now() - getUserStart
-          logger.info(`${logPrefix} 📬 getUser() completed in ${getUserElapsed}ms`, { hasUser: !!data?.user })
-          
-          if (data?.user) {
-            user = data.user
-          }
-        }
+        // 只使用getSession()，这是最快的检查方式
+        const { data: { session }, error } = await supabase.auth.getSession()
         
         if (!mounted) {
           logger.info(`${logPrefix} 🚫 Component unmounted, ignoring results`)
           return
         }
         
-        setUser(user)
-        
-        // 如果有用户，获取profile
-        if (user) {
-          logger.info(`${logPrefix} 👤 User found, fetching profile for:`, user.id)
+        if (error) {
+          logger.error(`${logPrefix} ❌ Session error:`, error)
+          setUser(null)
+          setProfile(null)
+        } else if (session?.user) {
+          logger.info(`${logPrefix} ✅ User found:`, session.user.id)
+          setUser(session.user)
           
-          const profileStartTime = Date.now()
-          logger.info(`${logPrefix} 📊 Building profile query...`)
-          const profileQuery = supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', user.id)
-            .single()
-          
-          logger.info(`${logPrefix} 📊 Executing profile query...`)
-          const { data: profileData, error: profileError } = await profileQuery
-          
-          const profileElapsed = Date.now() - profileStartTime
-          logger.info(`${logPrefix} 📬 Profile fetch completed in ${profileElapsed}ms`, { hasProfile: !!profileData, hasError: !!profileError })
-          
-          if (!mounted) {
-            logger.info(`${logPrefix} 🚫 Component unmounted after profile fetch`)
-            return
+          // 异步获取profile，不阻塞认证流程
+          try {
+            const { data: profileData, error: profileError } = await supabase
+              .from('profiles')
+              .select('*')
+              .eq('id', session.user.id)
+              .single()
+            
+            if (profileError) {
+              logger.warn(`${logPrefix} ⚠️ Profile not found (user may be new):`, profileError)
+              setProfile(null)
+            } else {
+              logger.info(`${logPrefix} ✅ Profile loaded`)
+              setProfile(profileData || null)
+            }
+          } catch (profileError) {
+            logger.warn(`${logPrefix} ⚠️ Profile fetch failed:`, profileError)
+            setProfile(null)
           }
-          
-          if (profileError) {
-            logger.error(`${logPrefix} ❌ Failed to get profile:`, profileError)
-            logger.error(`${logPrefix} ❌ Profile error details:`, JSON.stringify(profileError))
-          }
-          
-          setProfile(profileData || null)
         } else {
           logger.info(`${logPrefix} 👤 No user logged in`)
+          setUser(null)
           setProfile(null)
         }
       } catch (error) {
         if (!mounted) return
-        logger.error(`${logPrefix} ❌ Exception loading user:`, error)
-        logger.error(`${logPrefix} ❌ Exception details:`, JSON.stringify(error, Object.getOwnPropertyNames(error)))
+        logger.error(`${logPrefix} ❌ Auth initialization failed:`, error)
         setUser(null)
         setProfile(null)
       } finally {
-        if (mounted && !timeoutReached) {
-          logger.info(`${logPrefix} ✅ Loading complete`)
-          clearTimeout(timeout)
+        if (mounted) {
+          logger.info(`${logPrefix} ✅ Auth initialization complete`)
           setLoading(false)
         }
       }
     }
 
-    loadUser()
+    initializeAuth()
 
     // 监听认证状态变化
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        logger.info(`${logPrefix} 🔄 Auth state changed:`, { event, hasSession: !!session });
+        logger.info(`${logPrefix} 🔄 Auth state changed:`, { event, hasSession: !!session })
+        
         if (!mounted) {
-            logger.info(`${logPrefix} 🚫 Component unmounted, ignoring auth state change.`);
-            return;
+          logger.info(`${logPrefix} 🚫 Component unmounted, ignoring auth state change`)
+          return
         }
         
-        const userChanged = session?.user?.id !== user?.id;
-
-        if (event === 'SIGNED_IN' && session?.user) {
-          logger.info(`${logPrefix} 🔑 SIGNED_IN event. User: ${session.user.id}`);
-          setUser(session.user)
-          const { data: profileData, error: profileError } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .single()
-          
-          if(profileError) {
-            logger.error(`${logPrefix} ❌ Error fetching profile on SIGNED_IN:`, profileError);
-          } else {
-            logger.info(`${logPrefix} ✅ Profile fetched on SIGNED_IN.`);
-          }
-          setProfile(profileData || null)
-
-        } else if (event === 'SIGNED_OUT') {
-          logger.info(`${logPrefix} 🚪 SIGNED_OUT event.`);
-          setUser(null)
-          setProfile(null)
-        
-        } else if (event === 'USER_UPDATED' && session?.user) {
-            logger.info(`${logPrefix} 🔄 USER_UPDATED event. User: ${session.user.id}`);
-            setUser(session.user);
-            // Optionally, you might want to refresh the profile here as well
-            await refreshProfile();
-
-        } else if (event === 'TOKEN_REFRESHED' && session?.user && userChanged) {
-            logger.info(`${logPrefix} 🔄 TOKEN_REFRESHED event with a new user.`);
-            setUser(session.user);
-            await refreshProfile();
+        switch (event) {
+          case 'SIGNED_IN':
+            if (session?.user) {
+              logger.info(`${logPrefix} 🔑 User signed in:`, session.user.id)
+              setUser(session.user)
+              // 异步获取profile
+              refreshProfile()
+            }
+            break
+            
+          case 'SIGNED_OUT':
+            logger.info(`${logPrefix} 🚪 User signed out`)
+            setUser(null)
+            setProfile(null)
+            break
+            
+          case 'TOKEN_REFRESHED':
+            if (session?.user) {
+              logger.info(`${logPrefix} 🔄 Token refreshed for user:`, session.user.id)
+              setUser(session.user)
+              // 可选：刷新profile
+              // await refreshProfile()
+            }
+            break
         }
       }
     )
 
     return () => {
       mounted = false
-      clearTimeout(timeout)
       subscription.unsubscribe()
     }
   }, [supabase])
