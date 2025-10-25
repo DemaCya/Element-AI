@@ -91,25 +91,19 @@ export class BaziService {
       const forceUTC = process.env.FORCE_UTC_TIMEZONE === 'true'
       console.log('🔮 [BaziService] 强制UTC时区设置:', forceUTC)
       
-      // 尝试设置UTC时区环境（可能被系统覆盖）
-      if (forceUTC) {
         process.env.TZ = 'UTC'
-      }
 
-      const birthDateLocal = toDate(birthDateTimeString, { timeZone: birthData.timeZone })
-
-      // 创建纯UTC时间的Date对象 - 使用最可靠的方法
-      // 直接使用ISO字符串创建，确保是UTC时间
-      const birthDate = new Date(birthDateLocal.toISOString())
+      const birthDateInOriginalTimeZone = toDate(birthDateTimeString, { timeZone: birthData.timeZone });
+      const birthDateUTCString = birthDateInOriginalTimeZone.toISOString();
+      const birthDateLocal = toDate(birthDateUTCString);
       
       // 验证时区设置和转换结果
       console.log('🔮 [BaziService] 环境时区设置:', process.env.TZ)
       console.log('🔮 [BaziService] 系统时区偏移:', new Date().getTimezoneOffset())
       console.log('🔮 [BaziService] 原始本地时间:', birthDateLocal.toString())
       console.log('🔮 [BaziService] 原始本地时间ISO:', birthDateLocal.toISOString())
-      console.log('🔮 [BaziService] 转换后UTC时间:', birthDate.toString())
       
-      const calculator = new BaziCalculator(birthDate, birthData.gender, birthData.timeZone, birthData.isTimeKnownInput)
+      const calculator = new BaziCalculator(birthDateLocal, birthData.gender, birthData.timeZone, birthData.isTimeKnownInput)
 
       console.log("🔮 [BaziService] calculator.toString():",calculator.toString())
       
