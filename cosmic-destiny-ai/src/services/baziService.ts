@@ -92,31 +92,15 @@ export class BaziService {
       
       // 强制设置UTC时区环境
       process.env.TZ = 'UTC'
-      
-      // 检查时区格式和有效性
-      try {
-        const testDate = new Date()
-        const timeZoneTest = Intl.DateTimeFormat(undefined, { timeZone: birthData.timeZone }).resolvedOptions().timeZone
-        console.log('🔮 [BaziService] 时区验证 - 输入:', birthData.timeZone, '解析结果:', timeZoneTest)
-      } catch (error) {
-        console.error('🔮 [BaziService] 时区验证失败:', error)
-      }
 
       // 将用户输入的本地时间转换为UTC时间
       const birthDateLocal = toDate(birthDateTimeString, { timeZone: birthData.timeZone })
-      console.log('🔮 [BaziService] 用户本地时间:', birthDateLocal.toString())
-      console.log('🔮 [BaziService] 用户本地时间UTC表示:', birthDateLocal.toISOString())
       
       // 创建UTC时间对象，确保传入BaziCalculator的是UTC时间
       // 使用toISOString()确保时区信息正确传递
       const birthDateUTC = new Date(birthDateLocal.toISOString())
       console.log('🔮 [BaziService] 转换后的UTC时间:', birthDateUTC.toString())
       console.log('🔮 [BaziService] 转换后的UTC时间ISO:', birthDateUTC.toISOString())
-      
-      // 验证时区转换的正确性
-      const timezoneOffset = birthDateLocal.getTimezoneOffset()
-      console.log('🔮 [BaziService] 时区偏移量 (分钟):', timezoneOffset)
-      console.log('🔮 [BaziService] 时区偏移量 (小时):', timezoneOffset / 60)
 
       // Create bazi calculator instance
       console.log('🔮 [BaziService] 创建BaziCalculator参数:')
@@ -127,16 +111,9 @@ export class BaziService {
       
       // 确保在UTC环境下创建BaziCalculator
       // 传入UTC时间对象，确保时区一致性
-      const calculator = new BaziCalculator(birthDateUTC, birthData.gender, 'UTC', birthData.isTimeKnownInput)
+      const calculator = new BaziCalculator(birthDateUTC, birthData.gender, birthData.timeZone, birthData.isTimeKnownInput)
 
       console.log("🔮 [BaziService] calculator.toString():",calculator.toString())
-      
-      // 验证计算器创建后的环境状态
-      console.log('🔮 [BaziService] 计算器创建后验证:')
-      console.log('- 当前进程时区:', process.env.TZ)
-      console.log('- 新Date()显示:', new Date().toString())
-      console.log('- 传入的birthDate (UTC):', birthDateUTC.toString())
-      console.log('- birthDate UTC ISO:', birthDateUTC.toISOString())
       
       // Calculate comprehensive bazi analysis
       const analysis = calculator.getCompleteAnalysis();
