@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { useUser } from '@/contexts/UserContext'
 import { useSupabase } from '@/contexts/SupabaseContext'
 import { Button } from '@/components/ui/button'
-import DebugInfo from '@/components/DebugInfo'
 
 // 强制动态渲染
 export const dynamic = 'force-dynamic'
@@ -328,7 +327,6 @@ Unlock the full report now to begin your journey of cosmic discovery!` : ''}`
 
   return (
     <div className="cosmic-bg min-h-screen">
-      <DebugInfo />
       {/* Header */}
       <header className="border-b border-purple-500/20 bg-slate-900/50 backdrop-blur-sm">
         <div className="container mx-auto px-4 py-4">
