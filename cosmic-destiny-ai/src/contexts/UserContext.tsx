@@ -168,24 +168,19 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
 
         if (event === 'SIGNED_IN' && session?.user) {
           logger.info(`${logPrefix} 🔑 SIGNED_IN event. User: ${session.user.id}`);
-          if (userChanged) {
-            setUser(session.user)
-            const { data: profileData, error: profileError } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('id', session.user.id)
-              .single()
-            
-            if(profileError) {
-              logger.error(`${logPrefix} ❌ Error fetching profile on SIGNED_IN:`, profileError);
-            } else {
-              logger.info(`${logPrefix} ✅ Profile fetched on SIGNED_IN.`);
-            }
-            setProfile(profileData || null)
+          setUser(session.user)
+          const { data: profileData, error: profileError } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single()
+          
+          if(profileError) {
+            logger.error(`${logPrefix} ❌ Error fetching profile on SIGNED_IN:`, profileError);
           } else {
-            logger.info(`${logPrefix} 🔑 SIGNED_IN event for existing user, session refreshed. No data fetch needed.`);
-            setUser(session.user);
+            logger.info(`${logPrefix} ✅ Profile fetched on SIGNED_IN.`);
           }
+          setProfile(profileData || null)
 
         } else if (event === 'SIGNED_OUT') {
           logger.info(`${logPrefix} 🚪 SIGNED_OUT event.`);
@@ -211,7 +206,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
       clearTimeout(timeout)
       subscription.unsubscribe()
     }
-  }, [supabase, user])
+  }, [supabase])
 
   const signOut = async () => {
     await supabase.auth.signOut()
