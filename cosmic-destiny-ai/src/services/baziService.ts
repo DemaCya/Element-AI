@@ -94,8 +94,12 @@ export class BaziService {
         process.env.TZ = 'UTC'
 
       const birthDateInOriginalTimeZone = toDate(birthDateTimeString, { timeZone: birthData.timeZone });
-      const birthDateUTCString = birthDateInOriginalTimeZone.toISOString();
-      const birthDateLocal = toDate(birthDateUTCString);
+      
+      const utcDate = new Date(birthDateInOriginalTimeZone.toLocaleString('en-US', { timeZone: 'UTC' }));
+      const localDate = new Date(birthDateInOriginalTimeZone.toLocaleString('en-US', { timeZone: birthData.timeZone }));
+      const offset = (localDate.getTime() - utcDate.getTime()) / 60000;
+      
+      const birthDateLocal = new Date(birthDateInOriginalTimeZone.getTime() - offset * 60 * 1000);
       
       // 验证时区设置和转换结果
       console.log('🔮 [BaziService] 环境时区设置:', process.env.TZ)
