@@ -1,5 +1,5 @@
 import { BirthData, BaziData } from '@/types'
-import { toDate } from 'date-fns-tz';
+// import { toDate } from 'date-fns-tz';
 
 export class BaziService {
   // 生成模拟的八字数据（用于测试）
@@ -98,15 +98,17 @@ export class BaziService {
       const forceUTC = process.env.FORCE_UTC_TIMEZONE === 'true'
       console.log('🔮 [BaziService] 强制UTC时区设置:', forceUTC)
       
-      const birthDateLocal = toDate(birthDateTimeString, { timeZone: birthData.timeZone })
+      // Per user request, treat the local time string as UTC for calculation.
+      // This is to address potential timezone issues on Vercel.
+      // Example: "2024-01-01T08:00:00" (Shanghai time) -> 2024-01-01 08:00:00 UTC
+      const birthDateAsUTC = new Date(birthDateTimeString + 'Z');
       
       // 验证时区设置和转换结果
       console.log('🔮 [BaziService] 环境时区设置:', process.env.TZ)
       console.log('🔮 [BaziService] 系统时区偏移:', new Date().getTimezoneOffset())
-      console.log('🔮 [BaziService] 原始本地时间:', birthDateLocal.toString())
-      console.log('🔮 [BaziService] 原始本地时间ISO:', birthDateLocal.toISOString())
+      console.log('🔮 [BaziService] Parsed as UTC for Bazi:', birthDateAsUTC.toISOString())
       
-      const calculator = new BaziCalculator(birthDateLocal, birthData.gender, birthData.timeZone, birthData.isTimeKnownInput)
+      const calculator = new BaziCalculator(birthDateAsUTC, birthData.gender, birthData.timeZone, birthData.isTimeKnownInput)
 
       console.log("🔮 [BaziService] calculator.toString():",calculator.toString())
       
