@@ -66,12 +66,15 @@ export class BaziService {
   }
 
   static async calculateBazi(birthData: BirthData): Promise<BaziData> {
-    const originalTZ = process.env.TZ;
     try {
       // Import the bazi calculator dynamically to avoid SSR issues
       const baziModule = await import('@aharris02/bazi-calculator-by-alvamind')
 
       const BaziCalculator = baziModule.BaziCalculator;
+
+      // Log the server's timezone for debugging
+      const serverTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      console.log(`🌍 [BaziService] Server runtime timezone detected: ${serverTimeZone}`);
 
       let birthDateTimeString;
       if(birthData.isTimeKnownInput){
@@ -92,9 +95,9 @@ export class BaziService {
       const forceUTC = process.env.FORCE_UTC_TIMEZONE === 'true'
       console.log('🔮 [BaziService] 强制UTC时区设置:', forceUTC)
       
-      process.env.TZ = birthData.timeZone;
-        
-      const birthDateLocal = toDate(birthDateTimeString);
+        process.env.TZ = 'UTC'
+
+      const birthDateLocal = toDate(birthDateTimeString, { timeZone: birthData.timeZone })
       
       // 验证时区设置和转换结果
       console.log('🔮 [BaziService] 环境时区设置:', process.env.TZ)
@@ -259,8 +262,6 @@ export class BaziService {
       
       // 如果计算失败（比如缺少依赖包），返回模拟数据
       return this.generateMockBaziData(birthData)
-    } finally {
-      process.env.TZ = originalTZ;
     }
   }
 
