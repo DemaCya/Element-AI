@@ -67,14 +67,17 @@ export class BaziService {
 
   static async calculateBazi(birthData: BirthData): Promise<BaziData> {
     try {
+      // Force the Node.js process to use UTC. This is the most critical step.
+      process.env.TZ = 'UTC'
+
+      // Log the server's timezone for debugging AFTER attempting to set it.
+      const serverTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      console.log(`🌍 [BaziService] Server runtime timezone is now: ${serverTimeZone}`);
+
       // Import the bazi calculator dynamically to avoid SSR issues
       const baziModule = await import('@aharris02/bazi-calculator-by-alvamind')
 
       const BaziCalculator = baziModule.BaziCalculator;
-
-      // Log the server's timezone for debugging
-      const serverTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      console.log(`🌍 [BaziService] Server runtime timezone detected: ${serverTimeZone}`);
 
       let birthDateTimeString;
       if(birthData.isTimeKnownInput){
@@ -95,8 +98,6 @@ export class BaziService {
       const forceUTC = process.env.FORCE_UTC_TIMEZONE === 'true'
       console.log('🔮 [BaziService] 强制UTC时区设置:', forceUTC)
       
-        process.env.TZ = 'UTC'
-
       const birthDateLocal = toDate(birthDateTimeString, { timeZone: birthData.timeZone })
       
       // 验证时区设置和转换结果
