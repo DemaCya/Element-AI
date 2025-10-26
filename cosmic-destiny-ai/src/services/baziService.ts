@@ -1,5 +1,5 @@
 import { BirthData, BaziData } from '@/types'
-// import { toDate } from 'date-fns-tz';
+import { toDate } from 'date-fns-tz';
 
 export class BaziService {
   // 生成模拟的八字数据（用于测试）
@@ -67,6 +67,13 @@ export class BaziService {
 
   static async calculateBazi(birthData: BirthData): Promise<BaziData> {
     try {
+      // 🌍 在八字计算前记录服务器时区信息
+      console.log('🌍 [BaziService] ===== 八字计算开始 =====');
+      console.log(`🌍 [BaziService] 当前服务器时区: ${Intl.DateTimeFormat().resolvedOptions().timeZone}`);
+      console.log(`🌍 [BaziService] 当前环境变量TZ: ${process.env.TZ || '未设置'}`);
+      console.log(`🌍 [BaziService] 当前系统时间: ${new Date().toString()}`);
+      console.log(`🌍 [BaziService] 当前UTC时间: ${new Date().toISOString()}`);
+      
       // Force the Node.js process to use UTC. This is the most critical step.
       process.env.TZ = 'UTC'
 
@@ -94,22 +101,15 @@ export class BaziService {
       console.log('🔮 [BaziService] 时区:', birthData.timeZone)
       console.log('🔮 [BaziService] 性别:', birthData.gender)
       
-      // 检查是否强制使用UTC时区
-      const forceUTC = process.env.FORCE_UTC_TIMEZONE === 'true'
-      console.log('🔮 [BaziService] 强制UTC时区设置:', forceUTC)
-      
-      // Per user request, treat the local time string as UTC for calculation.
-      // This is to address potential timezone issues on Vercel.
-      // Example: "2024-01-01T08:00:00" (Shanghai time) -> 2024-01-01 08:00:00 UTC
-      const birthDateAsUTC = new Date(birthDateTimeString + 'Z');
+      const birthDateLocal = toDate(birthDateTimeString, { timeZone: birthData.timeZone })
       
       // 验证时区设置和转换结果
       console.log('🔮 [BaziService] 环境时区设置:', process.env.TZ)
       console.log('🔮 [BaziService] 系统时区偏移:', new Date().getTimezoneOffset())
-      console.log('🔮 [BaziService] Parsed as UTC for Bazi:', birthDateAsUTC.toISOString())
-      console.log('🔮 [BaziService] Parsed as toString() for Bazi:', birthDateAsUTC.toString())
-
-      const calculator = new BaziCalculator(birthDateAsUTC, birthData.gender, birthData.timeZone, birthData.isTimeKnownInput)
+      console.log('🔮 [BaziService] 原始本地时间:', birthDateLocal.toString())
+      console.log('🔮 [BaziService] 原始本地时间ISO:', birthDateLocal.toISOString())
+      
+      const calculator = new BaziCalculator(birthDateLocal, birthData.gender, birthData.timeZone, birthData.isTimeKnownInput)
 
       console.log("🔮 [BaziService] calculator.toString():",calculator.toString())
       
