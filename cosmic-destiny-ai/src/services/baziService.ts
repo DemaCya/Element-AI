@@ -107,7 +107,8 @@ export class BaziService {
       console.log('🔮 [BaziService] 环境时区设置:', process.env.TZ)
       console.log('🔮 [BaziService] 系统时区偏移:', new Date().getTimezoneOffset())
       console.log('🔮 [BaziService] Parsed as UTC for Bazi:', birthDateAsUTC.toISOString())
-      
+      console.log('🔮 [BaziService] Parsed as toString() for Bazi:', birthDateAsUTC.toString())
+
       const calculator = new BaziCalculator(birthDateAsUTC, birthData.gender, birthData.timeZone, birthData.isTimeKnownInput)
 
       console.log("🔮 [BaziService] calculator.toString():",calculator.toString())
