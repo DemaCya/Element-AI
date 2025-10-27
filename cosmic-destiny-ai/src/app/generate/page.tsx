@@ -6,7 +6,8 @@ import { useUser } from '@/contexts/UserContext'
 import { useSupabase } from '@/contexts/SupabaseContext'
 import { Button } from '@/components/ui/button'
 import { Sparkles, Calendar, Clock, Globe, User, AlertCircle, CheckCircle } from 'lucide-react'
-import { BaziService } from '@/services/baziService'
+// No longer need to import BaziService here
+// import { BaziService } from '@/services/baziService'
 
 // 强制动态渲染
 export const dynamic = 'force-dynamic'
@@ -120,9 +121,22 @@ function GenerateReportContent() {
       // Step 2: Calculate Bazi destiny
       await updateStepStatus(1, 'processing')
       
-      // Call real Bazi calculation service
-      const baziData = await BaziService.calculateBazi(birthData)
-      console.log('Bazi calculation completed:', baziData)
+      // Call the new API route to perform Bazi calculation on the server
+      const response = await fetch('/api/calculate-bazi', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(birthData),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to calculate Bazi from API')
+      }
+
+      const baziData = await response.json()
+      console.log('Bazi calculation completed via API:', baziData)
 
       await updateStepStatus(1, 'completed')
 
