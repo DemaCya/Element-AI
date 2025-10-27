@@ -91,7 +91,7 @@ export class BaziService {
         // 当用户提供了具体时间时，使用用户输入的时间
         birthDateTimeString = `${birthData.birthDate}T${birthData.birthTime}:00`
       }else{
-        // 当用户没有提供时间时，使用默认时间 12:00:00
+        // 当用户没有提供时间时，使用默认时间 12:00:001
         birthDateTimeString = `${birthData.birthDate}T12:00:00`
       }
 
