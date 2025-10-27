@@ -166,7 +166,7 @@ function GenerateReportContent() {
       
       const reportInsertData = {
         user_id: user.id,
-        name: birthData.reportName || `命理报告 - ${new Date(birthData.birthDate).toLocaleDateString()}`,
+        name: birthData.reportName || `Destiny Profile for ${birthData.birthDate}`,
         birth_date: birthData.birthDate,
         birth_time: birthData.birthTime || null,
         timezone: birthData.timeZone,
