@@ -536,7 +536,7 @@ export default function BirthForm({ onSubmit, onClose, isLoading }: BirthFormPro
                       </h3>
                       <Input
                         type="text"
-                        placeholder="例如：2024年运势分析、我的八字报告等（可留空）"
+                        placeholder="e.g. My Destiny Profile, My Mom's Destiny Profile (optional)"
                         value={formData.reportName || ''}
                         onChange={(e) => updateFormData('reportName', e.target.value)}
                         className="w-full bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-purple-400/50 rounded-xl px-4 py-3"
