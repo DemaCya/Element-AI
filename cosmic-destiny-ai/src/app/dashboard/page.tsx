@@ -259,24 +259,6 @@ function DashboardContent() {
                 </Button>
               </div>
 
-              {/* Upgrade */}
-              {!reports.some(r => r.is_paid) && reports.length > 0 && (
-                <div className="bg-gradient-to-r from-purple-600/20 to-indigo-600/20 rounded-lg p-6 border border-purple-500/30">
-                  <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                    <CreditCard className="w-5 h-5 text-yellow-400" />
-                    Unlock Full Report
-                  </h3>
-                  <p className="text-gray-300 mb-4">
-                    Access your complete destiny analysis with detailed insights and predictions
-                  </p>
-                  <Button
-                    variant="outline"
-                    className="w-full border-yellow-400 text-yellow-400 hover:bg-yellow-400/10"
-                  >
-                    Upgrade for $19.99
-                  </Button>
-                </div>
-              )}
             </div>
           </div>
         </div>
