@@ -157,7 +157,7 @@ export default function Home() {
         <footer className="py-12 px-4 border-t border-purple-500/20">
           <div className="container mx-auto max-w-4xl text-center">
             <p className="text-gray-300">
-              © 2024 <span className="bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent font-semibold">Cosmic Destiny AI</span>. For entertainment purposes only.
+              © 2025 <span className="bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent font-semibold">Cosmic Destiny AI</span>. For entertainment purposes only.
             </p>
           </div>
         </footer>
