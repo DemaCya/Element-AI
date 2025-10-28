@@ -34,7 +34,6 @@ function ReportContent() {
   const [loading, setLoading] = useState(true)
   const [isVerifying, setIsVerifying] = useState(false) // 新增状态，用于验证支付
   const [pageLoadId] = useState(() => `page-load-${Date.now()}`) // 用于追踪日志
-  const [showUpgradeModal, setShowUpgradeModal] = useState(true) // 控制毛玻璃升级框的显示
   const supabase = useSupabase()
 
   useEffect(() => {
@@ -383,10 +382,10 @@ Unlock the full report now to begin your journey of cosmic discovery!` : ''}`
           {/* Report Content */}
           <div className="relative">
             {!report.is_paid ? (
-              // 未付费：显示预览内容和毛玻璃升级框
-              <>
+              // 未付费：显示预览内容和局部毛玻璃遮罩
+              <div className="relative">
                 {/* 报告内容区域 */}
-                <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-8 border border-purple-500/20 mb-8">
+                <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-8 border border-purple-500/20 relative overflow-hidden">
                   <div className="prose prose-invert max-w-none">
                     <div 
                       dangerouslySetInnerHTML={{ 
@@ -394,80 +393,48 @@ Unlock the full report now to begin your journey of cosmic discovery!` : ''}`
                       }}
                     />
                   </div>
-                </div>
-                
-                {/* 毛玻璃升级框 - 覆盖在内容上方 */}
-                {showUpgradeModal && (
-                  <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-                    {/* 背景遮罩 */}
-                    <div 
-                      className="absolute inset-0 bg-black/30 backdrop-blur-md"
-                      onClick={() => setShowUpgradeModal(false)}
-                    ></div>
-                    
-                    {/* 毛玻璃升级框 */}
-                    <div className="relative w-full max-w-2xl mx-auto">
-                      <div className="bg-gradient-to-br from-blue-500/25 via-purple-500/25 to-pink-500/25 backdrop-blur-lg rounded-2xl p-8 border border-white/30 shadow-2xl">
-                        {/* 关闭按钮 */}
-                        <button
-                          onClick={() => setShowUpgradeModal(false)}
-                          className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors"
-                        >
-                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                          </svg>
-                        </button>
+                  
+                  {/* 毛玻璃遮罩 - 只遮住下半部分 */}
+                  <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-slate-900/90 via-slate-800/60 to-transparent backdrop-blur-sm pointer-events-none"></div>
+                  
+                  {/* 升级提示框 - 覆盖在毛玻璃上 */}
+                  <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 w-full max-w-lg px-4">
+                    <div className="bg-gradient-to-br from-blue-500/30 via-purple-500/30 to-pink-500/30 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-xl">
+                      <div className="text-center">
+                        <Sparkles className="w-8 h-8 text-purple-400 mx-auto mb-3" />
+                        <h3 className="text-xl font-bold text-white mb-3">
+                          Unlock Your Complete Destiny Report
+                        </h3>
+                        <p className="text-gray-200 mb-4 text-sm leading-relaxed">
+                          The preview shows only a glimpse of your destiny analysis. The full report includes in-depth personality insights, detailed career guidance, comprehensive relationship advice, life purpose interpretation, and personalized health recommendations.
+                        </p>
                         
-                        {/* 毛玻璃效果内容 */}
-                        <div className="text-center">
-                          <Sparkles className="w-12 h-12 text-purple-400 mx-auto mb-4" />
-                          <h3 className="text-2xl font-bold text-white mb-4">
-                            Unlock Your Complete Destiny Report
-                          </h3>
-                          <p className="text-gray-200 mb-6 max-w-xl mx-auto leading-relaxed">
-                            The preview shows only a glimpse of your destiny analysis. The full report includes in-depth personality insights, detailed career guidance, comprehensive relationship advice, life purpose interpretation, and personalized health recommendations - over 3,000 words of content tailored exclusively for you.
-                          </p>
-                          
-                          {/* 购买按钮 */}
-                          <Button
-                            onClick={handleUpgrade}
-                            className="relative overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 text-lg font-semibold rounded-lg shadow-lg transition-all duration-300 ease-out hover:shadow-2xl hover:shadow-purple-500/50 hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 active:shadow-lg group mb-4"
+                        {/* 购买按钮 */}
+                        <Button
+                          onClick={handleUpgrade}
+                          className="relative overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-2 text-base font-semibold rounded-lg shadow-lg transition-all duration-300 ease-out hover:shadow-2xl hover:shadow-purple-500/50 hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 active:shadow-lg group mb-3"
+                        >
+                          <span className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                          <span className="relative flex items-center justify-center">
+                            <Zap className="w-4 h-4 mr-2 group-hover:animate-pulse" />
+                            Unlock Full Report Now
+                          </span>
+                        </Button>
+                        
+                        {/* 底部链接 */}
+                        <div className="text-xs">
+                          <button 
+                            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                            className="text-white/70 hover:text-white underline transition-colors"
                           >
-                            <span className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                            <span className="relative flex items-center justify-center">
-                              <Zap className="w-5 h-5 mr-2 group-hover:animate-pulse" />
-                              Unlock Full Report Now
-                            </span>
-                          </Button>
-                          
-                          {/* 底部链接 */}
-                          <div className="text-sm">
-                            <button 
-                              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                              className="text-white/80 hover:text-white underline transition-colors"
-                            >
-                              Already purchased? Read now
-                            </button>
-                          </div>
+                            Already purchased? Read now
+                          </button>
                         </div>
                       </div>
                     </div>
                   </div>
-                )}
-                
-                {/* 显示升级提示的小按钮 */}
-                {!showUpgradeModal && (
-                  <div className="fixed bottom-6 right-6 z-40">
-                    <Button
-                      onClick={() => setShowUpgradeModal(true)}
-                      className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-3 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-                    >
-                      <Sparkles className="w-5 h-5 mr-2" />
-                      Unlock Report
-                    </Button>
-                  </div>
-                )}
-              </>
+                </div>
+              </div>
             ) : (
               // 已付费：显示完整的报告内容
               <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-8 border border-purple-500/20">
