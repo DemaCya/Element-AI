@@ -380,12 +380,11 @@ Unlock the full report now to begin your journey of cosmic discovery!` : ''}`
           </div>
 
           {/* Report Content */}
-          <div className="relative">
+          <div className="space-y-8">
             {!report.is_paid ? (
-              // 未付费：显示预览内容和局部毛玻璃遮罩
-              <div className="relative">
-                {/* 报告内容区域 */}
-                <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-8 border border-purple-500/20 relative overflow-hidden">
+              // 未付费：显示预览内容和升级提示
+              <>
+                <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-8 border border-purple-500/20">
                   <div className="prose prose-invert max-w-none">
                     <div 
                       dangerouslySetInnerHTML={{ 
@@ -393,48 +392,31 @@ Unlock the full report now to begin your journey of cosmic discovery!` : ''}`
                       }}
                     />
                   </div>
-                  
-                  {/* 毛玻璃遮罩 - 只遮住下半部分 */}
-                  <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-slate-800/99 via-slate-800/90 to-slate-800/75 backdrop-blur-2xl pointer-events-none"></div>
-                  
-                  {/* 升级提示框 - 覆盖在毛玻璃上 */}
-                  <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 w-full max-w-lg px-4">
-                    <div className="bg-gradient-to-br from-blue-500/30 via-purple-500/30 to-pink-500/30 backdrop-blur-lg rounded-xl p-6 border border-white/20 shadow-xl">
-                      <div className="text-center">
-                        <Sparkles className="w-8 h-8 text-purple-400 mx-auto mb-3" />
-                        <h3 className="text-xl font-bold text-white mb-3">
-                          Unlock Your Complete Destiny Report
-                        </h3>
-                        <p className="text-gray-200 mb-4 text-sm leading-relaxed">
-                          The preview shows only a glimpse of your destiny analysis. The full report includes in-depth personality insights, detailed career guidance, comprehensive relationship advice, life purpose interpretation, and personalized health recommendations.
-                        </p>
-                        
-                        {/* 购买按钮 */}
-                        <Button
-                          onClick={handleUpgrade}
-                          className="relative overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 py-2 text-base font-semibold rounded-lg shadow-lg transition-all duration-300 ease-out hover:shadow-2xl hover:shadow-purple-500/50 hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 active:shadow-lg group mb-3"
-                        >
-                          <span className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                          <span className="relative flex items-center justify-center">
-                            <Zap className="w-4 h-4 mr-2 group-hover:animate-pulse" />
-                            Unlock Full Report Now
-                          </span>
-                        </Button>
-                        
-                        {/* 底部链接 */}
-                        <div className="text-xs">
-                          <button 
-                            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                            className="text-white/70 hover:text-white underline transition-colors"
-                          >
-                            Already purchased? Read now
-                          </button>
-                        </div>
-                      </div>
-                    </div>
+                </div>
+                
+                {/* Upgrade Card */}
+                <div className="bg-gradient-to-r from-purple-900/50 via-pink-900/50 to-purple-900/50 backdrop-blur-sm rounded-lg p-8 border border-purple-500/30">
+                  <div className="text-center">
+                    <Sparkles className="w-12 h-12 text-purple-400 mx-auto mb-4" />
+                    <h3 className="text-2xl font-bold text-white mb-4">
+                      Unlock Your Complete Destiny Report
+                    </h3>
+                    <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
+                      The preview shows only a glimpse of your destiny analysis. The full report includes in-depth personality insights, detailed career guidance, comprehensive relationship advice, life purpose interpretation, and personalized health recommendations - over 3,000 words of content tailored exclusively for you.
+                    </p>
+                    <Button
+                      onClick={handleUpgrade}
+                      className="relative overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 text-lg font-semibold rounded-lg shadow-lg transition-all duration-300 ease-out hover:shadow-2xl hover:shadow-purple-500/50 hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 active:shadow-lg group"
+                    >
+                      <span className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                      <span className="relative flex items-center justify-center">
+                        <Zap className="w-5 h-5 mr-2 group-hover:animate-pulse" />
+                        Unlock Full Report Now
+                      </span>
+                    </Button>
                   </div>
                 </div>
-              </div>
+              </>
             ) : (
               // 已付费：显示完整的报告内容
               <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-8 border border-purple-500/20">
