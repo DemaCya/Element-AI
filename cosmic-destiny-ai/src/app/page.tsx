@@ -156,17 +156,6 @@ export default function Home() {
         {/* Footer */}
         <footer className="py-12 px-4 border-t border-purple-500/20">
           <div className="container mx-auto max-w-4xl text-center">
-            <div className="flex flex-wrap justify-center gap-6 mb-8">
-              <a href="#" className="text-white hover:text-purple-200 transition-colors">
-                Contact
-              </a>
-              <a href="#" className="text-white hover:text-purple-200 transition-colors">
-                Terms of Service
-              </a>
-              <a href="#" className="text-white hover:text-purple-200 transition-colors">
-                Privacy Policy
-              </a>
-            </div>
             <p className="text-gray-300">
               © 2024 <span className="bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent font-semibold">Cosmic Destiny AI</span>. For entertainment purposes only.
             </p>
