@@ -395,7 +395,7 @@ Unlock the full report now to begin your journey of cosmic discovery!` : ''}`
                   </div>
                   
                   {/* 毛玻璃遮罩 - 只遮住下半部分 */}
-                  <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-slate-800/90 via-slate-800/95 to-slate-800/99 backdrop-blur-2xl pointer-events-none"></div>
+                  <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-slate-800/80 via-slate-800/90 to-slate-800/99 backdrop-blur-2xl pointer-events-none"></div>
                   
                   {/* 升级提示框 - 覆盖在毛玻璃上 */}
                   <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 w-full max-w-lg px-4">
