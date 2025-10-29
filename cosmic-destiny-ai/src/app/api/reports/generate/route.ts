@@ -352,6 +352,14 @@ export async function POST(request: NextRequest) {
 
     console.log('🚀 [API] Starting report generation with birthData:', birthData)
 
+    // 调试环境变量
+    console.log('🔑 [API] Environment variables check:')
+    console.log('🔑 [API] ZHIPU_API_KEY exists:', !!process.env.ZHIPU_API_KEY)
+    console.log('🔑 [API] ZHIPU_API_KEY length:', process.env.ZHIPU_API_KEY?.length || 0)
+    console.log('🔑 [API] ZHIPU_API_KEY prefix:', process.env.ZHIPU_API_KEY?.substring(0, 10) || 'undefined')
+    console.log('🔑 [API] NODE_ENV:', process.env.NODE_ENV)
+    console.log('🔑 [API] VERCEL:', process.env.VERCEL)
+
     // 检查智谱AI API密钥
     if (!process.env.ZHIPU_API_KEY) {
       console.warn('⚠️ [API] ZHIPU_API_KEY not found, falling back to mock reports')
