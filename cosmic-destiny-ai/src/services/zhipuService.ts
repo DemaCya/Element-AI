@@ -92,7 +92,7 @@ export class ZhipuService {
           }
         ],
         temperature: 0.8,
-        max_tokens: 15000,
+        max_tokens: 12000,
         stream: false
       })
 
@@ -129,7 +129,7 @@ export class ZhipuService {
 2. 其他部分保持专业温和，但必须指出缺点
 3. 性格分析要平衡，既要指出优势也要委婉指出劣势
 4. 保持专业性的同时，要敢于指出问题和挑战
-5. 字数控制在12000字左右
+5. 字数控制在10000字左右
 6. 使用Markdown格式，结构清晰
 
 报告结构：
