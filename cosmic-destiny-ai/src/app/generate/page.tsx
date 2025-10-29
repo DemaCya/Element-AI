@@ -202,7 +202,6 @@ function GenerateReportContent() {
       }
 
       const apiResult = await apiResponse.json()
-      console.log('✅ [Generate] API response received:', apiResult)
 
       if (!apiResult.success) {
         clearInterval(progressInterval)
