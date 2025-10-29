@@ -193,9 +193,47 @@ export class BaziService {
       const luckPillars = calculator.calculateLuckPillars();
       const interactions = calculator.calculateInteractions();
       
-      // 计算当前大运
+      // 使用库的方法获取当前大运（更准确）
       let currentPillar = null;
-      if (luckPillars && luckPillars.pillars.length > 0) {
+      try {
+        const currentDate = new Date();
+        const currentPillarFromLib = calculator.getCurrentLuckPillar(currentDate);
+        
+        if (currentPillarFromLib) {
+          // 计算精确年龄（考虑月份和日期）
+          const currentYear = currentDate.getFullYear();
+          const currentMonth = currentDate.getMonth();
+          const currentDay = currentDate.getDate();
+          const birthYear = birthDateLocal.getFullYear();
+          const birthMonth = birthDateLocal.getMonth();
+          const birthDay = birthDateLocal.getDate();
+          
+          let age = currentYear - birthYear;
+          if (currentMonth < birthMonth || (currentMonth === birthMonth && currentDay < birthDay)) {
+            age--;
+          }
+          
+          // 将库返回的数据转换为我们的格式
+          currentPillar = {
+            number: currentPillarFromLib.number,
+            heavenlyStem: currentPillarFromLib.heavenlyStem.character,
+            earthlyBranch: currentPillarFromLib.earthlyBranch.character,
+            yearStart: currentPillarFromLib.yearStart,
+            yearEnd: currentPillarFromLib.yearEnd,
+            ageStart: currentPillarFromLib.ageStart,
+            currentAge: age
+          };
+          
+          console.log('✅ [BaziService] 使用库方法成功获取当前大运:', currentPillarFromLib.number);
+        } else {
+          console.warn('⚠️ [BaziService] 库方法返回null，将使用备用方法计算');
+        }
+      } catch (error) {
+        console.warn('⚠️ [BaziService] 使用库方法获取当前大运失败:', error);
+      }
+      
+      // 备用方法：如果库方法失败，使用自己计算的方法
+      if (!currentPillar && luckPillars && luckPillars.pillars.length > 0) {
         const currentYear = new Date().getFullYear();
         const currentDate = new Date();
         const birthYear = birthDateLocal.getFullYear();
@@ -223,6 +261,7 @@ export class BaziService {
                 ageStart: pillar.ageStart,
                 currentAge: age
               };
+              console.log('✅ [BaziService] 使用备用方法计算当前大运');
               break;
             }
           }

@@ -124,38 +124,62 @@ export class ZhipuService {
   private getSystemPrompt(): string {
     return `你是一位资深且智慧的命理师，精通中国传统八字命理学。请根据用户提供的八字信息，生成一份专业、详细的命理分析报告。
 
-要求：
-1. 近况分析要铁口直断，具体准确，吸引用户付费欲望
-2. 其他部分保持专业温和，但必须指出缺点
-3. 性格分析要平衡，既要指出优势也要委婉指出劣势
-4. 保持专业性的同时，要敢于指出问题和挑战
-5. 字数控制在10000字左右
-6. 使用Markdown格式，结构清晰
+═══════════════════════════════════════════════════════════
+【核心要求】
+═══════════════════════════════════════════════════════════
+1. 【近况分析】必须铁口直断，具体准确，吸引用户付费欲望
+   - 不要用"可能"、"大概"、"也许"等模糊词汇
+   - 要具体到事件和时间，结合当前大运分析
+   - 放在报告最前面，作为重点内容
 
-报告结构：
-1. **近况分析** - 铁口直断，具体分析过去一年发生的事件（放在最前面）
-2. 出生信息概览
-3. 八字详细分析
-4. 日主强弱分析
-5. 五行平衡分析
-6. 性格特质分析（平衡指出优势和劣势）
-7. 事业运势指导（具体行业和方向）
-8. 财富运势分析（具体理财建议）
-9. 感情婚姻分析（委婉指出感情模式问题）
-10. 健康养生指导（具体健康风险和建议）
-11. 大运流年分析（具体时间节点）
-12. 有利不利因素分析（具体因素和影响）
-13. 人生发展建议（具体行动建议）
-14. 综合总结
+2. 【当前大运】是关键分析点
+   - 必须结合当前大运的五行特点分析近况
+   - 说明当前大运对用户的整体影响
+   - 预测未来几年的大运走势
 
-**特别要求**：
-- 近况分析必须铁口直断，不要用"可能"、"大概"等模糊词汇，要具体到事件和时间
-- 性格分析要平衡，优势要突出，劣势要委婉但明确
+3. 【性格分析】要平衡
+   - 既要指出优势，也要委婉指出劣势
+   - 优势要突出，劣势要明确但温和
+
+4. 【建议要具体】
+   - 所有建议都要具体可操作
+   - 不要泛泛而谈，要有针对性
+
+5. 【格式要求】
+   - 字数控制在10000字左右
+   - 使用Markdown格式，结构清晰
+   - 用词专业温和，但内容真实准确
+
+═══════════════════════════════════════════════════════════
+【报告结构（必须包含）】
+═══════════════════════════════════════════════════════════
+1. **近况分析** - 铁口直断，具体分析过去一年发生的事件（最重要的部分，放最前面）
+2. **当前大运分析** - 结合当前大运分析运势走向和特点
+3. 出生信息概览
+4. 八字详细分析
+5. 日主强弱分析
+6. 五行平衡分析
+7. 性格特质分析（平衡指出优势和劣势）
+8. 事业运势指导（具体行业和方向）
+9. 财富运势分析（具体理财建议）
+10. 感情婚姻分析（委婉指出感情模式问题）
+11. 健康养生指导（具体健康风险和建议）
+12. 大运流年分析（具体时间节点，包括未来大运预测）
+13. 有利不利因素分析（具体因素和影响）
+14. 人生发展建议（具体行动建议）
+15. 综合总结
+
+═══════════════════════════════════════════════════════════
+【特别强调】
+═══════════════════════════════════════════════════════════
+- 近况分析必须铁口直断，结合当前大运，具体到事件和时间
+- 当前大运是分析的核心，必须详细说明其影响
+- 性格分析要平衡，优势突出，劣势明确但温和
 - 感情分析要委婉指出问题，但必须说出来
 - 所有建议都要具体可操作，不要泛泛而谈
 - 用词要专业温和，但内容要真实准确
 
-请确保内容专业、准确、有指导价值，近况分析要特别吸引人。`
+请确保内容专业、准确、有指导价值，近况分析和当前大运分析要特别吸引人和准确。`
   }
 
   /**
@@ -171,109 +195,193 @@ export class ZhipuService {
     
     const currentTimeInfo = `
 【当前时间信息】
-- 当前日期：${currentDate}
-- 当前年份：${currentYear}年
-- 当前月份：${currentMonth}月
-- 当前日期：${currentDay}日
-- 分析时间范围：${currentYear - 1}年${currentMonth}月${currentDay}日 至 ${currentDate}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  • 当前日期：${currentDate}
+  • 当前年份：${currentYear}年
+  • 当前月份：${currentMonth}月
+  • 当前日期：${currentDay}日
+  • 分析时间范围：${currentYear - 1}年${currentMonth}月${currentDay}日 至 ${currentDate}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 `
 
     const birthInfo = `
 【出生信息】
-- 出生日期：${birthData.birthDate}
-- 出生时间：${birthData.birthTime || '12:00'}${birthData.isTimeKnownInput ? ' (用户提供)' : ' (系统默认)'}
-- 性别：${birthData.gender === 'male' ? '男' : '女'}
-- 时区：${birthData.timeZone}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  • 出生日期：${birthData.birthDate}
+  • 出生时间：${birthData.birthTime || '12:00'}${birthData.isTimeKnownInput ? ' ✓(用户提供)' : ' (系统默认)'}
+  • 性别：${birthData.gender === 'male' ? '男' : '女'}
+  • 时区：${birthData.timeZone}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 `
 
     const baziInfo = `
-【八字基础信息】
-- 年柱：${baziData.yearPillar}
-- 月柱：${baziData.monthPillar}
-- 日柱：${baziData.dayPillar}
-- 时柱：${baziData.hourPillar || '未知'}
+【八字基础信息（核心数据）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+四柱信息：
+  • 年柱：${baziData.yearPillar}
+  • 月柱：${baziData.monthPillar}
+  • 日柱：${baziData.dayPillar}
+  • 时柱：${baziData.hourPillar || '未知'}
 
-【天干地支】
-- 天干：${baziData.heavenlyStems.join('、')}
-- 地支：${baziData.earthlyBranches.join('、')}
-- 藏干：${baziData.hiddenStems.join('、') || '无'}
+天干地支分解：
+  • 天干序列：${baziData.heavenlyStems.join('、')}（年干、月干、日干、时干）
+  • 地支序列：${baziData.earthlyBranches.join('、')}（年支、月支、日支、时支）
+  • 藏干信息：${baziData.hiddenStems.join('、') || '无'}
 
-【日主信息】
-- 日主：${baziData.dayMaster}
-- 阴阳：${baziData.dayMasterNature}
-- 五行：${baziData.dayMasterElement}
+日主核心信息：
+  • 日主天干：${baziData.dayMaster}
+  • 阴阳属性：${baziData.dayMasterNature === 'Yang' ? '阳' : '阴'}
+  • 五行属性：${baziData.dayMasterElement === 'WOOD' ? '木' : baziData.dayMasterElement === 'FIRE' ? '火' : baziData.dayMasterElement === 'EARTH' ? '土' : baziData.dayMasterElement === 'METAL' ? '金' : '水'}
 
-【五行分布】
-- 木：${baziData.elements.wood}
-- 火：${baziData.elements.fire}
-- 土：${baziData.elements.earth}
-- 金：${baziData.elements.metal}
-- 水：${baziData.elements.water}
+五行能量分布（分析日主强弱的关键）：
+  • 木元素：${baziData.elements.wood} 分
+  • 火元素：${baziData.elements.fire} 分
+  • 土元素：${baziData.elements.earth} 分
+  • 金元素：${baziData.elements.metal} 分
+  • 水元素：${baziData.elements.water} 分
+  • 五行总分：${baziData.elements.wood + baziData.elements.fire + baziData.elements.earth + baziData.elements.metal + baziData.elements.water} 分
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 `
 
     const strengthInfo = baziData.dayMasterStrength ? `
-【日主强弱分析】
-- 强弱程度：${baziData.dayMasterStrength.strength}
-- 得分：${baziData.dayMasterStrength.score}
-- 分析备注：${baziData.dayMasterStrength.notes ? baziData.dayMasterStrength.notes.join('；') : '无'}
+【日主强弱分析（关键判断）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  • 强弱判断：${baziData.dayMasterStrength.strength === 'Strong' ? '强' : baziData.dayMasterStrength.strength === 'Weak' ? '弱' : '平衡'}
+  • 强弱得分：${baziData.dayMasterStrength.score} 分（正数为强，负数为弱）
+  • 判断依据：
+${baziData.dayMasterStrength.notes ? baziData.dayMasterStrength.notes.map(note => `    - ${note}`).join('\n') : '    - 无详细说明'}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ` : ''
 
     const favorableInfo = baziData.favorableElements ? `
-【有利元素分析】
-- 主要有利：${baziData.favorableElements.primary.join('、')}
-- 次要有利：${baziData.favorableElements.secondary?.join('、') || '无'}
-- 不利元素：${baziData.favorableElements.unfavorable?.join('、') || '无'}
-- 分析备注：${baziData.favorableElements.notes ? baziData.favorableElements.notes.join('；') : '无'}
+【有利元素分析（补运建议）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  • 主要有利五行：${baziData.favorableElements.primary.map(e => {
+    const map = { 'WOOD': '木', 'FIRE': '火', 'EARTH': '土', 'METAL': '金', 'WATER': '水' };
+    return map[e as keyof typeof map] || e;
+  }).join('、')}
+  • 次要有利五行：${baziData.favorableElements.secondary?.map(e => {
+    const map = { 'WOOD': '木', 'FIRE': '火', 'EARTH': '土', 'METAL': '金', 'WATER': '水' };
+    return map[e as keyof typeof map] || e;
+  }).join('、') || '无'}
+  • 不利五行：${baziData.favorableElements.unfavorable?.map(e => {
+    const map = { 'WOOD': '木', 'FIRE': '火', 'EARTH': '土', 'METAL': '金', 'WATER': '水' };
+    return map[e as keyof typeof map] || e;
+  }).join('、') || '无'}
+  • 分析说明：
+${baziData.favorableElements.notes ? baziData.favorableElements.notes.map(note => `    - ${note}`).join('\n') : '    - 无详细说明'}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ` : ''
 
     const eightMansionsInfo = baziData.eightMansions ? `
-【八宅分析】
-- 命卦组别：${baziData.eightMansions.group}
-- 吉方：
-  * 财富：${baziData.eightMansions.lucky.wealth}
-  * 健康：${baziData.eightMansions.lucky.health}
-  * 感情：${baziData.eightMansions.lucky.romance}
-  * 事业：${baziData.eightMansions.lucky.career}
-- 凶方：
-  * 五鬼：${baziData.eightMansions.unlucky.obstacles}
-  * 六煞：${baziData.eightMansions.unlucky.quarrels}
-  * 祸害：${baziData.eightMansions.unlucky.setbacks}
-  * 绝命：${baziData.eightMansions.unlucky.totalLoss}
+【八宅风水分析（方位建议）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  • 命卦组别：${baziData.eightMansions.group === 'East' ? '东四命' : '西四命'}
+  • 吉利方位：
+    ✓ 财富方位：${baziData.eightMansions.lucky.wealth}
+    ✓ 健康方位：${baziData.eightMansions.lucky.health}
+    ✓ 感情方位：${baziData.eightMansions.lucky.romance}
+    ✓ 事业方位：${baziData.eightMansions.lucky.career}
+  • 不利方位（需避开）：
+    ✗ 五鬼方（阻碍）：${baziData.eightMansions.unlucky.obstacles}
+    ✗ 六煞方（口舌）：${baziData.eightMansions.unlucky.quarrels}
+    ✗ 祸害方（挫折）：${baziData.eightMansions.unlucky.setbacks}
+    ✗ 绝命方（大凶）：${baziData.eightMansions.unlucky.totalLoss}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ` : ''
 
     const basicAnalysisInfo = `
-【基本分析】
-- 命卦：${baziData.lifeGua || '未知'}
-- 贵人：${baziData.nobleman ? baziData.nobleman.join('、') : '无'}
-- 智慧：${baziData.intelligence || '未知'}
-- 天马：${baziData.skyHorse || '无'}
-- 桃花：${baziData.peachBlossom || '无'}
+【特殊信息分析】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  • 生命卦数：${baziData.lifeGua || '未知'}（用于风水布局参考）
+  • 天乙贵人：${baziData.nobleman ? baziData.nobleman.join('、') : '无'}（有利地支）
+  • 文昌智慧：${baziData.intelligence || '未知'}（聪明才智方位）
+  • 天马星：${baziData.skyHorse || '无'}（变动迁移方向）
+  • 桃花位：${baziData.peachBlossom || '无'}（感情人缘方位）
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 `
 
     const luckInfo = baziData.luckPillars ? `
 【大运信息】
-- 大运规则：${baziData.luckPillars.incrementRule === 1 ? '顺行' : '逆行'}
-- 时间已知：${baziData.luckPillars.isTimingKnown ? '是' : '否'}
-- 大运柱数：${baziData.luckPillars.pillars.length}个
-- 大运详情：
-${baziData.luckPillars.pillars.map((pillar, index) => 
-  `  ${index + 1}. 第${pillar.number}步大运：${pillar.heavenlyStem}${pillar.earthlyBranch} (${pillar.ageStart}岁开始)`
-).join('\n')}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+基础规则：
+  • 大运方向：${baziData.luckPillars.incrementRule === 1 ? '顺行（向前）' : '逆行（向后）'}
+  • 时间精度：${baziData.luckPillars.isTimingKnown ? '已知确切时间' : '未提供确切时间'}
+  • 大运总数：${baziData.luckPillars.pillars.length}步（每步10年）
+
+${baziData.luckPillars.currentPillar ? `
+⭐ 当前大运（重点关注）：
+  • 大运编号：第${baziData.luckPillars.currentPillar.number}步
+  • 天干地支：${baziData.luckPillars.currentPillar.heavenlyStem}${baziData.luckPillars.currentPillar.earthlyBranch}
+  • 年份范围：${baziData.luckPillars.currentPillar.yearStart}年 - ${baziData.luckPillars.currentPillar.yearEnd}年
+  • 起运年龄：${baziData.luckPillars.currentPillar.ageStart}岁
+  • 当前年龄：${baziData.luckPillars.currentPillar.currentAge}岁
+  • 大运状态：${baziData.luckPillars.currentPillar.yearStart && new Date().getFullYear() < baziData.luckPillars.currentPillar.yearStart ? '即将进入' : baziData.luckPillars.currentPillar.yearEnd && new Date().getFullYear() > baziData.luckPillars.currentPillar.yearEnd ? '已结束' : '进行中'}
+
+  【分析重点】请特别关注当前大运对用户近况的影响，结合当前大运${baziData.luckPillars.currentPillar.heavenlyStem}${baziData.luckPillars.currentPillar.earthlyBranch}的特点，分析过去一年（${currentYear - 1}年${currentMonth}月-${currentYear}年${currentMonth}月）的具体事件和运势变化。
+` : ''}
+
+完整大运列表：
+${baziData.luckPillars.pillars.map((pillar, index) => {
+  const isCurrent = baziData.luckPillars?.currentPillar?.number === pillar.number ? ' ⭐当前' : '';
+  return `  ${index + 1}. 第${pillar.number}步大运：${pillar.heavenlyStem}${pillar.earthlyBranch}${isCurrent}
+      └─ 起运：${pillar.ageStart}岁 | 年份：${pillar.yearStart || '?'}-${pillar.yearEnd || '?'}年`;
+}).join('\n')}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ` : ''
 
     const interactionsInfo = baziData.interactions ? `
-【相互作用分析】
-${baziData.interactions.map((interaction, index) => 
-  `${index + 1}. ${interaction.type}：${interaction.description || '无描述'}
-   - 参与者：${interaction.participants.map(p => `${p.pillar}(${p.elementChar})`).join('、')}
-   - 涉及有利元素：${interaction.involvesFavorableElement ? '是' : '否'}
-   - 涉及不利元素：${interaction.involvesUnfavorableElement ? '是' : '否'}`
-).join('\n\n')}
+【八字相互作用分析（重要影响）】
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+共发现 ${baziData.interactions.length} 个相互作用，详情如下：
+
+${baziData.interactions.map((interaction, index) => {
+  const typeNames: { [key: string]: string } = {
+    'Branch6Combo': '六合',
+    'Branch3Combo': '三合',
+    'BranchClash': '六冲',
+    'BranchHarm': '六害',
+    'StemClash': '天干冲',
+    'TrinityCombo': '三会',
+    'DirectionalCombo': '三会局'
+  };
+  const typeName = typeNames[interaction.type] || interaction.type;
+  return `${index + 1}. 【${typeName}】${interaction.type}
+     • 相互作用描述：${interaction.description || '无描述'}
+     • 参与元素：${interaction.participants.map(p => `${p.pillar}(${p.elementChar}-${p.elementType})`).join('、')}
+     • 影响评估：
+       - 涉及有利元素：${interaction.involvesFavorableElement ? '✓ 是' : '✗ 否'}
+       - 涉及不利元素：${interaction.involvesUnfavorableElement ? '⚠ 是（需注意）' : '✓ 否'}`
+}).join('\n\n')}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ` : ''
 
     const wordLimit = '10000字左右'
 
-    return `请根据以下八字信息生成详细的命理分析报告，字数控制在${wordLimit}：
+    return `═══════════════════════════════════════════════════════════
+【八字命理分析报告生成任务】
+═══════════════════════════════════════════════════════════
+
+请根据以下完整的八字信息，生成一份专业、详细、有指导价值的命理分析报告。
+
+📋 **报告要求**：
+  • 字数控制：${wordLimit}
+  • 格式要求：使用Markdown格式，结构清晰，层次分明
+  • 语言风格：专业温和，但内容真实准确
+
+📊 **分析重点（按优先级）**：
+  1. 【近况分析】必须铁口直断，具体准确，分析过去一年（${currentYear - 1}年${currentMonth}月 - ${currentYear}年${currentMonth}月）的具体事件
+  2. 【当前大运分析】结合当前大运，分析运势走向
+  3. 【性格分析】平衡指出优势和劣势
+  4. 【事业运势】具体行业和方向建议
+  5. 【感情婚姻】委婉但明确地指出问题
+  6. 【健康养生】具体健康风险和建议
+  7. 【大运流年】具体时间节点分析
+  8. 【综合建议】具体可操作的建议
+
+═══════════════════════════════════════════════════════════
+【数据部分开始】
+═══════════════════════════════════════════════════════════
 
 ${currentTimeInfo}
 
@@ -293,12 +401,20 @@ ${luckInfo}
 
 ${interactionsInfo}
 
-**重要提醒**：
-- 近况分析必须铁口直断，不要用"可能"、"大概"等模糊词汇，要具体到事件和时间
-- 性格分析要平衡，优势要突出，劣势要委婉但明确
-- 感情分析要委婉指出问题，但必须说出来
-- 所有建议都要具体可操作，不要泛泛而谈
-- 用词要专业温和，但内容要真实准确`
+═══════════════════════════════════════════════════════════
+【数据部分结束】
+═══════════════════════════════════════════════════════════
+
+⚠️  **特别注意事项**：
+  ⚡ 近况分析必须铁口直断：不要用"可能"、"大概"、"也许"等模糊词汇
+  ⚡ 要具体到事件和时间：例如"2024年3月可能发生工作变动"→"2024年3月发生了工作调动或岗位调整"
+  ⚡ 当前大运是关键：必须结合当前大运${baziData.luckPillars?.currentPillar ? `（${baziData.luckPillars.currentPillar.heavenlyStem}${baziData.luckPillars.currentPillar.earthlyBranch}）` : ''}来分析近况
+  ⚡ 性格分析要平衡：优势要突出，劣势要委婉但明确说出来
+  ⚡ 感情分析要直面问题：委婉但必须指出感情模式中的问题
+  ⚡ 建议要具体可操作：不要泛泛而谈，要给具体的方向和行动建议
+  ⚡ 用词专业温和：保持命理师的职业水准，但内容必须真实准确
+
+现在请开始生成报告...`
   }
 
   /**
