@@ -264,14 +264,40 @@ function ReportContent() {
     if (!content) return ''
     
     return content
+      // 标题处理
       .replace(/^# (.*$)/gim, '<h1 class="text-3xl font-bold text-white mb-6 border-b border-purple-500/30 pb-2">$1</h1>')
       .replace(/^## (.*$)/gim, '<h2 class="text-2xl font-bold text-purple-300 mb-4 mt-8">$1</h2>')
       .replace(/^### (.*$)/gim, '<h3 class="text-xl font-semibold text-purple-200 mb-3 mt-6">$1</h3>')
+      .replace(/^#### (.*$)/gim, '<h4 class="text-lg font-semibold text-purple-100 mb-2 mt-4">$1</h4>')
+      
+      // 列表处理
       .replace(/^\- (.*$)/gim, '<li class="flex items-start gap-2 text-gray-300 mb-2"><div class="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div><span>$1</span></li>')
+      .replace(/^\* (.*$)/gim, '<li class="flex items-start gap-2 text-gray-300 mb-2"><div class="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div><span>$1</span></li>')
+      .replace(/^\d+\. (.*$)/gim, '<li class="flex items-start gap-2 text-gray-300 mb-2"><span class="text-purple-400 font-semibold mr-2">$1</span></li>')
+      
+      // 文本格式处理
       .replace(/\*\*(.*?)\*\*/g, '<strong class="text-purple-200 font-semibold">$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em class="text-purple-100 italic">$1</em>')
+      .replace(/`(.*?)`/g, '<code class="bg-purple-900/50 text-purple-200 px-2 py-1 rounded text-sm font-mono">$1</code>')
+      
+      // 链接处理
+      .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-purple-300 hover:text-purple-200 underline" target="_blank" rel="noopener noreferrer">$1</a>')
+      
+      // 分割线处理
+      .replace(/^---$/gim, '<hr class="border-purple-500/30 my-6">')
+      .replace(/^___$/gim, '<hr class="border-purple-500/30 my-6">')
+      
+      // 引用处理
+      .replace(/^> (.*$)/gim, '<blockquote class="border-l-4 border-purple-500/50 pl-4 py-2 bg-purple-900/20 text-gray-300 italic">$1</blockquote>')
+      
+      // 段落处理
       .replace(/\n\n/g, '</p><p class="text-gray-200 leading-relaxed mb-4">')
-      .replace(/^(?!<[h|l])/gm, '<p class="text-gray-200 leading-relaxed mb-4">')
+      .replace(/^(?!<[h|l|b|c|a|q])/gm, '<p class="text-gray-200 leading-relaxed mb-4">')
       .replace(/<p class="text-gray-200 leading-relaxed mb-4"><\/p>/g, '')
+      
+      // 清理多余的空段落
+      .replace(/<p class="text-gray-200 leading-relaxed mb-4"><\/p>/g, '')
+      .replace(/<p class="text-gray-200 leading-relaxed mb-4">\s*<\/p>/g, '')
   }
 
   // 获取报告内容

@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { ZhipuService } from '@/services/zhipuService'
+import { BaziService } from '@/services/baziService'
 
 export const dynamic = 'force-dynamic'
 
-// Extract preview report from full report (first 800-1000 characters)
+// Extract preview report from full report (first 1500-2000 characters)
 function extractPreviewFromFullReport(fullReport: string): string {
-  // Find a good breaking point around 800-1000 characters
-  const targetLength = 900
+  // Find a good breaking point around 1500-2000 characters
+  const targetLength = 1800
   let preview = fullReport.substring(0, targetLength)
   
   // Try to break at a sentence or paragraph boundary
@@ -33,6 +35,8 @@ function extractPreviewFromFullReport(fullReport: string): string {
 - 全面感情分析和最佳配对
 - 人生使命和关键转折点
 - 个性化健康养生方案
+- 大运流年详细分析
+- 有利不利因素深度解读
 - 以及更多专属于您的命理指导...
 
 立即解锁完整报告，开启您的命运探索之旅！`
@@ -348,28 +352,47 @@ export async function POST(request: NextRequest) {
 
     console.log('🚀 [API] Starting report generation with birthData:', birthData)
 
-    // Generate mock reports (no Bazi calculation needed for API)
-    console.log('📝 [API] Generating mock reports...')
-    const mockBaziData = {
-      dayMaster: '甲',
-      heavenlyStems: ['甲', '乙', '丙', '丁'],
-      earthlyBranches: ['子', '丑', '寅', '卯'],
-      elements: { wood: 2, fire: 1, earth: 1, metal: 1, water: 1 }
+    // 检查智谱AI API密钥
+    if (!process.env.ZHIPU_API_KEY) {
+      console.warn('⚠️ [API] ZHIPU_API_KEY not found, falling back to mock reports')
+      return generateMockReports(birthData, reportName)
     }
-    const fullReport = generateMockReport(birthData, mockBaziData)
-    const previewReport = generateMockPreviewReport(birthData, mockBaziData)
-    console.log('📝 [API] Mock reports generated, full length:', fullReport.length, 'preview length:', previewReport.length)
-    
-    // 生成报告ID
-    const reportId = `report-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-    
-    return NextResponse.json({
-      success: true,
-      reportId,
-      previewReport,
-      fullReport,
-      message: '报告生成成功'
-    })
+
+    try {
+      // 计算八字数据
+      console.log('🔮 [API] Calculating Bazi data...')
+      const baziData = await BaziService.calculateBazi(birthData)
+      console.log('✅ [API] Bazi data calculated successfully')
+
+      // 使用智谱AI生成报告
+      console.log('🤖 [API] Generating AI report with ZhipuAI...')
+      const zhipuService = new ZhipuService()
+      
+      // 生成完整报告
+      const fullReport = await zhipuService.generateBaziReport(birthData, baziData)
+      console.log('✅ [API] Full AI report generated, length:', fullReport.length)
+      
+      // 从完整报告中截取预览版（前1500字符）
+      const previewReport = extractPreviewFromFullReport(fullReport)
+      console.log('✅ [API] Preview report extracted, length:', previewReport.length)
+      
+      // 生成报告ID
+      const reportId = `report-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+      
+      return NextResponse.json({
+        success: true,
+        reportId,
+        previewReport,
+        fullReport,
+        message: 'AI报告生成成功',
+        source: 'zhipu-ai'
+      })
+
+    } catch (aiError) {
+      console.error('❌ [API] AI generation failed, falling back to mock reports:', aiError)
+      return generateMockReports(birthData, reportName)
+    }
+
   } catch (error) {
     console.error('❌ [API] Error generating report:', error)
     return NextResponse.json({
@@ -378,4 +401,32 @@ export async function POST(request: NextRequest) {
       details: error instanceof Error ? error.message : 'Unknown error'
     }, { status: 500 })
   }
+}
+
+// 生成模拟报告的函数（作为备用方案）
+function generateMockReports(birthData: any, reportName: string) {
+  console.log('📝 [API] Generating mock reports as fallback...')
+  
+  // Generate mock reports (no Bazi calculation needed for API)
+  const mockBaziData = {
+    dayMaster: '甲',
+    heavenlyStems: ['甲', '乙', '丙', '丁'],
+    earthlyBranches: ['子', '丑', '寅', '卯'],
+    elements: { wood: 2, fire: 1, earth: 1, metal: 1, water: 1 }
+  }
+  const fullReport = generateMockReport(birthData, mockBaziData)
+  const previewReport = generateMockPreviewReport(birthData, mockBaziData)
+  console.log('📝 [API] Mock reports generated, full length:', fullReport.length, 'preview length:', previewReport.length)
+  
+  // 生成报告ID
+  const reportId = `report-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+  
+  return NextResponse.json({
+    success: true,
+    reportId,
+    previewReport,
+    fullReport,
+    message: '模拟报告生成成功',
+    source: 'mock'
+  })
 }
