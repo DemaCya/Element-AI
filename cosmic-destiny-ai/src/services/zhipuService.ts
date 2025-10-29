@@ -91,10 +91,13 @@ export class ZhipuService {
             content: prompt
           }
         ],
+        thinking: {
+          type: 'enabled'
+        },
         temperature: 0.8,
         max_tokens: 12000,
         stream: false
-      })
+      } as any)
 
       const content = response.choices[0]?.message?.content
       if (!content) {
