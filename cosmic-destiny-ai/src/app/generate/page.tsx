@@ -154,9 +154,32 @@ function GenerateReportContent() {
       console.log('🏛️ [Generate] Day Pillar (日柱):', baziData.dayPillar)
       console.log('🏛️ [Generate] Hour Pillar (时柱):', baziData.hourPillar)
       
-      // Generate mock reports for now
-      const fullReport = generateFullReport(birthData, baziData)
-      const previewReport = generatePreviewReport(birthData, baziData)
+      // Call API to generate AI reports
+      console.log('🤖 [Generate] Calling API to generate AI reports...')
+      const apiResponse = await fetch('/api/reports/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          birthData,
+          reportName: birthData.reportName || `Destiny Profile for ${birthData.birthDate}`
+        }),
+      })
+
+      if (!apiResponse.ok) {
+        throw new Error(`API call failed: ${apiResponse.status} ${apiResponse.statusText}`)
+      }
+
+      const apiResult = await apiResponse.json()
+      console.log('✅ [Generate] API response received:', apiResult)
+
+      if (!apiResult.success) {
+        throw new Error(apiResult.message || 'Failed to generate report')
+      }
+
+      const fullReport = apiResult.fullReport
+      const previewReport = apiResult.previewReport
 
       await updateStepStatus(2, 'completed')
 
