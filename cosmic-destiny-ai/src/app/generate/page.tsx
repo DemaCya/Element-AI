@@ -155,14 +155,32 @@ function GenerateReportContent() {
       console.log('🏛️ [Generate] Day Pillar (日柱):', baziData.dayPillar)
       console.log('🏛️ [Generate] Hour Pillar (时柱):', baziData.hourPillar)
       
-      // 启动进度模拟
+      // 启动进度模拟 - 5分钟内的平滑进度
       setAiProgress(0)
+      const startTime = Date.now()
+      const totalDuration = 5 * 60 * 1000 // 5分钟，单位毫秒
+      
       const progressInterval = setInterval(() => {
-        setAiProgress(prev => {
-          if (prev >= 95) return 95 // 保持在95%，等待完成
-          return prev + Math.random() * 5 // 随机增加，模拟不确定性
-        })
-      }, 500) // 每500ms更新一次进度
+        const elapsed = Date.now() - startTime
+        const progressRatio = Math.min(elapsed / totalDuration, 0.95) // 最多到95%
+        
+        // 使用平滑的曲线函数，让进度增长更自然
+        // 前半段增长快，后半段增长慢
+        let smoothProgress = progressRatio
+        if (progressRatio < 0.7) {
+          // 前70%：使用较快的曲线 (x^0.8)
+          smoothProgress = Math.pow(progressRatio / 0.7, 0.8) * 0.7
+        } else {
+          // 后25%：使用较慢的曲线
+          smoothProgress = 0.7 + Math.pow((progressRatio - 0.7) / 0.25, 1.5) * 0.25
+        }
+        
+        // 添加小幅随机波动，让进度更真实
+        const randomVariation = (Math.random() - 0.5) * 0.5 // ±0.25%的波动
+        const finalProgress = Math.min(Math.max(smoothProgress * 95 + randomVariation, 0), 95)
+        
+        setAiProgress(finalProgress)
+      }, 1000) // 每1秒更新一次进度
       
       // Call API to generate AI reports
       console.log('🤖 [Generate] Calling API to generate AI reports...')
