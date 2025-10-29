@@ -27,8 +27,6 @@ interface GenerationStep {
   description: string
   status: 'pending' | 'processing' | 'completed' | 'error'
   icon: React.ReactNode
-  progress?: number
-  progressMessage?: string
 }
 
 // 使用useSearchParams的组件
@@ -40,8 +38,6 @@ function GenerateReportContent() {
   const [currentStep, setCurrentStep] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [reportId, setReportId] = useState<string | null>(null)
-  const [sessionId, setSessionId] = useState<string | null>(null)
-  const [aiProgress, setAiProgress] = useState<{progress: number, status: string, message: string} | null>(null)
   const supabase = useSupabase()
 
   // Generation steps configuration
@@ -63,11 +59,9 @@ function GenerateReportContent() {
     {
       id: 'generate',
       title: 'Generating Report Content',
-      description: aiProgress ? aiProgress.message : 'Using AI to generate personalized destiny report',
+      description: 'Using AI to generate personalized destiny report',
       status: 'pending',
-      icon: <Calendar className="w-5 h-5" />,
-      progress: aiProgress?.progress,
-      progressMessage: aiProgress?.message
+      icon: <Calendar className="w-5 h-5" />
     },
     {
       id: 'save',
@@ -77,42 +71,6 @@ function GenerateReportContent() {
       icon: <CheckCircle className="w-5 h-5" />
     }
   ]
-
-  // 轮询AI进度
-  useEffect(() => {
-    if (!sessionId || !isGenerating) return
-
-    const pollProgress = async () => {
-      try {
-        const response = await fetch(`/api/progress?sessionId=${sessionId}`)
-        if (response.ok) {
-          const data = await response.json()
-          if (data.success) {
-            setAiProgress({
-              progress: data.progress,
-              status: data.status,
-              message: data.message
-            })
-            
-            // 如果完成或出错，停止轮询
-            if (data.status === 'completed' || data.status === 'error') {
-              return
-            }
-          }
-        }
-      } catch (error) {
-        console.warn('Failed to poll progress:', error)
-      }
-    }
-
-    // 立即轮询一次
-    pollProgress()
-    
-    // 每2秒轮询一次
-    const interval = setInterval(pollProgress, 2000)
-    
-    return () => clearInterval(interval)
-  }, [sessionId, isGenerating])
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -139,10 +97,6 @@ function GenerateReportContent() {
   const generateReport = async () => {
     setIsGenerating(true)
     setError(null)
-    
-    // 生成唯一的session ID用于进度跟踪
-    const newSessionId = `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-    setSessionId(newSessionId)
 
     try {
       // Step 1: Validate user information
@@ -209,8 +163,7 @@ function GenerateReportContent() {
         },
         body: JSON.stringify({
           birthData,
-          reportName: birthData.reportName || `Destiny Profile for ${birthData.birthDate}`,
-          sessionId: newSessionId
+          reportName: birthData.reportName || `Destiny Profile for ${birthData.birthDate}`
         }),
       })
 
@@ -262,15 +215,7 @@ function GenerateReportContent() {
       await updateStepStatus(3, 'completed')
 
       // Delay before redirect to let user see completion status
-      setTimeout(async () => {
-        // 清理进度数据
-        if (sessionId) {
-          try {
-            await fetch(`/api/progress?sessionId=${sessionId}`, { method: 'DELETE' })
-          } catch (error) {
-            console.warn('Failed to cleanup progress:', error)
-          }
-        }
+      setTimeout(() => {
         router.push(`/report?id=${(reportData as any).id}`)
       }, 1000)
 
@@ -440,25 +385,8 @@ function GenerateReportContent() {
                         {step.title}
                       </h3>
                       <p className="text-gray-400">{step.description}</p>
-                      {index === 2 && step.progress !== undefined && (
-                        <div className="mt-3">
-                          <div className="flex justify-between text-sm text-gray-300 mb-1">
-                            <span>AI生成进度</span>
-                            <span>{step.progress}%</span>
-                          </div>
-                          <div className="w-full bg-gray-700 rounded-full h-2">
-                            <div 
-                              className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-500 ease-out"
-                              style={{ width: `${step.progress}%` }}
-                            ></div>
-                          </div>
-                          {step.progressMessage && (
-                            <p className="text-xs text-purple-300 mt-1">{step.progressMessage}</p>
-                          )}
-                        </div>
-                      )}
                     </div>
-                    {index === currentStep && !(index === 2 && step.progress !== undefined) && (
+                    {index === currentStep && (
                       <div className="animate-spin rounded-full h-6 w-6 border-2 border-purple-500 border-t-transparent"></div>
                     )}
                   </div>

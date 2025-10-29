@@ -3,42 +3,13 @@ import { BirthData, BaziData } from '@/types'
 
 export class ZhipuService {
   private client: ZhipuAI
-  private sessionId?: string
 
-  constructor(sessionId?: string) {
+  constructor() {
     const apiKey = process.env.ZHIPU_API_KEY
     if (!apiKey) {
       throw new Error('ZHIPU_API_KEY environment variable is not set')
     }
     this.client = new ZhipuAI({ apiKey })
-    this.sessionId = sessionId
-  }
-
-  /**
-   * 更新进度
-   * @param progress 进度百分比 (0-100)
-   * @param status 状态
-   * @param message 消息
-   */
-  private async updateProgress(progress: number, status: string, message: string) {
-    if (!this.sessionId) return
-    
-    try {
-      await fetch('/api/progress', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          sessionId: this.sessionId,
-          progress,
-          status,
-          message
-        })
-      })
-    } catch (error) {
-      console.warn('⚠️ [ZhipuService] Failed to update progress:', error)
-    }
   }
 
   /**
@@ -53,9 +24,6 @@ export class ZhipuService {
   ): Promise<string> {
     try {
       console.log('🤖 [ZhipuService] Starting AI report generation...')
-      
-      // 更新进度：开始生成
-      await this.updateProgress(10, 'preparing', '正在准备AI分析数据...')
       
       // 打印八字信息供检查
       console.log('🔮 [ZhipuService] Bazi Data for verification:')
@@ -109,13 +77,7 @@ export class ZhipuService {
       }
       console.log('')
       
-      // 更新进度：构建提示词
-      await this.updateProgress(20, 'analyzing', '正在分析八字信息...')
-      
       const prompt = this.buildPrompt(birthData, baziData)
-      
-      // 更新进度：发送到AI
-      await this.updateProgress(30, 'generating', '正在调用AI生成报告...')
       
       const response = await this.client.chat.completions.create({
         model: 'glm-4.6',
@@ -134,9 +96,6 @@ export class ZhipuService {
         stream: false
       })
 
-      // 更新进度：处理响应
-      await this.updateProgress(80, 'processing', '正在处理AI响应...')
-
       const content = response.choices[0]?.message?.content
       if (!content) {
         throw new Error('No content generated from ZhipuAI')
@@ -151,16 +110,10 @@ export class ZhipuService {
       if (content.length < 5000) {
         console.warn('⚠️ [ZhipuService] Report seems shorter than expected, might be truncated')
       }
-      
-      // 更新进度：完成
-      await this.updateProgress(100, 'completed', 'AI报告生成完成！')
-      
       return content
 
     } catch (error) {
       console.error('❌ [ZhipuService] Error generating AI report:', error)
-      // 更新进度：错误
-      await this.updateProgress(0, 'error', 'AI报告生成失败')
       throw error
     }
   }
@@ -318,7 +271,7 @@ ${baziData.interactions.map((interaction, index) =>
 ).join('\n\n')}
 ` : ''
 
-    const wordLimit = '12000字左右'
+    const wordLimit = '10000字左右'
 
     return `请根据以下八字信息生成详细的命理分析报告，字数控制在${wordLimit}：
 
