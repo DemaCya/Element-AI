@@ -24,6 +24,10 @@ export default function Home() {
       answer: "We combine traditional Chinese astrology (Bazi) with advanced AI analysis. Simply provide your birth details, and our system will generate a comprehensive personality and destiny report based on ancient wisdom and modern insights."
     },
     {
+      question: "What's the difference between giving my birth date to a generic AI and using your service?",
+      answer: "After extensive testing, we've found that general-purpose AIs often \"hallucinate\" or make errors when calculating Bazi charts directly from a birth date. This can result in a completely wrong chart, leading to a misleading destiny report. Our service ensures accuracy by first using a professional Bazi plotting engine to generate your correct chart. The AI then provides analysis based on this accurate foundation."
+    },
+    {
       question: "Is this based on real astrology or science?",
       answer: "Our system uses authentic Bazi calculations combined with AI-powered analysis. While not scientifically proven, millions have found value in these ancient wisdom traditions for self-discovery and personal growth."
     },
