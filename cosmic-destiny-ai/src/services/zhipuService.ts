@@ -25,6 +25,58 @@ export class ZhipuService {
     try {
       console.log('🤖 [ZhipuService] Starting AI report generation...')
       
+      // 打印八字信息供检查
+      console.log('🔮 [ZhipuService] Bazi Data for verification:')
+      console.log('📊 [ZhipuService] Birth Data:', {
+        birthDate: birthData.birthDate,
+        birthTime: birthData.birthTime,
+        timeZone: birthData.timeZone,
+        gender: birthData.gender,
+        isTimeKnownInput: birthData.isTimeKnownInput
+      })
+      console.log('📊 [ZhipuService] Bazi Calculation Results:')
+      console.log('   - Year Pillar (年柱):', baziData.yearPillar)
+      console.log('   - Month Pillar (月柱):', baziData.monthPillar)
+      console.log('   - Day Pillar (日柱):', baziData.dayPillar)
+      console.log('   - Hour Pillar (时柱):', baziData.hourPillar)
+      console.log('   - Heavenly Stems (天干):', baziData.heavenlyStems)
+      console.log('   - Earthly Branches (地支):', baziData.earthlyBranches)
+      console.log('   - Hidden Stems (藏干):', baziData.hiddenStems)
+      console.log('   - Day Master (日主):', baziData.dayMaster)
+      console.log('   - Day Master Nature (阴阳):', baziData.dayMasterNature)
+      console.log('   - Day Master Element (五行):', baziData.dayMasterElement)
+      console.log('   - Elements Distribution (五行分布):', baziData.elements)
+      if (baziData.dayMasterStrength) {
+        console.log('   - Day Master Strength (日主强弱):', {
+          strength: baziData.dayMasterStrength.strength,
+          score: baziData.dayMasterStrength.score,
+          notes: baziData.dayMasterStrength.notes
+        })
+      }
+      if (baziData.favorableElements) {
+        console.log('   - Favorable Elements (有利元素):', {
+          primary: baziData.favorableElements.primary,
+          secondary: baziData.favorableElements.secondary,
+          unfavorable: baziData.favorableElements.unfavorable
+        })
+      }
+      console.log('   - Life Gua (命卦):', baziData.lifeGua)
+      console.log('   - Nobleman (贵人):', baziData.nobleman)
+      console.log('   - Intelligence (智慧):', baziData.intelligence)
+      console.log('   - Sky Horse (天马):', baziData.skyHorse)
+      console.log('   - Peach Blossom (桃花):', baziData.peachBlossom)
+      if (baziData.luckPillars) {
+        console.log('   - Luck Pillars (大运):', {
+          incrementRule: baziData.luckPillars.incrementRule,
+          isTimingKnown: baziData.luckPillars.isTimingKnown,
+          pillarsCount: baziData.luckPillars.pillars.length
+        })
+      }
+      if (baziData.interactions) {
+        console.log('   - Interactions (相互作用):', baziData.interactions.length, 'interactions found')
+      }
+      console.log('')
+      
       const prompt = this.buildPrompt(birthData, baziData)
       
       const response = await this.client.chat.completions.create({
