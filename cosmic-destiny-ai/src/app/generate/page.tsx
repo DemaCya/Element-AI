@@ -27,6 +27,8 @@ interface GenerationStep {
   description: string
   status: 'pending' | 'processing' | 'completed' | 'error'
   icon: React.ReactNode
+  progress?: number
+  progressMessage?: string
 }
 
 // 使用useSearchParams的组件
@@ -38,6 +40,8 @@ function GenerateReportContent() {
   const [currentStep, setCurrentStep] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [reportId, setReportId] = useState<string | null>(null)
+  const [sessionId, setSessionId] = useState<string | null>(null)
+  const [aiProgress, setAiProgress] = useState<{progress: number, status: string, message: string} | null>(null)
   const supabase = useSupabase()
 
   // Generation steps configuration
@@ -72,6 +76,42 @@ function GenerateReportContent() {
     }
   ]
 
+  // 轮询AI进度
+  useEffect(() => {
+    if (!sessionId || !isGenerating) return
+
+    const pollProgress = async () => {
+      try {
+        const response = await fetch(`/api/progress?sessionId=${sessionId}`)
+        if (response.ok) {
+          const data = await response.json()
+          if (data.success) {
+            setAiProgress({
+              progress: data.progress,
+              status: data.status,
+              message: data.message
+            })
+            
+            // 如果完成或出错，停止轮询
+            if (data.status === 'completed' || data.status === 'error') {
+              return
+            }
+          }
+        }
+      } catch (error) {
+        console.warn('Failed to poll progress:', error)
+      }
+    }
+
+    // 立即轮询一次
+    pollProgress()
+    
+    // 每2秒轮询一次
+    const interval = setInterval(pollProgress, 2000)
+    
+    return () => clearInterval(interval)
+  }, [sessionId, isGenerating])
+
   useEffect(() => {
     if (!authLoading && !user) {
       router.push('/auth')
@@ -97,6 +137,10 @@ function GenerateReportContent() {
   const generateReport = async () => {
     setIsGenerating(true)
     setError(null)
+    
+    // 生成唯一的session ID用于进度跟踪
+    const newSessionId = `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+    setSessionId(newSessionId)
 
     try {
       // Step 1: Validate user information
@@ -163,7 +207,8 @@ function GenerateReportContent() {
         },
         body: JSON.stringify({
           birthData,
-          reportName: birthData.reportName || `Destiny Profile for ${birthData.birthDate}`
+          reportName: birthData.reportName || `Destiny Profile for ${birthData.birthDate}`,
+          sessionId: newSessionId
         }),
       })
 

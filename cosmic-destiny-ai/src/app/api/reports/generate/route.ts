@@ -348,9 +348,10 @@ export async function POST(request: NextRequest) {
   // 动态模式下的正常API逻辑
   try {
     const body = await request.json()
-    const { birthData, reportName } = body
+    const { birthData, reportName, sessionId } = body
 
     console.log('🚀 [API] Starting report generation with birthData:', birthData)
+    console.log('📊 [API] Session ID for progress tracking:', sessionId)
 
     // 调试环境变量
     console.log('🔑 [API] Environment variables check:')
@@ -374,7 +375,7 @@ export async function POST(request: NextRequest) {
 
       // 使用智谱AI生成报告
       console.log('🤖 [API] Generating AI report with ZhipuAI...')
-      const zhipuService = new ZhipuService()
+      const zhipuService = new ZhipuService(sessionId)
       
       // 生成完整报告
       const fullReport = await zhipuService.generateBaziReport(birthData, baziData)
