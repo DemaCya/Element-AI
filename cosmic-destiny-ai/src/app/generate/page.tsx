@@ -63,9 +63,11 @@ function GenerateReportContent() {
     {
       id: 'generate',
       title: 'Generating Report Content',
-      description: 'Using AI to generate personalized destiny report',
+      description: aiProgress ? aiProgress.message : 'Using AI to generate personalized destiny report',
       status: 'pending',
-      icon: <Calendar className="w-5 h-5" />
+      icon: <Calendar className="w-5 h-5" />,
+      progress: aiProgress?.progress,
+      progressMessage: aiProgress?.message
     },
     {
       id: 'save',
@@ -260,7 +262,15 @@ function GenerateReportContent() {
       await updateStepStatus(3, 'completed')
 
       // Delay before redirect to let user see completion status
-      setTimeout(() => {
+      setTimeout(async () => {
+        // 清理进度数据
+        if (sessionId) {
+          try {
+            await fetch(`/api/progress?sessionId=${sessionId}`, { method: 'DELETE' })
+          } catch (error) {
+            console.warn('Failed to cleanup progress:', error)
+          }
+        }
         router.push(`/report?id=${(reportData as any).id}`)
       }, 1000)
 
@@ -430,8 +440,25 @@ function GenerateReportContent() {
                         {step.title}
                       </h3>
                       <p className="text-gray-400">{step.description}</p>
+                      {index === 2 && step.progress !== undefined && (
+                        <div className="mt-3">
+                          <div className="flex justify-between text-sm text-gray-300 mb-1">
+                            <span>AI生成进度</span>
+                            <span>{step.progress}%</span>
+                          </div>
+                          <div className="w-full bg-gray-700 rounded-full h-2">
+                            <div 
+                              className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-500 ease-out"
+                              style={{ width: `${step.progress}%` }}
+                            ></div>
+                          </div>
+                          {step.progressMessage && (
+                            <p className="text-xs text-purple-300 mt-1">{step.progressMessage}</p>
+                          )}
+                        </div>
+                      )}
                     </div>
-                    {index === currentStep && (
+                    {index === currentStep && !(index === 2 && step.progress !== undefined) && (
                       <div className="animate-spin rounded-full h-6 w-6 border-2 border-purple-500 border-t-transparent"></div>
                     )}
                   </div>

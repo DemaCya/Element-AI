@@ -9,7 +9,7 @@ const progressStore = new Map<string, {
 }>()
 
 // 清理过期进度（超过10分钟）
-const cleanupExpiredProgress = () => {
+function cleanupExpiredProgress() {
   const now = Date.now()
   const tenMinutes = 10 * 60 * 1000
   
