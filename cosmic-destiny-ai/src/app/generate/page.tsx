@@ -38,6 +38,7 @@ function GenerateReportContent() {
   const [currentStep, setCurrentStep] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [reportId, setReportId] = useState<string | null>(null)
+  const [aiProgress, setAiProgress] = useState(0) // AI生成进度 (0-100)
   const supabase = useSupabase()
 
   // Generation steps configuration
@@ -154,6 +155,15 @@ function GenerateReportContent() {
       console.log('🏛️ [Generate] Day Pillar (日柱):', baziData.dayPillar)
       console.log('🏛️ [Generate] Hour Pillar (时柱):', baziData.hourPillar)
       
+      // 启动进度模拟
+      setAiProgress(0)
+      const progressInterval = setInterval(() => {
+        setAiProgress(prev => {
+          if (prev >= 95) return 95 // 保持在95%，等待完成
+          return prev + Math.random() * 5 // 随机增加，模拟不确定性
+        })
+      }, 500) // 每500ms更新一次进度
+      
       // Call API to generate AI reports
       console.log('🤖 [Generate] Calling API to generate AI reports...')
       const apiResponse = await fetch('/api/reports/generate', {
@@ -168,6 +178,8 @@ function GenerateReportContent() {
       })
 
       if (!apiResponse.ok) {
+        clearInterval(progressInterval)
+        setAiProgress(0)
         throw new Error(`API call failed: ${apiResponse.status} ${apiResponse.statusText}`)
       }
 
@@ -175,8 +187,14 @@ function GenerateReportContent() {
       console.log('✅ [Generate] API response received:', apiResult)
 
       if (!apiResult.success) {
+        clearInterval(progressInterval)
+        setAiProgress(0)
         throw new Error(apiResult.message || 'Failed to generate report')
       }
+
+      // 完成后将进度设置为100%
+      clearInterval(progressInterval)
+      setAiProgress(100)
 
       const fullReport = apiResult.fullReport
       const previewReport = apiResult.previewReport
@@ -387,7 +405,41 @@ function GenerateReportContent() {
                       <p className="text-gray-400">{step.description}</p>
                     </div>
                     {index === currentStep && (
-                      <div className="animate-spin rounded-full h-6 w-6 border-2 border-purple-500 border-t-transparent"></div>
+                      index === 2 && aiProgress > 0 ? (
+                        // 显示进度环
+                        <div className="relative w-6 h-6">
+                          <svg className="w-6 h-6 transform -rotate-90" viewBox="0 0 24 24">
+                            {/* 背景圆环 */}
+                            <circle
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="rgba(168, 85, 247, 0.2)"
+                              strokeWidth="2"
+                              fill="none"
+                            />
+                            {/* 进度圆环 */}
+                            <circle
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="#a855f7"
+                              strokeWidth="2"
+                              fill="none"
+                              strokeDasharray={`${2 * Math.PI * 10}`}
+                              strokeDashoffset={`${2 * Math.PI * 10 * (1 - aiProgress / 100)}`}
+                              strokeLinecap="round"
+                              className="transition-all duration-300"
+                            />
+                          </svg>
+                          <span className="absolute inset-0 flex items-center justify-center text-xs font-bold text-purple-400">
+                            {Math.round(aiProgress)}%
+                          </span>
+                        </div>
+                      ) : (
+                        // 默认旋转加载器
+                        <div className="animate-spin rounded-full h-6 w-6 border-2 border-purple-500 border-t-transparent"></div>
+                      )
                     )}
                   </div>
                 </div>
