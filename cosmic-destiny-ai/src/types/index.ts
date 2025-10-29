@@ -81,6 +81,15 @@ export interface BaziData {
     }>
     incrementRule: 1 | -1
     isTimingKnown: boolean
+    currentPillar?: {
+      number: number
+      heavenlyStem: string
+      earthlyBranch: string
+      yearStart: number | null
+      yearEnd: number | null
+      ageStart: number | null
+      currentAge: number
+    }
   }
   
   // 相互作用分析

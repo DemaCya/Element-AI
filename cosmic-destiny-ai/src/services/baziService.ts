@@ -116,6 +116,44 @@ export class BaziService {
       // Calculate comprehensive bazi analysis
       const analysis = calculator.getCompleteAnalysis();
       
+      // 打印完整的八字分析详情
+      console.log('🔮 [BaziService] ===== 完整八字分析详情 =====');
+      
+      // 打印四柱信息
+      if (analysis?.mainPillars) {
+        console.log('🔮 [BaziService] mainPillars:');
+        console.log('  - year:', analysis.mainPillars.year);
+        console.log('  - month:', analysis.mainPillars.month);
+        console.log('  - day:', analysis.mainPillars.day);
+        console.log('  - time:', analysis.mainPillars.time);
+      }
+      
+      // 打印详细柱信息
+      if (analysis?.detailedPillars) {
+        console.log('🔮 [BaziService] detailedPillars:');
+        console.log('  - year:', analysis.detailedPillars.year);
+        console.log('  - month:', analysis.detailedPillars.month);
+        console.log('  - day:', analysis.detailedPillars.day);
+        console.log('  - hour:', analysis.detailedPillars.hour);
+      }
+      
+      // 打印基础分析
+      if (analysis?.basicAnalysis) {
+        console.log('🔮 [BaziService] basicAnalysis:');
+        console.log('  - dayMaster:', analysis.basicAnalysis.dayMaster);
+        console.log('  - dayMasterStrength:', analysis.basicAnalysis.dayMasterStrength);
+        console.log('  - fiveFactors:', analysis.basicAnalysis.fiveFactors);
+        console.log('  - favorableElements:', analysis.basicAnalysis.favorableElements);
+        console.log('  - eightMansions:', analysis.basicAnalysis.eightMansions);
+        console.log('  - lifeGua:', analysis.basicAnalysis.lifeGua);
+        console.log('  - nobleman:', analysis.basicAnalysis.nobleman);
+        console.log('  - intelligence:', analysis.basicAnalysis.intelligence);
+        console.log('  - skyHorse:', analysis.basicAnalysis.skyHorse);
+        console.log('  - peachBlossom:', analysis.basicAnalysis.peachBlossom);
+      }
+      
+      console.log('🔮 [BaziService] ===== 八字分析详情结束 =====');
+      
       // 打印天干地支8个字
       if (analysis?.mainPillars) {
         const yearPillar = analysis.mainPillars.year;
@@ -154,6 +192,119 @@ export class BaziService {
       }
       const luckPillars = calculator.calculateLuckPillars();
       const interactions = calculator.calculateInteractions();
+      
+      // 计算当前大运
+      let currentPillar = null;
+      if (luckPillars && luckPillars.pillars.length > 0) {
+        const currentYear = new Date().getFullYear();
+        const currentDate = new Date();
+        const birthYear = birthDateLocal.getFullYear();
+        const birthMonth = birthDateLocal.getMonth();
+        const birthDay = birthDateLocal.getDate();
+        const currentMonth = currentDate.getMonth();
+        const currentDay = currentDate.getDate();
+        
+        // 计算精确年龄（考虑月份和日期）
+        let age = currentYear - birthYear;
+        if (currentMonth < birthMonth || (currentMonth === birthMonth && currentDay < birthDay)) {
+          age--;
+        }
+        
+        // 查找当前年份所在的大运
+        for (const pillar of luckPillars.pillars) {
+          if (pillar.yearStart !== null && pillar.yearEnd !== null) {
+            if (currentYear >= pillar.yearStart && currentYear <= pillar.yearEnd) {
+              currentPillar = {
+                number: pillar.number,
+                heavenlyStem: pillar.heavenlyStem.character,
+                earthlyBranch: pillar.earthlyBranch.character,
+                yearStart: pillar.yearStart,
+                yearEnd: pillar.yearEnd,
+                ageStart: pillar.ageStart,
+                currentAge: age
+              };
+              break;
+            }
+          }
+        }
+        
+        // 如果未找到当前大运，检查是否在起运之前或之后
+        if (!currentPillar && luckPillars.pillars.length > 0) {
+          const firstPillar = luckPillars.pillars[0];
+          const lastPillar = luckPillars.pillars[luckPillars.pillars.length - 1];
+          
+          if (firstPillar.yearStart !== null && currentYear < firstPillar.yearStart) {
+            // 尚未起运，返回第一个大运（即将进入）
+            currentPillar = {
+              number: firstPillar.number,
+              heavenlyStem: firstPillar.heavenlyStem.character,
+              earthlyBranch: firstPillar.earthlyBranch.character,
+              yearStart: firstPillar.yearStart,
+              yearEnd: firstPillar.yearEnd,
+              ageStart: firstPillar.ageStart,
+              currentAge: age
+            };
+          } else if (lastPillar.yearEnd !== null && currentYear > lastPillar.yearEnd) {
+            // 已超过最后一个大运，返回最后一个大运
+            currentPillar = {
+              number: lastPillar.number,
+              heavenlyStem: lastPillar.heavenlyStem.character,
+              earthlyBranch: lastPillar.earthlyBranch.character,
+              yearStart: lastPillar.yearStart,
+              yearEnd: lastPillar.yearEnd,
+              ageStart: lastPillar.ageStart,
+              currentAge: age
+            };
+          }
+        }
+      }
+      
+      // 打印大运信息
+      console.log('🔮 [BaziService] ===== 大运信息详情 =====');
+      if (luckPillars) {
+        console.log('🔮 [BaziService] luckPillars:');
+        console.log('  - incrementRule:', luckPillars.incrementRule);
+        console.log('  - isTimingKnown:', luckPillars.isTimingKnown);
+        console.log('  - startAgeYears:', luckPillars.startAgeYears);
+        console.log('  - startAgeMonths:', luckPillars.startAgeMonths);
+        console.log('  - startAgeDays:', luckPillars.startAgeDays);
+        console.log('  - pillars count:', luckPillars.pillars.length);
+        
+        if (currentPillar) {
+          const year = new Date().getFullYear();
+          const isBeforeStart = currentPillar.yearStart !== null && year < currentPillar.yearStart;
+          const isAfterEnd = currentPillar.yearEnd !== null && year > currentPillar.yearEnd;
+          let status = '';
+          if (isBeforeStart) {
+            status = '（即将进入）';
+          } else if (isAfterEnd) {
+            status = '（已结束）';
+          } else {
+            status = '（进行中）';
+          }
+          
+          console.log('  - 当前大运:');
+          console.log(`    大运${currentPillar.number}: ${currentPillar.heavenlyStem}${currentPillar.earthlyBranch} ${status}`);
+          console.log(`    年份范围: ${currentPillar.yearStart}-${currentPillar.yearEnd}`);
+          console.log(`    当前年龄: ${currentPillar.currentAge}岁`);
+          console.log(`    起运年龄: ${currentPillar.ageStart}岁`);
+        } else {
+          console.log('  - 当前大运: 未找到');
+        }
+        
+        // 打印全部大运柱的详细信息
+        console.log('  - 所有大运柱:');
+        luckPillars.pillars.forEach((pillar, index) => {
+          const isCurrent = currentPillar && pillar.number === currentPillar.number;
+          const marker = isCurrent ? ' ⭐当前' : '';
+          console.log(`  ${index + 1}. 大运${pillar.number}${marker}:`);
+          console.log(`    天干: ${pillar.heavenlyStem.character}`);
+          console.log(`    地支: ${pillar.earthlyBranch.character}`);
+          console.log(`    年份: ${pillar.yearStart}-${pillar.yearEnd}`);
+          console.log(`    起运年龄: ${pillar.ageStart}岁`);
+        });
+      }
+      console.log('🔮 [BaziService] ===== 大运信息详情结束 =====');
       
       if (!analysis) {
         throw new Error('Failed to calculate Bazi analysis')
@@ -241,7 +392,8 @@ export class BaziService {
             ageStart: p.ageStart
           })),
           incrementRule: luckPillars.incrementRule,
-          isTimingKnown: luckPillars.isTimingKnown
+          isTimingKnown: luckPillars.isTimingKnown,
+          currentPillar: currentPillar || undefined
         } : undefined,
         
         // 相互作用分析
