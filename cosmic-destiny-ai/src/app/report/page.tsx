@@ -44,6 +44,8 @@ function ReportContent() {
   // 预览边界（字符数）
   const PREVIEW_BOUNDARY = 1800
 
+  
+
   useEffect(() => {
     const logPrefix = `[${pageLoadId}]`
     console.log(`${logPrefix} 🟢 ReportContent MOUNTED.`)
@@ -156,87 +158,7 @@ function ReportContent() {
     }
   }, [searchParams, user?.id, supabase, router, pageLoadId])
 
-  useEffect(() => {
-    const logPrefix = `[${pageLoadId}]`
-    console.log(`${logPrefix} 🔍 Report useEffect triggered:`, { authLoading, userId: user?.id, hasUser: !!user, reportId: searchParams.get('id'), url: window.location.href })
-    
-    if (!authLoading && !user) {
-      console.log(`${logPrefix} 🔀 Report: No user and not loading, redirecting to auth`)
-      router.push('/auth')
-      return
-    }
-
-    if (user && !authLoading) {
-      console.log(`${logPrefix} 👤 Report: User found, starting initial fetch`)
-      fetchReport().then(fetchedReport => {
-        if (!fetchedReport) return
-        
-        // 检查是否需要启动流式传输
-        const shouldStream = searchParams.get('stream') === 'true'
-        const reportId = searchParams.get('id')
-        
-        if (shouldStream && reportId && !fetchedReport.full_report) {
-          console.log(`${logPrefix} 📡 Report: Starting streaming...`)
-          startStreaming(reportId).catch(err => {
-            console.error(`${logPrefix} ❌ Report: Failed to start streaming:`, err)
-          })
-        }
-        
-        // 检查是否从支付成功页面跳转过来（通过URL参数判断）
-        const fromPayment = searchParams.get('from') === 'payment'
-        
-        console.log(`${logPrefix} Initial fetch completed.`, {
-            isPaid: fetchedReport?.is_paid,
-            fromPayment: fromPayment
-        });
-        
-        // 只有在从支付页面跳转过来且报告未支付时，才进行支付验证轮询
-        if (fetchedReport && !fetchedReport.is_paid && fromPayment) {
-          console.log(`${logPrefix} ✅ Report: Conditions met. Starting payment verification polling...`)
-          setIsVerifying(true)
-          
-          let attempts = 0
-          const maxAttempts = 15 // 增加到15次 (45秒)
-          const initialDelay = 1000 // 第一次检查延迟1秒
-          const intervalTime = 3000 // 后续每3秒检查一次
-
-          const pollingLogic = async () => {
-            attempts++
-            console.log(`${logPrefix} 🔄 Report: Polling attempt #${attempts}`)
-            
-            const updatedReport = await fetchReport(true) // true表示是重试
-            
-            if (updatedReport?.is_paid) {
-                clearInterval(interval)
-                setIsVerifying(false)
-                console.log(`${logPrefix} ✅ Report: Payment verified via polling!`)
-            } else if (attempts >= maxAttempts) {
-              clearInterval(interval)
-              setIsVerifying(false)
-              console.log(`${logPrefix} ❌ Report: Polling finished after ${maxAttempts} attempts, report is still unpaid.`)
-              alert("We couldn't confirm your payment automatically. Please wait a few minutes and refresh the page, or contact support if the issue persists.")
-            }
-          };
-
-          let interval: NodeJS.Timeout;
-          // 第一次快速检查
-          setTimeout(() => {
-            pollingLogic();
-            // 然后设置定期检查
-            interval = setInterval(pollingLogic, intervalTime);
-          }, initialDelay);
-        } else {
-            console.log(`${logPrefix} ℹ️ Report: Conditions for polling not met.`, {
-                hasReport: !!fetchedReport,
-                isPaid: fetchedReport?.is_paid,
-                fromPayment: fromPayment
-            });
-        }
-      })
-    }
-  }, [user?.id, authLoading, fetchReport, router, searchParams, pageLoadId, startStreaming])
-
-  // 启动流式传输
+  // 启动流式传输（依赖 fetchReport，放在其后定义）
   const startStreaming = useCallback(async (reportId: string) => {
     try {
       setIsStreaming(true)
@@ -333,6 +255,88 @@ function ReportContent() {
       alert('流式传输失败: ' + (error instanceof Error ? error.message : 'Unknown error'))
     }
   }, [fetchReport])
+
+  useEffect(() => {
+    const logPrefix = `[${pageLoadId}]`
+    console.log(`${logPrefix} 🔍 Report useEffect triggered:`, { authLoading, userId: user?.id, hasUser: !!user, reportId: searchParams.get('id'), url: window.location.href })
+    
+    if (!authLoading && !user) {
+      console.log(`${logPrefix} 🔀 Report: No user and not loading, redirecting to auth`)
+      router.push('/auth')
+      return
+    }
+
+    if (user && !authLoading) {
+      console.log(`${logPrefix} 👤 Report: User found, starting initial fetch`)
+      fetchReport().then(fetchedReport => {
+        if (!fetchedReport) return
+        
+        // 检查是否需要启动流式传输
+        const shouldStream = searchParams.get('stream') === 'true'
+        const reportId = searchParams.get('id')
+        
+        if (shouldStream && reportId && !fetchedReport.full_report) {
+          console.log(`${logPrefix} 📡 Report: Starting streaming...`)
+          startStreaming(reportId).catch(err => {
+            console.error(`${logPrefix} ❌ Report: Failed to start streaming:`, err)
+          })
+        }
+        
+        // 检查是否从支付成功页面跳转过来（通过URL参数判断）
+        const fromPayment = searchParams.get('from') === 'payment'
+        
+        console.log(`${logPrefix} Initial fetch completed.`, {
+            isPaid: fetchedReport?.is_paid,
+            fromPayment: fromPayment
+        });
+        
+        // 只有在从支付页面跳转过来且报告未支付时，才进行支付验证轮询
+        if (fetchedReport && !fetchedReport.is_paid && fromPayment) {
+          console.log(`${logPrefix} ✅ Report: Conditions met. Starting payment verification polling...`)
+          setIsVerifying(true)
+          
+          let attempts = 0
+          const maxAttempts = 15 // 增加到15次 (45秒)
+          const initialDelay = 1000 // 第一次检查延迟1秒
+          const intervalTime = 3000 // 后续每3秒检查一次
+
+          const pollingLogic = async () => {
+            attempts++
+            console.log(`${logPrefix} 🔄 Report: Polling attempt #${attempts}`)
+            
+            const updatedReport = await fetchReport(true) // true表示是重试
+            
+            if (updatedReport?.is_paid) {
+                clearInterval(interval)
+                setIsVerifying(false)
+                console.log(`${logPrefix} ✅ Report: Payment verified via polling!`)
+            } else if (attempts >= maxAttempts) {
+              clearInterval(interval)
+              setIsVerifying(false)
+              console.log(`${logPrefix} ❌ Report: Polling finished after ${maxAttempts} attempts, report is still unpaid.`)
+              alert("We couldn't confirm your payment automatically. Please wait a few minutes and refresh the page, or contact support if the issue persists.")
+            }
+          };
+
+          let interval: NodeJS.Timeout;
+          // 第一次快速检查
+          setTimeout(() => {
+            pollingLogic();
+            // 然后设置定期检查
+            interval = setInterval(pollingLogic, intervalTime);
+          }, initialDelay);
+        } else {
+            console.log(`${logPrefix} ℹ️ Report: Conditions for polling not met.`, {
+                hasReport: !!fetchedReport,
+                isPaid: fetchedReport?.is_paid,
+                fromPayment: fromPayment
+            });
+        }
+      })
+    }
+  }, [user?.id, authLoading, fetchReport, router, searchParams, pageLoadId, startStreaming])
+
+  // （已前置定义）
 
   const handleUpgrade = async () => {
     if (!report?.id) {
