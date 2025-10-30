@@ -203,9 +203,9 @@ function GenerateReportContent() {
         let buffer = ''
         let totalLength = 0
 
-        // Keep UI at step 3 (Generating) until we have enough content saved by server
-        // We wait until ~preview threshold so report page shows text immediately
-        const PREVIEW_THRESHOLD = 1800
+        // Keep UI at step 3 (Generating) until we detect the stream has begun
+        // Redirect as soon as we see >10 chars from server to show content ASAP
+        const PREVIEW_THRESHOLD = 10
 
         // Read until threshold reached, then navigate; server continues in background
         while (true) {
@@ -221,7 +221,7 @@ function GenerateReportContent() {
                 if (evt.type === 'chunk') {
                   totalLength = evt.totalLength || totalLength
                   // Update a simple progress hint (not exact)
-                  const pct = Math.min(99, Math.floor((totalLength / (PREVIEW_THRESHOLD * 4)) * 100))
+                  const pct = Math.min(99, Math.floor((totalLength / 2000) * 100))
                   setAiProgress(pct)
                   // Redirect once preview size likely saved by server
                   if (totalLength >= PREVIEW_THRESHOLD) {
