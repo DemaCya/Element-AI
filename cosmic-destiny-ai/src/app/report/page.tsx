@@ -37,7 +37,7 @@ function ReportContent() {
   const [streamingContent, setStreamingContent] = useState<string>('') // 流式传输的内容
   const [isStreaming, setIsStreaming] = useState(false) // 是否正在流式传输
   const [isStreamComplete, setIsStreamComplete] = useState(false) // 流式传输是否完成
-  const [autoScroll, setAutoScroll] = useState(true) // 是否自动滚动
+  const [autoScroll, setAutoScroll] = useState(false) // 是否自动滚动（默认关闭）
   const contentContainerRef = React.useRef<HTMLDivElement>(null) // 内容容器引用
   const supabase = useSupabase()
 
@@ -54,20 +54,14 @@ function ReportContent() {
     }
   }, [pageLoadId])
 
-  // 自动滚动到底部
+  // 关闭自动滚动：保留占位但不执行滚动
   useEffect(() => {
-    if (autoScroll && contentContainerRef.current && isStreaming) {
-      contentContainerRef.current.scrollTop = contentContainerRef.current.scrollHeight
-    }
+    // intentionally disabled auto-scroll during streaming
   }, [streamingContent, autoScroll, isStreaming])
 
   // 检测用户手动滚动
   const handleScroll = () => {
-    if (contentContainerRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } = contentContainerRef.current
-      const isNearBottom = scrollHeight - scrollTop - clientHeight < 100 // 距离底部100px内
-      setAutoScroll(isNearBottom)
-    }
+    // auto-scroll disabled; user controls scrolling
   }
 
   const fetchReport = useCallback(async (isRetry = false): Promise<CosmicReport | null> => {
@@ -456,15 +450,15 @@ We are confirming your payment information. This usually takes a few seconds. Th
       // 如果是未付费用户，只显示预览版（前1800字符）
       if (!report.is_paid) {
         if (streamingContent.length <= PREVIEW_BOUNDARY) {
-          return streamingContent + (isStreaming ? '\n\n*正在生成中...*' : '')
+          return streamingContent + (isStreaming ? '\n\n*Generating...*' : '')
         } else {
           // 到达预览边界，停止显示新内容，但保持"正在生成中"提示
           const preview = streamingContent.substring(0, PREVIEW_BOUNDARY)
-          return preview + (isStreaming ? '\n\n---\n\n**想要了解更多详细内容吗？**\n\n完整报告包含：\n- 深度人格分析和成长建议\n- 详细职业规划和财富策略\n- 全面感情分析和最佳配对\n- 人生使命和关键转折点\n- 个性化健康养生方案\n- 大运流年详细分析\n- 有利不利因素深度解读\n- 以及更多专属于您的命理指导...\n\n立即解锁完整报告，开启您的命运探索之旅！\n\n*完整报告正在后台生成中...*' : '')
+          return preview + (isStreaming ? '\n\n---\n\n**想要了解更多详细内容吗？**\n\n完整报告包含：\n- 深度人格分析和成长建议\n- 详细职业规划和财富策略\n- 全面感情分析和最佳配对\n- 人生使命和关键转折点\n- 个性化健康养生方案\n- 大运流年详细分析\n- 有利不利因素深度解读\n- 以及更多专属于您的命理指导...\n\n立即解锁完整报告，开启您的命运探索之旅！\n\n*Full report is being generated in the background...*' : '')
         }
       } else {
         // 已付费用户显示完整流式内容
-        return streamingContent + (isStreaming ? '\n\n*正在生成中...*' : '')
+        return streamingContent + (isStreaming ? '\n\n*Generating...*' : '')
       }
     }
 
@@ -564,6 +558,15 @@ Unlock the full report now to begin your journey of cosmic discovery!` : ''}`
 
           {/* Report Content */}
           <div className="space-y-8">
+            {/* 思考模式提示：在开始流式传输但尚未收到任何字符时显示 */}
+            {isStreaming && !streamingContent && (
+              <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-6 border border-purple-500/20 text-center">
+                <div className="inline-flex items-center gap-3 text-purple-300">
+                  <div className="animate-spin rounded-full h-5 w-5 border-2 border-purple-400 border-t-transparent"></div>
+                  <span>The model is thinking; content will start shortly...</span>
+                </div>
+              </div>
+            )}
             {!report.is_paid ? (
               // 未付费：显示预览内容和升级提示
               <>
@@ -592,7 +595,7 @@ Unlock the full report now to begin your journey of cosmic discovery!` : ''}`
                   <div className="text-center text-purple-400">
                     <div className="inline-flex items-center gap-2">
                       <div className="animate-spin rounded-full h-4 w-4 border-2 border-purple-400 border-t-transparent"></div>
-                      <span>正在生成报告内容...</span>
+                      <span>Generating report content...</span>
                     </div>
                   </div>
                 )}
@@ -645,7 +648,7 @@ Unlock the full report now to begin your journey of cosmic discovery!` : ''}`
                   <div className="mt-4 text-center text-purple-400">
                     <div className="inline-flex items-center gap-2">
                       <div className="animate-spin rounded-full h-4 w-4 border-2 border-purple-400 border-t-transparent"></div>
-                      <span>正在生成报告内容...</span>
+                      <span>Generating report content...</span>
                     </div>
                   </div>
                 )}
