@@ -417,6 +417,75 @@ ${interactionsInfo}
   }
 
   /**
+   * 流式生成八字报告内容
+   * @param birthData 出生信息
+   * @param baziData 八字数据
+   * @param onChunk 接收到数据块时的回调函数
+   * @returns 异步迭代器，每个chunk包含增量内容
+   */
+  async *generateBaziReportStream(
+    birthData: BirthData,
+    baziData: BaziData,
+    onChunk?: (content: string, totalLength: number) => void
+  ): AsyncGenerator<string, string, unknown> {
+    try {
+      console.log('🤖 [ZhipuService] Starting streaming AI report generation...')
+      
+      const prompt = this.buildPrompt(birthData, baziData)
+      
+      // 使用流式传输
+      const stream = await this.client.chat.completions.create({
+        model: 'glm-4.6',
+        messages: [
+          {
+            role: 'system',
+            content: this.getSystemPrompt()
+          },
+          {
+            role: 'user',
+            content: prompt
+          }
+        ],
+        thinking: {
+          type: 'enabled'
+        },
+        temperature: 0.8,
+        max_tokens: 12000,
+        stream: true
+      } as any) as any // 类型断言，因为流式响应的类型定义可能不完整
+
+      let fullContent = ''
+      
+      // 遍历流式响应
+      // @ts-ignore - 流式响应实现了AsyncIterable接口，但类型定义可能不完整
+      for await (const chunk of stream) {
+        const delta = chunk.choices?.[0]?.delta?.content || ''
+        if (delta) {
+          fullContent += delta
+          // 调用回调函数
+          if (onChunk) {
+            onChunk(delta, fullContent.length)
+          }
+          // 返回增量内容
+          yield delta
+        }
+      }
+
+      console.log('📊 [ZhipuService] Streaming complete, total length:', fullContent.length)
+      
+      // 检查是否被截断
+      if (fullContent.length < 5000) {
+        console.warn('⚠️ [ZhipuService] Report seems shorter than expected, might be truncated')
+      }
+      
+      return fullContent
+    } catch (error) {
+      console.error('❌ [ZhipuService] Error in streaming AI report generation:', error)
+      throw error
+    }
+  }
+
+  /**
    * 测试API连接
    */
   async testConnection(): Promise<boolean> {

@@ -34,7 +34,15 @@ function ReportContent() {
   const [loading, setLoading] = useState(true)
   const [isVerifying, setIsVerifying] = useState(false) // 新增状态，用于验证支付
   const [pageLoadId] = useState(() => `page-load-${Date.now()}`) // 用于追踪日志
+  const [streamingContent, setStreamingContent] = useState<string>('') // 流式传输的内容
+  const [isStreaming, setIsStreaming] = useState(false) // 是否正在流式传输
+  const [isStreamComplete, setIsStreamComplete] = useState(false) // 流式传输是否完成
+  const [autoScroll, setAutoScroll] = useState(true) // 是否自动滚动
+  const contentContainerRef = React.useRef<HTMLDivElement>(null) // 内容容器引用
   const supabase = useSupabase()
+
+  // 预览边界（字符数）
+  const PREVIEW_BOUNDARY = 1800
 
   useEffect(() => {
     const logPrefix = `[${pageLoadId}]`
@@ -43,6 +51,22 @@ function ReportContent() {
       console.log(`${logPrefix} 🔴 ReportContent UNMOUNTED.`)
     }
   }, [pageLoadId])
+
+  // 自动滚动到底部
+  useEffect(() => {
+    if (autoScroll && contentContainerRef.current && isStreaming) {
+      contentContainerRef.current.scrollTop = contentContainerRef.current.scrollHeight
+    }
+  }, [streamingContent, autoScroll, isStreaming])
+
+  // 检测用户手动滚动
+  const handleScroll = () => {
+    if (contentContainerRef.current) {
+      const { scrollTop, scrollHeight, clientHeight } = contentContainerRef.current
+      const isNearBottom = scrollHeight - scrollTop - clientHeight < 100 // 距离底部100px内
+      setAutoScroll(isNearBottom)
+    }
+  }
 
   const fetchReport = useCallback(async (isRetry = false): Promise<CosmicReport | null> => {
     const reportId = searchParams.get('id')
@@ -145,6 +169,19 @@ function ReportContent() {
     if (user && !authLoading) {
       console.log(`${logPrefix} 👤 Report: User found, starting initial fetch`)
       fetchReport().then(fetchedReport => {
+        if (!fetchedReport) return
+        
+        // 检查是否需要启动流式传输
+        const shouldStream = searchParams.get('stream') === 'true'
+        const reportId = searchParams.get('id')
+        
+        if (shouldStream && reportId && !fetchedReport.full_report) {
+          console.log(`${logPrefix} 📡 Report: Starting streaming...`)
+          startStreaming(reportId).catch(err => {
+            console.error(`${logPrefix} ❌ Report: Failed to start streaming:`, err)
+          })
+        }
+        
         // 检查是否从支付成功页面跳转过来（通过URL参数判断）
         const fromPayment = searchParams.get('from') === 'payment'
         
@@ -197,7 +234,105 @@ function ReportContent() {
         }
       })
     }
-  }, [user?.id, authLoading, fetchReport, router, searchParams, pageLoadId])
+  }, [user?.id, authLoading, fetchReport, router, searchParams, pageLoadId, startStreaming])
+
+  // 启动流式传输
+  const startStreaming = useCallback(async (reportId: string) => {
+    try {
+      setIsStreaming(true)
+      
+      // 从sessionStorage获取birthData
+      const birthDataStr = sessionStorage.getItem(`birthData_${reportId}`)
+      if (!birthDataStr) {
+        console.error('❌ [Report] No birthData found in sessionStorage')
+        return
+      }
+      
+      const birthData = JSON.parse(birthDataStr)
+      
+      // 发起流式请求
+      const response = await fetch('/api/reports/generate-stream', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          reportId,
+          birthData
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error(`Stream API failed: ${response.status}`)
+      }
+
+      const reader = response.body?.getReader()
+      const decoder = new TextDecoder()
+
+      if (!reader) {
+        throw new Error('No response body reader')
+      }
+
+      let buffer = ''
+
+      while (true) {
+        const { done, value } = await reader.read()
+        
+        if (done) {
+          console.log('✅ [Report] Stream complete')
+          setIsStreaming(false)
+          setIsStreamComplete(true)
+          // 清理sessionStorage
+          sessionStorage.removeItem(`birthData_${reportId}`)
+          // 重新获取报告数据
+          await fetchReport(true)
+          break
+        }
+
+        buffer += decoder.decode(value, { stream: true })
+        
+        // 处理SSE消息
+        const lines = buffer.split('\n')
+        buffer = lines.pop() || '' // 保留最后一个不完整的行
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const data = JSON.parse(line.slice(6))
+              
+              if (data.type === 'chunk') {
+                setStreamingContent(prev => {
+                  const newContent = prev + data.content
+                  return newContent
+                })
+                
+                // 定期刷新报告数据（从数据库获取最新内容）
+                if (data.totalLength % 5000 === 0) {
+                  fetchReport(true)
+                }
+              } else if (data.type === 'done') {
+                console.log('✅ [Report] Stream done, total length:', data.totalLength)
+                setIsStreaming(false)
+                setIsStreamComplete(true)
+                sessionStorage.removeItem(`birthData_${reportId}`)
+                await fetchReport(true)
+              } else if (data.type === 'error') {
+                console.error('❌ [Report] Stream error:', data.error)
+                setIsStreaming(false)
+                alert('流式传输出现错误: ' + data.error)
+              }
+            } catch (e) {
+              console.error('❌ [Report] Failed to parse SSE message:', e, line)
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('❌ [Report] Stream error:', error)
+      setIsStreaming(false)
+      alert('流式传输失败: ' + (error instanceof Error ? error.message : 'Unknown error'))
+    }
+  }, [fetchReport])
 
   const handleUpgrade = async () => {
     if (!report?.id) {
@@ -312,6 +447,24 @@ function ReportContent() {
 We are confirming your payment information. This usually takes a few seconds. The page will refresh automatically.`
     }
 
+    // 如果有流式内容，优先使用流式内容
+    if (streamingContent) {
+      // 如果是未付费用户，只显示预览版（前1800字符）
+      if (!report.is_paid) {
+        if (streamingContent.length <= PREVIEW_BOUNDARY) {
+          return streamingContent + (isStreaming ? '\n\n*正在生成中...*' : '')
+        } else {
+          // 到达预览边界，停止显示新内容，但保持"正在生成中"提示
+          const preview = streamingContent.substring(0, PREVIEW_BOUNDARY)
+          return preview + (isStreaming ? '\n\n---\n\n**想要了解更多详细内容吗？**\n\n完整报告包含：\n- 深度人格分析和成长建议\n- 详细职业规划和财富策略\n- 全面感情分析和最佳配对\n- 人生使命和关键转折点\n- 个性化健康养生方案\n- 大运流年详细分析\n- 有利不利因素深度解读\n- 以及更多专属于您的命理指导...\n\n立即解锁完整报告，开启您的命运探索之旅！\n\n*完整报告正在后台生成中...*' : '')
+        }
+      } else {
+        // 已付费用户显示完整流式内容
+        return streamingContent + (isStreaming ? '\n\n*正在生成中...*' : '')
+      }
+    }
+
+    // 如果没有流式内容，使用数据库中的内容
     // 如果有预览报告且未付费，显示预览
     if (!report.is_paid && report.preview_report) {
       return report.preview_report
@@ -410,7 +563,17 @@ Unlock the full report now to begin your journey of cosmic discovery!` : ''}`
             {!report.is_paid ? (
               // 未付费：显示预览内容和升级提示
               <>
-                <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-8 border border-purple-500/20">
+                <div 
+                  ref={contentContainerRef}
+                  onScroll={handleScroll}
+                  className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-8 border border-purple-500/20"
+                  style={{
+                    minHeight: '400px',
+                    maxHeight: '80vh',
+                    overflowY: 'auto',
+                    transition: 'height 0.3s ease-out'
+                  }}
+                >
                   <div className="prose prose-invert max-w-none">
                     <div 
                       dangerouslySetInnerHTML={{ 
@@ -419,6 +582,16 @@ Unlock the full report now to begin your journey of cosmic discovery!` : ''}`
                     />
                   </div>
                 </div>
+                
+                {/* Streaming Indicator */}
+                {isStreaming && (
+                  <div className="text-center text-purple-400">
+                    <div className="inline-flex items-center gap-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-purple-400 border-t-transparent"></div>
+                      <span>正在生成报告内容...</span>
+                    </div>
+                  </div>
+                )}
                 
                 {/* Upgrade Card */}
                 <div className="bg-gradient-to-r from-purple-900/50 via-pink-900/50 to-purple-900/50 backdrop-blur-sm rounded-lg p-8 border border-purple-500/30">
@@ -445,7 +618,17 @@ Unlock the full report now to begin your journey of cosmic discovery!` : ''}`
               </>
             ) : (
               // 已付费：显示完整的报告内容
-              <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-8 border border-purple-500/20">
+              <div 
+                ref={contentContainerRef}
+                onScroll={handleScroll}
+                className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-8 border border-purple-500/20"
+                style={{
+                  minHeight: '400px',
+                  maxHeight: '80vh',
+                  overflowY: 'auto',
+                  transition: 'height 0.3s ease-out'
+                }}
+              >
                 <div className="prose prose-invert max-w-none">
                   <div 
                     dangerouslySetInnerHTML={{ 
@@ -453,6 +636,15 @@ Unlock the full report now to begin your journey of cosmic discovery!` : ''}`
                     }}
                   />
                 </div>
+                {/* Streaming Indicator */}
+                {isStreaming && (
+                  <div className="mt-4 text-center text-purple-400">
+                    <div className="inline-flex items-center gap-2">
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-purple-400 border-t-transparent"></div>
+                      <span>正在生成报告内容...</span>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>

@@ -141,7 +141,7 @@ function GenerateReportContent() {
 
       await updateStepStatus(1, 'completed')
 
-      // Step 3: Generate report content (using mock for now)
+      // Step 3: Create report record first (without content, will be populated by streaming)
       await updateStepStatus(2, 'processing')
       
       // Print Bazi calculation results for verification
@@ -150,78 +150,8 @@ function GenerateReportContent() {
       console.log('📊 [Generate] Earthly Branches (地支):', baziData.earthlyBranches)
       console.log('👑 [Generate] Day Master (日主):', baziData.dayMaster)
       console.log('⚖️ [Generate] Elements (五行):', baziData.elements)
-      console.log('🏛️ [Generate] Year Pillar (年柱):', baziData.yearPillar)
-      console.log('🏛️ [Generate] Month Pillar (月柱):', baziData.monthPillar)
-      console.log('🏛️ [Generate] Day Pillar (日柱):', baziData.dayPillar)
-      console.log('🏛️ [Generate] Hour Pillar (时柱):', baziData.hourPillar)
       
-      // 启动进度模拟 - 5分钟内的平滑进度
-      setAiProgress(0)
-      const startTime = Date.now()
-      const totalDuration = 5 * 60 * 1000 // 5分钟，单位毫秒
-      
-      const progressInterval = setInterval(() => {
-        const elapsed = Date.now() - startTime
-        const progressRatio = Math.min(elapsed / totalDuration, 0.95) // 最多到95%
-        
-        // 使用平滑的曲线函数，让进度增长更自然
-        // 前半段增长快，后半段增长慢
-        let smoothProgress = progressRatio
-        if (progressRatio < 0.7) {
-          // 前70%：使用较快的曲线 (x^0.8)
-          smoothProgress = Math.pow(progressRatio / 0.7, 0.8) * 0.7
-        } else {
-          // 后25%：使用较慢的曲线
-          smoothProgress = 0.7 + Math.pow((progressRatio - 0.7) / 0.25, 1.5) * 0.25
-        }
-        
-        // 添加小幅随机波动，让进度更真实
-        const randomVariation = (Math.random() - 0.5) * 0.5 // ±0.25%的波动
-        const finalProgress = Math.min(Math.max(smoothProgress * 95 + randomVariation, 0), 95)
-        
-        setAiProgress(finalProgress)
-      }, 1000) // 每1秒更新一次进度
-      
-      // Call API to generate AI reports
-      console.log('🤖 [Generate] Calling API to generate AI reports...')
-      const apiResponse = await fetch('/api/reports/generate', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          birthData,
-          reportName: birthData.reportName || `Destiny Profile for ${birthData.birthDate}`
-        }),
-      })
-
-      if (!apiResponse.ok) {
-        clearInterval(progressInterval)
-        setAiProgress(0)
-        throw new Error(`API call failed: ${apiResponse.status} ${apiResponse.statusText}`)
-      }
-
-      const apiResult = await apiResponse.json()
-
-      if (!apiResult.success) {
-        clearInterval(progressInterval)
-        setAiProgress(0)
-        throw new Error(apiResult.message || 'Failed to generate report')
-      }
-
-      // 完成后将进度设置为100%
-      clearInterval(progressInterval)
-      setAiProgress(100)
-
-      const fullReport = apiResult.fullReport
-      const previewReport = apiResult.previewReport
-
-      await updateStepStatus(2, 'completed')
-
-      // Step 4: Save report data
-      await updateStepStatus(3, 'processing')
-      await new Promise(resolve => setTimeout(resolve, 500)) // Simulate save time
-      
+      // Create empty report record first
       const reportInsertData = {
         user_id: user.id,
         name: birthData.reportName || `Destiny Profile for ${birthData.birthDate}`,
@@ -232,8 +162,8 @@ function GenerateReportContent() {
         is_time_known_input: birthData.isTimeKnownInput,
         is_paid: false,
         bazi_data: baziData,
-        full_report: fullReport,
-        preview_report: previewReport
+        full_report: '', // Will be populated by streaming
+        preview_report: '' // Will be populated by streaming
       }
 
       const { data: reportData, error: reportError } = await supabase
@@ -243,16 +173,22 @@ function GenerateReportContent() {
         .single()
 
       if (reportError) {
-        throw new Error(`Failed to save report: ${reportError.message}`)
+        throw new Error(`Failed to create report: ${reportError.message}`)
       }
 
-      setReportId((reportData as any).id)
+      const newReportId = (reportData as any).id
+      setReportId(newReportId)
+      
+      // Store birthData in sessionStorage for streaming API
+      sessionStorage.setItem(`birthData_${newReportId}`, JSON.stringify(birthData))
+      
+      await updateStepStatus(2, 'completed')
+
+      // Step 4: Mark as ready for streaming
       await updateStepStatus(3, 'completed')
 
-      // Delay before redirect to let user see completion status
-      setTimeout(() => {
-        router.push(`/report?id=${(reportData as any).id}`)
-      }, 1000)
+      // Immediately redirect to report page where streaming will start
+      router.push(`/report?id=${newReportId}&stream=true`)
 
     } catch (error) {
       console.error('Failed to generate report:', error)
