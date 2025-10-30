@@ -91,6 +91,9 @@ export class ZhipuService {
             content: prompt
           }
         ],
+        thinking: {
+          type: 'disabled'
+        },
         temperature: 0.8,
         max_tokens: 12000,
         stream: false
@@ -443,6 +446,9 @@ ${interactionsInfo}
             content: prompt
           }
         ],
+        thinking: {
+          type: 'disabled'
+        },
         temperature: 0.8,
         max_tokens: 12000,
         stream: true

@@ -184,65 +184,11 @@ function GenerateReportContent() {
       
       await updateStepStatus(2, 'completed')
 
-      // Step 4: Begin streaming on this page and wait until content starts
-      await updateStepStatus(3, 'processing')
+      // Step 4: Mark as ready for streaming
+      await updateStepStatus(3, 'completed')
 
-      try {
-        const response = await fetch('/api/reports/generate-stream', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ reportId: newReportId, birthData })
-        })
-
-        if (!response.ok || !response.body) {
-          throw new Error(`Stream API failed: ${response.status}`)
-        }
-
-        const reader = response.body.getReader()
-        const decoder = new TextDecoder()
-        let buffer = ''
-        let totalLength = 0
-
-        // Keep UI at step 3 (Generating) until we detect the stream has begun
-        // Redirect as soon as we see >10 chars from server to show content ASAP
-        const PREVIEW_THRESHOLD = 10
-
-        // Read until threshold reached, then navigate; server continues in background
-        while (true) {
-          const { done, value } = await reader.read()
-          if (done) break
-          buffer += decoder.decode(value, { stream: true })
-          const lines = buffer.split('\n')
-          buffer = lines.pop() || ''
-          for (const line of lines) {
-            if (line.startsWith('data: ')) {
-              try {
-                const evt = JSON.parse(line.slice(6))
-                if (evt.type === 'chunk') {
-                  totalLength = evt.totalLength || totalLength
-                  // Update a simple progress hint (not exact)
-                  const pct = Math.min(99, Math.floor((totalLength / 2000) * 100))
-                  setAiProgress(pct)
-                  // Redirect once preview size likely saved by server
-                  if (totalLength >= PREVIEW_THRESHOLD) {
-                    reader.cancel().catch(() => {})
-                    router.push(`/report?id=${newReportId}`)
-                    return
-                  }
-                } else if (evt.type === 'done') {
-                  setAiProgress(100)
-                }
-              } catch (e) {
-                // ignore malformed line
-              }
-            }
-          }
-        }
-      } catch (streamErr) {
-        console.error('[Generate] Streaming error before redirect:', streamErr)
-        // Even if streaming read fails, server continues; proceed to report page
-        router.push(`/report?id=${newReportId}`)
-      }
+      // Immediately redirect to report page where streaming will start
+      router.push(`/report?id=${newReportId}&stream=true`)
 
     } catch (error) {
       console.error('Failed to generate report:', error)

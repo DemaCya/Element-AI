@@ -131,23 +131,6 @@ export async function POST(request: NextRequest) {
                 }
               }
               
-              // 提前保存一个极小预览，确保报告页能尽快显示内容（仅一次）
-              if (!previewBoundaryReached && !previewContent && fullContent.length >= 10) {
-                try {
-                  previewContent = fullContent
-                  await supabase
-                    .from('user_reports')
-                    .update({ 
-                      preview_report: previewContent,
-                      updated_at: new Date().toISOString()
-                    })
-                    .eq('id', reportId)
-                  console.log('📝 [Stream API] Early preview saved at', fullContent.length, 'characters')
-                } catch (saveError) {
-                  console.error('❌ [Stream API] Failed to save early preview:', saveError)
-                }
-              }
-              
               // 分批保存完整报告 - 这个操作会继续执行，即使前端断开
               const shouldSave = 
                 (fullContent.length - lastSaveLength >= BATCH_SAVE_CHAR_THRESHOLD) ||
