@@ -265,15 +265,25 @@ function ReportContent() {
       fetchReport().then(fetchedReport => {
         if (!fetchedReport) return
         
-        // 检查是否需要启动流式传输
-        const shouldStream = searchParams.get('stream') === 'true'
-        const reportId = searchParams.get('id')
-        
-        if (shouldStream && reportId && !fetchedReport.full_report) {
-          console.log(`${logPrefix} 📡 Report: Starting streaming...`)
-          startStreaming(reportId).catch(err => {
-            console.error(`${logPrefix} ❌ Report: Failed to start streaming:`, err)
-          })
+        // 不在报告页发起新的流式请求，避免重复生成
+        // 若数据库内容尚未就绪，则进行轻量轮询刷新，直到有内容
+        if (!fetchedReport.full_report && !streamingContent) {
+          setIsStreaming(true)
+          let attempts = 0
+          const maxAttempts = 600 // 600 * 2s = 20分钟上限
+          const interval = setInterval(async () => {
+            attempts++
+            const updated = await fetchReport(true)
+            if (updated?.full_report || updated?.preview_report) {
+              // 一旦数据库有内容即可停止轮询
+              clearInterval(interval)
+              setIsStreaming(false)
+              setIsStreamComplete(!!updated?.full_report)
+            } else if (attempts >= maxAttempts) {
+              clearInterval(interval)
+              setIsStreaming(false)
+            }
+          }, 2000)
         }
         
         // 检查是否从支付成功页面跳转过来（通过URL参数判断）
