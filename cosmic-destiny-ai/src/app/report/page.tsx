@@ -474,31 +474,8 @@ We are confirming your payment information. This usually takes a few seconds. Th
       return report.full_report
     }
     
-    // 如果没有报告内容，显示默认内容
-    return `# Your Astrological Overview
-
-## Birth Information
-- Birth Date: ${report.birth_date}
-- Birth Time: ${report.birth_time || 'Unknown'}
-- Gender: ${report.gender === 'male' ? 'Male' : 'Female'}
-- Timezone: ${report.timezone}
-
-## Report Status
-${report.is_paid ? '✅ Full Report' : '📋 Preview Report'}
-
-${!report.is_paid ? `
-
-**Want to unlock more details?**
-
-The full report includes:
-- In-depth personality analysis and growth advice
-- Detailed career planning and wealth strategies  
-- Comprehensive relationship analysis and best matches
-- Life mission and key turning points
-- Personalized health and wellness plan
-- And much more guidance tailored to your destiny...
-
-Unlock the full report now to begin your journey of cosmic discovery!` : ''}`
+    // 如果没有报告内容，显示精简占位语
+    return `# Your astrological report is on its way...`
   }
 
   return (

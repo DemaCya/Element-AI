@@ -187,7 +187,9 @@ function GenerateReportContent() {
       // Step 4: Mark as ready for streaming
       await updateStepStatus(3, 'completed')
 
-      // Immediately redirect to report page where streaming will start
+      // 为了避免报告页在流式开始前显示占位内容，这里稍作停留
+      // 让用户仍停留在四步进度界面片刻，等后端开始生成再跳转
+      await new Promise(resolve => setTimeout(resolve, 1500))
       router.push(`/report?id=${newReportId}&stream=true`)
 
     } catch (error) {
