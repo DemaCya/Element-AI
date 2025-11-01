@@ -437,7 +437,7 @@ function ReportContent() {
   // Get report content
   const getReportContent = () => {
     if (!report) return ''
-    
+
     // If verifying payment, insert a notice
     if (isVerifying) {
       return `# Verifying Payment Status...
@@ -448,32 +448,19 @@ We are confirming your payment information. This usually takes a few seconds. Th
 
     // If there is streaming content, use it first
     if (streamingContent) {
-      // If user has not paid, only show preview (first 1800 characters)
-      if (!report.is_paid) {
-        if (streamingContent.length <= PREVIEW_BOUNDARY) {
-          return streamingContent + (isStreaming ? '\n\n*Generating...*' : '')
-        } else {
-          // Reached preview boundary, stop showing new content, but keep "Generating..." message
-          const preview = streamingContent.substring(0, PREVIEW_BOUNDARY)
-          return preview + (isStreaming ? '\n\n---\n\n**Want to learn more?**\n\nThe full report includes:\n- In-depth personality analysis and growth suggestions\n- Detailed career planning and wealth strategies\n- Comprehensive relationship analysis and best matches\n- Life mission and key turning points\n- Personalized health and wellness plan\n- Detailed analysis of luck pillars and annual cycles\n- In-depth interpretation of favorable and unfavorable factors\n- And more exclusive numerology guidance for you...\n\nUnlock the full report now and start your journey of destiny exploration!\n\n*Full report is being generated in the background...*' : '')
-        }
-      } else {
-        // Paid users see full streaming content
-        return streamingContent + (isStreaming ? '\n\n*Generating...*' : '')
-      }
+      return streamingContent + (isStreaming ? '\n\n*Generating...*' : '')
     }
 
-    // If no streaming content, use content from database
-    // If there is a preview report and not paid, show preview
-    if (!report.is_paid && report.preview_report) {
-      return report.preview_report
-    }
-    
     // If there is a full report, show full report
     if (report.full_report) {
       return report.full_report
     }
-    
+
+    // If there is a preview report and not paid, show preview
+    if (report.preview_report) {
+      return report.preview_report
+    }
+
     // If no report content, show a concise placeholder
     return `# Your astrological report is on its way...`
   }
@@ -536,93 +523,34 @@ We are confirming your payment information. This usually takes a few seconds. Th
 
           {/* Report Content */}
           <div className="space-y-8">
-            {!report.is_paid ? (
-              // Unpaid: show preview content and upgrade prompt
-              <>
-                <div 
-                  ref={contentContainerRef}
-                  onScroll={handleScroll}
-                  className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-8 border border-purple-500/20"
-                  style={{
-                    minHeight: '400px',
-                    maxHeight: '80vh',
-                    overflowY: 'auto',
-                    transition: 'height 0.3s ease-out'
+            <div
+              ref={contentContainerRef}
+              onScroll={handleScroll}
+              className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-8 border border-purple-500/20"
+              style={{
+                minHeight: '400px',
+                maxHeight: '80vh',
+                overflowY: 'auto',
+                transition: 'height 0.3s ease-out'
+              }}
+            >
+              <div className="prose prose-invert max-w-none">
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: parseReportContent(getReportContent())
                   }}
-                >
-                  <div className="prose prose-invert max-w-none">
-                    <div 
-                      dangerouslySetInnerHTML={{ 
-                        __html: parseReportContent(getReportContent()) 
-                      }}
-                    />
-                  </div>
-                </div>
-                
-                {/* Streaming Indicator */}
-                {isStreaming && (
-                  <div className="text-center text-purple-400">
-                    <div className="inline-flex items-center gap-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-purple-400 border-t-transparent"></div>
-                      <span>Generating report content...</span>
-                    </div>
-                  </div>
-                )}
-                
-                {/* Upgrade Card */}
-                <div className="bg-gradient-to-r from-purple-900/50 via-pink-900/50 to-purple-900/50 backdrop-blur-sm rounded-lg p-8 border border-purple-500/30">
-                  <div className="text-center">
-                    <Sparkles className="w-12 h-12 text-purple-400 mx-auto mb-4" />
-                    <h3 className="text-2xl font-bold text-white mb-4">
-                      Unlock Your Complete Destiny Report
-                    </h3>
-                    <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
-                      The preview shows only a glimpse of your destiny analysis. The full report includes in-depth personality insights, detailed career guidance, comprehensive relationship advice, life purpose interpretation, and personalized health recommendations - over 3,000 words of content tailored exclusively for you.
-                    </p>
-                    <Button
-                      onClick={handleUpgrade}
-                      className="relative overflow-hidden bg-gradient-to-r from-purple-600 to-pink-600 text-white px-8 py-3 text-lg font-semibold rounded-lg shadow-lg transition-all duration-300 ease-out hover:shadow-2xl hover:shadow-purple-500/50 hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 active:shadow-lg group"
-                    >
-                      <span className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-                      <span className="relative flex items-center justify-center">
-                        <Zap className="w-5 h-5 mr-2 group-hover:animate-pulse" />
-                        Unlock Full Report Now
-                      </span>
-                    </Button>
-                  </div>
-                </div>
-              </>
-            ) : (
-              // Paid: show full report content
-              <div 
-                ref={contentContainerRef}
-                onScroll={handleScroll}
-                className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-8 border border-purple-500/20"
-                style={{
-                  minHeight: '400px',
-                  maxHeight: '80vh',
-                  overflowY: 'auto',
-                  transition: 'height 0.3s ease-out'
-                }}
-              >
-                <div className="prose prose-invert max-w-none">
-                  <div 
-                    dangerouslySetInnerHTML={{ 
-                      __html: parseReportContent(getReportContent()) 
-                    }}
-                  />
-                </div>
-                {/* Streaming Indicator */}
-                {isStreaming && (
-                  <div className="mt-4 text-center text-purple-400">
-                    <div className="inline-flex items-center gap-2">
-                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-purple-400 border-t-transparent"></div>
-                      <span>Generating report content...</span>
-                    </div>
-                  </div>
-                )}
+                />
               </div>
-            )}
+              {/* Streaming Indicator */}
+              {isStreaming && (
+                <div className="mt-4 text-center text-purple-400">
+                  <div className="inline-flex items-center gap-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-2 border-purple-400 border-t-transparent"></div>
+                    <span>Generating report content...</span>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Report Footer */}
