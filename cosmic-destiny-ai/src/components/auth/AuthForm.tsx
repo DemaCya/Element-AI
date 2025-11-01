@@ -28,7 +28,7 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
 
     try {
       if (isSignUp) {
-        // 注册新用户
+        // Register new user
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
@@ -45,14 +45,14 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
         }
 
         if (data.user) {
-          setError('注册成功！请检查您的邮箱以验证账户。')
-          // 等待一下再跳转，让用户看到成功消息
+          setError('Sign up successful! Please check your email to verify your account.')
+          // Wait a bit to redirect, so the user can see the success message
           setTimeout(() => {
             onSuccess?.()
           }, 2000)
         }
       } else {
-        // 登录现有用户
+        // Sign in existing user
         const { data, error } = await supabase.auth.signInWithPassword({
           email,
           password
@@ -69,7 +69,7 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
       }
     } catch (error: any) {
       console.error('Auth error:', error)
-      setError(`认证失败: ${error.message || '请重试'}`)
+      setError(`Authentication failed: ${error.message || 'Please try again'}`)
     } finally {
       setLoading(false)
     }
@@ -91,10 +91,10 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
         setError(error.message)
         setLoading(false)
       }
-      // 如果成功，用户会被重定向到Google，然后回到callback页面
+      // If successful, the user will be redirected to Google, then back to the callback page
     } catch (error: any) {
       console.error('Google auth error:', error)
-      setError(`Google登录失败: ${error.message || '请重试'}`)
+      setError(`Google sign-in failed: ${error.message || 'Please try again'}`)
       setLoading(false)
     }
   }

@@ -67,12 +67,12 @@ export class BaziService {
 
   static async calculateBazi(birthData: BirthData): Promise<BaziData> {
     try {
-      // 🌍 在八字计算前记录服务器时区信息
-      console.log('🌍 [BaziService] ===== 八字计算开始 =====');
-      console.log(`🌍 [BaziService] 当前服务器时区: ${Intl.DateTimeFormat().resolvedOptions().timeZone}`);
-      console.log(`🌍 [BaziService] 当前环境变量TZ: ${process.env.TZ || '未设置'}`);
-      console.log(`🌍 [BaziService] 当前系统时间: ${new Date().toString()}`);
-      console.log(`🌍 [BaziService] 当前UTC时间: ${new Date().toISOString()}`);
+      // 🌍 Log server timezone information before Bazi calculation
+      console.log('🌍 [BaziService] ===== Bazi Calculation Start =====');
+      console.log(`🌍 [BaziService] Current server timezone: ${Intl.DateTimeFormat().resolvedOptions().timeZone}`);
+      console.log(`🌍 [BaziService] Current environment TZ: ${process.env.TZ || 'Not set'}`);
+      console.log(`🌍 [BaziService] Current system time: ${new Date().toString()}`);
+      console.log(`🌍 [BaziService] Current UTC time: ${new Date().toISOString()}`);
       
       // Force the Node.js process to use UTC. This is the most critical step.
       process.env.TZ = 'UTC'
@@ -88,26 +88,26 @@ export class BaziService {
 
       let birthDateTimeString;
       if(birthData.isTimeKnownInput){
-        // 当用户提供了具体时间时，使用用户输入的时间
+        // When user provides a specific time, use user input
         birthDateTimeString = `${birthData.birthDate}T${birthData.birthTime}:00`
       }else{
-        // 当用户没有提供时间时，使用默认时间 12:00:001
+        // When user does not provide a time, use default time 12:00:00
         birthDateTimeString = `${birthData.birthDate}T12:00:00`
       }
 
-      console.log('🔮 [BaziService] 出生日期时间字符串:', birthDateTimeString)
-      console.log('🔮 [BaziService] 是否已知出生时间:', birthData.isTimeKnownInput)
-      console.log('🔮 [BaziService] 用户输入的出生时间:', birthData.birthTime)
-      console.log('🔮 [BaziService] 时区:', birthData.timeZone)
-      console.log('🔮 [BaziService] 性别:', birthData.gender)
+      console.log('🔮 [BaziService] Birth date-time string:', birthDateTimeString)
+      console.log('🔮 [BaziService] Is birth time known:', birthData.isTimeKnownInput)
+      console.log('🔮 [BaziService] User input birth time:', birthData.birthTime)
+      console.log('🔮 [BaziService] Time zone:', birthData.timeZone)
+      console.log('🔮 [BaziService] Gender:', birthData.gender)
       
       const birthDateLocal = toDate(birthDateTimeString, { timeZone: birthData.timeZone })
       
-      // 验证时区设置和转换结果
-      console.log('🔮 [BaziService] 环境时区设置:', process.env.TZ)
-      console.log('🔮 [BaziService] 系统时区偏移:', new Date().getTimezoneOffset())
-      console.log('🔮 [BaziService] 原始本地时间:', birthDateLocal.toString())
-      console.log('🔮 [BaziService] 原始本地时间ISO:', birthDateLocal.toISOString())
+      // Verify timezone settings and conversion results
+      console.log('🔮 [BaziService] Environment timezone setting:', process.env.TZ)
+      console.log('🔮 [BaziService] System timezone offset:', new Date().getTimezoneOffset())
+      console.log('🔮 [BaziService] Original local time:', birthDateLocal.toString())
+      console.log('🔮 [BaziService] Original local time ISO:', birthDateLocal.toISOString())
       
       const calculator = new BaziCalculator(birthDateLocal, birthData.gender, birthData.timeZone, birthData.isTimeKnownInput)
 
@@ -116,10 +116,10 @@ export class BaziService {
       // Calculate comprehensive bazi analysis
       const analysis = calculator.getCompleteAnalysis();
       
-      // 打印完整的八字分析详情
-      console.log('🔮 [BaziService] ===== 完整八字分析详情 =====');
+      // Print complete Bazi analysis details
+      console.log('🔮 [BaziService] ===== Complete Bazi Analysis Details =====');
       
-      // 打印四柱信息
+      // Print four pillars information
       if (analysis?.mainPillars) {
         console.log('🔮 [BaziService] mainPillars:');
         console.log('  - year:', analysis.mainPillars.year);
@@ -128,7 +128,7 @@ export class BaziService {
         console.log('  - time:', analysis.mainPillars.time);
       }
       
-      // 打印详细柱信息
+      // Print detailed pillars information
       if (analysis?.detailedPillars) {
         console.log('🔮 [BaziService] detailedPillars:');
         console.log('  - year:', analysis.detailedPillars.year);
@@ -137,7 +137,7 @@ export class BaziService {
         console.log('  - hour:', analysis.detailedPillars.hour);
       }
       
-      // 打印基础分析
+      // Print basic analysis
       if (analysis?.basicAnalysis) {
         console.log('🔮 [BaziService] basicAnalysis:');
         console.log('  - dayMaster:', analysis.basicAnalysis.dayMaster);
@@ -152,22 +152,22 @@ export class BaziService {
         console.log('  - peachBlossom:', analysis.basicAnalysis.peachBlossom);
       }
       
-      console.log('🔮 [BaziService] ===== 八字分析详情结束 =====');
+      console.log('🔮 [BaziService] ===== Bazi Analysis Details End =====');
       
-      // 打印天干地支8个字
+      // Print 8 characters of Heavenly Stems and Earthly Branches
       if (analysis?.mainPillars) {
         const yearPillar = analysis.mainPillars.year;
         const monthPillar = analysis.mainPillars.month;
         const dayPillar = analysis.mainPillars.day;
         const hourPillar = analysis.mainPillars.time;
         
-        console.log("🔮 [BaziService] 天干地支8个字:");
-        console.log(`年柱: ${yearPillar?.chinese || 'N/A'}`);
-        console.log(`月柱: ${monthPillar?.chinese || 'N/A'}`);
-        console.log(`日柱: ${dayPillar?.chinese || 'N/A'}`);
-        console.log(`时柱: ${hourPillar?.chinese || 'N/A'}`);
+        console.log("🔮 [BaziService] 8 Characters of Heavenly Stems and Earthly Branches:");
+        console.log(`Year Pillar: ${yearPillar?.chinese || 'N/A'}`);
+        console.log(`Month Pillar: ${monthPillar?.chinese || 'N/A'}`);
+        console.log(`Day Pillar: ${dayPillar?.chinese || 'N/A'}`);
+        console.log(`Hour Pillar: ${hourPillar?.chinese || 'N/A'}`);
         
-        // 从chinese字段提取8个字符（每个柱包含天干地支2个字符）
+        // Extract 8 characters from the chinese field (each pillar contains 2 characters for stem and branch)
         const eightCharacters = [
           yearPillar?.chinese,
           monthPillar?.chinese,
@@ -175,19 +175,19 @@ export class BaziService {
           hourPillar?.chinese
         ].filter(Boolean).join('');
         
-        console.log(`🔮 [BaziService] 八字8个字: ${eightCharacters}`);
+        console.log(`🔮 [BaziService] Bazi 8 Characters: ${eightCharacters}`);
         
-        // 如果需要单独的天干地支字符，可以从detailedPillars获取
+        // If individual stem and branch characters are needed, they can be obtained from detailedPillars
         if (analysis.detailedPillars) {
-          console.log("🔮 [BaziService] 详细天干地支信息:");
-          console.log(`年干: ${analysis.detailedPillars.year?.heavenlyStem?.character || ''}`);
-          console.log(`年支: ${analysis.detailedPillars.year?.earthlyBranch?.character || ''}`);
-          console.log(`月干: ${analysis.detailedPillars.month?.heavenlyStem?.character || ''}`);
-          console.log(`月支: ${analysis.detailedPillars.month?.earthlyBranch?.character || ''}`);
-          console.log(`日干: ${analysis.detailedPillars.day?.heavenlyStem?.character || ''}`);
-          console.log(`日支: ${analysis.detailedPillars.day?.earthlyBranch?.character || ''}`);
-          console.log(`时干: ${analysis.detailedPillars.hour?.heavenlyStem?.character || ''}`);
-          console.log(`时支: ${analysis.detailedPillars.hour?.earthlyBranch?.character || ''}`);
+          console.log("🔮 [BaziService] Detailed Heavenly Stem and Earthly Branch Information:");
+          console.log(`Year Stem: ${analysis.detailedPillars.year?.heavenlyStem?.character || ''}`);
+          console.log(`Year Branch: ${analysis.detailedPillars.year?.earthlyBranch?.character || ''}`);
+          console.log(`Month Stem: ${analysis.detailedPillars.month?.heavenlyStem?.character || ''}`);
+          console.log(`Month Branch: ${analysis.detailedPillars.month?.earthlyBranch?.character || ''}`);
+          console.log(`Day Stem: ${analysis.detailedPillars.day?.heavenlyStem?.character || ''}`);
+          console.log(`Day Branch: ${analysis.detailedPillars.day?.earthlyBranch?.character || ''}`);
+          console.log(`Hour Stem: ${analysis.detailedPillars.hour?.heavenlyStem?.character || ''}`);
+          console.log(`Hour Branch: ${analysis.detailedPillars.hour?.earthlyBranch?.character || ''}`);
         }
       }
       const luckPillars = calculator.calculateLuckPillars();
@@ -200,7 +200,7 @@ export class BaziService {
         const currentPillarFromLib = calculator.getCurrentLuckPillar(currentDate);
         
         if (currentPillarFromLib) {
-          // 计算精确年龄（考虑月份和日期）
+          // Calculate precise age (considering month and day)
           const currentYear = currentDate.getFullYear();
           const currentMonth = currentDate.getMonth();
           const currentDay = currentDate.getDate();
@@ -213,7 +213,7 @@ export class BaziService {
             age--;
           }
           
-          // 将库返回的数据转换为我们的格式
+          // Convert data returned from the library to our format
           currentPillar = {
             number: currentPillarFromLib.number,
             heavenlyStem: currentPillarFromLib.heavenlyStem.character,
@@ -224,15 +224,15 @@ export class BaziService {
             currentAge: age
           };
           
-          console.log('✅ [BaziService] 使用库方法成功获取当前大运:', currentPillarFromLib.number);
+          console.log('✅ [BaziService] Successfully obtained current luck pillar using library method:', currentPillarFromLib.number);
         } else {
-          console.warn('⚠️ [BaziService] 库方法返回null，将使用备用方法计算');
+          console.warn('⚠️ [BaziService] Library method returned null, will use fallback method for calculation');
         }
       } catch (error) {
-        console.warn('⚠️ [BaziService] 使用库方法获取当前大运失败:', error);
+        console.warn('⚠️ [BaziService] Failed to get current luck pillar using library method:', error);
       }
       
-      // 备用方法：如果库方法失败，使用自己计算的方法
+      // Fallback method: if library method fails, use our own calculation
       if (!currentPillar && luckPillars && luckPillars.pillars.length > 0) {
         const currentYear = new Date().getFullYear();
         const currentDate = new Date();
@@ -242,13 +242,13 @@ export class BaziService {
         const currentMonth = currentDate.getMonth();
         const currentDay = currentDate.getDate();
         
-        // 计算精确年龄（考虑月份和日期）
+        // Calculate precise age (considering month and day)
         let age = currentYear - birthYear;
         if (currentMonth < birthMonth || (currentMonth === birthMonth && currentDay < birthDay)) {
           age--;
         }
         
-        // 查找当前年份所在的大运
+        // Find the luck pillar for the current year
         for (const pillar of luckPillars.pillars) {
           if (pillar.yearStart !== null && pillar.yearEnd !== null) {
             if (currentYear >= pillar.yearStart && currentYear <= pillar.yearEnd) {
@@ -261,19 +261,19 @@ export class BaziService {
                 ageStart: pillar.ageStart,
                 currentAge: age
               };
-              console.log('✅ [BaziService] 使用备用方法计算当前大运');
+              console.log('✅ [BaziService] Calculated current luck pillar using fallback method');
               break;
             }
           }
         }
         
-        // 如果未找到当前大运，检查是否在起运之前或之后
+        // If current luck pillar is not found, check if it's before or after the luck periods
         if (!currentPillar && luckPillars.pillars.length > 0) {
           const firstPillar = luckPillars.pillars[0];
           const lastPillar = luckPillars.pillars[luckPillars.pillars.length - 1];
           
           if (firstPillar.yearStart !== null && currentYear < firstPillar.yearStart) {
-            // 尚未起运，返回第一个大运（即将进入）
+            // Not yet in a luck period, return the first luck pillar (upcoming)
             currentPillar = {
               number: firstPillar.number,
               heavenlyStem: firstPillar.heavenlyStem.character,
@@ -284,7 +284,7 @@ export class BaziService {
               currentAge: age
             };
           } else if (lastPillar.yearEnd !== null && currentYear > lastPillar.yearEnd) {
-            // 已超过最后一个大运，返回最后一个大运
+            // Past the last luck period, return the last luck pillar
             currentPillar = {
               number: lastPillar.number,
               heavenlyStem: lastPillar.heavenlyStem.character,
@@ -298,8 +298,8 @@ export class BaziService {
         }
       }
       
-      // 打印大运信息
-      console.log('🔮 [BaziService] ===== 大运信息详情 =====');
+      // Print luck pillar information
+      console.log('🔮 [BaziService] ===== Luck Pillar Information Details =====');
       if (luckPillars) {
         console.log('🔮 [BaziService] luckPillars:');
         console.log('  - incrementRule:', luckPillars.incrementRule);
@@ -315,35 +315,35 @@ export class BaziService {
           const isAfterEnd = currentPillar.yearEnd !== null && year > currentPillar.yearEnd;
           let status = '';
           if (isBeforeStart) {
-            status = '（即将进入）';
+            status = '(Upcoming)';
           } else if (isAfterEnd) {
-            status = '（已结束）';
+            status = '(Finished)';
           } else {
-            status = '（进行中）';
+            status = '(In Progress)';
           }
           
-          console.log('  - 当前大运:');
-          console.log(`    大运${currentPillar.number}: ${currentPillar.heavenlyStem}${currentPillar.earthlyBranch} ${status}`);
-          console.log(`    年份范围: ${currentPillar.yearStart}-${currentPillar.yearEnd}`);
-          console.log(`    当前年龄: ${currentPillar.currentAge}岁`);
-          console.log(`    起运年龄: ${currentPillar.ageStart}岁`);
+          console.log('  - Current Luck Pillar:');
+          console.log(`    Luck Pillar ${currentPillar.number}: ${currentPillar.heavenlyStem}${currentPillar.earthlyBranch} ${status}`);
+          console.log(`    Year Range: ${currentPillar.yearStart}-${currentPillar.yearEnd}`);
+          console.log(`    Current Age: ${currentPillar.currentAge}`);
+          console.log(`    Starting Age: ${currentPillar.ageStart}`);
         } else {
-          console.log('  - 当前大运: 未找到');
+          console.log('  - Current Luck Pillar: Not found');
         }
         
-        // 打印全部大运柱的详细信息
-        console.log('  - 所有大运柱:');
+        // Print details of all luck pillars
+        console.log('  - All Luck Pillars:');
         luckPillars.pillars.forEach((pillar, index) => {
           const isCurrent = currentPillar && pillar.number === currentPillar.number;
-          const marker = isCurrent ? ' ⭐当前' : '';
-          console.log(`  ${index + 1}. 大运${pillar.number}${marker}:`);
-          console.log(`    天干: ${pillar.heavenlyStem.character}`);
-          console.log(`    地支: ${pillar.earthlyBranch.character}`);
-          console.log(`    年份: ${pillar.yearStart}-${pillar.yearEnd}`);
-          console.log(`    起运年龄: ${pillar.ageStart}岁`);
+          const marker = isCurrent ? ' ⭐Current' : '';
+          console.log(`  ${index + 1}. Luck Pillar ${pillar.number}${marker}:`);
+          console.log(`    Heavenly Stem: ${pillar.heavenlyStem.character}`);
+          console.log(`    Earthly Branch: ${pillar.earthlyBranch.character}`);
+          console.log(`    Years: ${pillar.yearStart}-${pillar.yearEnd}`);
+          console.log(`    Start Age: ${pillar.ageStart}`);
         });
       }
-      console.log('🔮 [BaziService] ===== 大运信息详情结束 =====');
+      console.log('🔮 [BaziService] ===== Luck Pillar Information Details End =====');
       
       if (!analysis) {
         throw new Error('Failed to calculate Bazi analysis')
@@ -453,9 +453,9 @@ export class BaziService {
       return baziData
     } catch (error) {
       console.error('Error calculating Bazi:', error)
-      console.warn('⚠️ [BaziService] 使用模拟数据进行测试')
+      console.warn('⚠️ [BaziService] Using mock data for testing')
       
-      // 如果计算失败（比如缺少依赖包），返回模拟数据
+      // If calculation fails (e.g., missing dependency), return mock data
       return this.generateMockBaziData(birthData)
     }
   }
@@ -478,11 +478,11 @@ export class BaziService {
     )[0]
 
     const elementNames = {
-      wood: 'Wood (木)',
-      fire: 'Fire (火)',
-      earth: 'Earth (土)',
-      metal: 'Metal (金)',
-      water: 'Water (水)'
+      wood: 'Wood',
+      fire: 'Fire',
+      earth: 'Earth',
+      metal: 'Metal',
+      water: 'Water'
     }
 
     return `Dominant Element: ${elementNames[dominant as keyof typeof elementNames]} (${percentages[dominant as keyof typeof percentages]}%)`

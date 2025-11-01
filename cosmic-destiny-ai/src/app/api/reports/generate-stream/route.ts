@@ -112,7 +112,7 @@ export async function POST(request: NextRequest) {
                 }
                 
                 // 添加预览结尾
-                previewContent += '\n\n---\n\n**想要了解更多详细内容吗？**\n\n完整报告包含：\n- 深度人格分析和成长建议\n- 详细职业规划和财富策略\n- 全面感情分析和最佳配对\n- 人生使命和关键转折点\n- 个性化健康养生方案\n- 大运流年详细分析\n- 有利不利因素深度解读\n- 以及更多专属于您的命理指导...\n\n立即解锁完整报告，开启您的命运探索之旅！'
+                previewContent += '\n\n---\n\n**Want to learn more?**\n\nThe full report includes:\n- In-depth personality analysis and growth advice\n- Detailed career planning and wealth strategies\n- Comprehensive relationship analysis and best matches\n- Life mission and key turning points\n- Personalized health and wellness plans\n- Detailed analysis of Luck Pillars and Annual Cycles\n- In-depth interpretation of favorable and unfavorable factors\n- And much more guidance tailored to you...\n\nUnlock the full report now to begin your journey of destiny exploration!'
                 
                 // 保存预览版 - 这个操作会继续执行，即使前端断开
                 try {

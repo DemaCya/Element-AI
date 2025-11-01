@@ -390,20 +390,20 @@ export default function BirthForm({ onSubmit, onClose, isLoading }: BirthFormPro
   }, [])
 
   const handleSubmit = (e: React.FormEvent) => {
-    console.log("🚀 handleSubmit 函数被调用了！")
+    console.log("🚀 handleSubmit function called!")
     e.preventDefault()
-    console.log("当前步骤:", step)
-    console.log("表单数据:", formData)
+    console.log("Current step:", step)
+    console.log("Form data:", formData)
     // Only submit if we're on step 2 and all required fields are filled
     if (step === 2 && formData.birthDate && formData.timeZone && formData.gender) {
-      console.log("✅ 步骤二了，可以提交了")
-      console.log("提交的formData:", formData)
+      console.log("✅ Step two, ready to submit")
+      console.log("Submitted formData:", formData)
       console.log("isTimeKnownInput:", formData.isTimeKnownInput)
       console.log("birthTime:", formData.birthTime)
-      console.log("🚀 准备调用 onSubmit")
+      console.log("🚀 Preparing to call onSubmit")
       onSubmit(formData)
     } else {
-      console.log("❌ 条件不满足，无法提交")
+      console.log("❌ Conditions not met, cannot submit")
       console.log("step === 2:", step === 2)
       console.log("formData.birthDate:", formData.birthDate)
       console.log("formData.timeZone:", formData.timeZone)
@@ -759,7 +759,7 @@ export default function BirthForm({ onSubmit, onClose, isLoading }: BirthFormPro
                       variant="cosmic"
                       disabled={(() => {
                         const disabled = isLoading || !formData.birthDate || !formData.timeZone || !formData.gender
-                        console.log("🔍 按钮禁用状态检查:", {
+                        console.log("🔍 Button disabled state check:", {
                           isLoading,
                           birthDate: formData.birthDate,
                           timeZone: formData.timeZone,
@@ -769,13 +769,13 @@ export default function BirthForm({ onSubmit, onClose, isLoading }: BirthFormPro
                         return disabled
                       })()}
                       onClick={(e) => {
-                        console.log("🔥 按钮被点击了！")
+                        console.log("🔥 Button clicked!")
                         e.preventDefault()
                         console.log("Step 2 button clicked")
                         console.log("formData:", formData)
                         console.log("isLoading:", isLoading)
                         console.log("disabled condition:", isLoading || !formData.birthDate || !formData.timeZone || !formData.gender)
-                        console.log("🔥 准备调用 handleSubmit")
+                        console.log("🔥 Preparing to call handleSubmit")
                         handleSubmit(e)
                       }}
                       className="flex-1 group relative overflow-hidden"

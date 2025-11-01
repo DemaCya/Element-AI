@@ -7,7 +7,7 @@ export interface BirthData {
 }
 
 export interface BaziData {
-  // 基础四柱信息
+  // Basic Four Pillars Information
   heavenlyStems: string[]
   earthlyBranches: string[]
   hiddenStems: string[]
@@ -16,12 +16,12 @@ export interface BaziData {
   dayPillar: string
   hourPillar?: string
   
-  // 日主信息
+  // Day Master Information
   dayMaster: string
   dayMasterNature: 'Yang' | 'Yin'
   dayMasterElement: 'WOOD' | 'FIRE' | 'EARTH' | 'METAL' | 'WATER'
   
-  // 五行分析
+  // Five Elements Analysis
   elements: {
     wood: number
     fire: number
@@ -30,14 +30,14 @@ export interface BaziData {
     water: number
   }
   
-  // 日主强弱分析
+  // Day Master Strength Analysis
   dayMasterStrength?: {
     strength: 'Strong' | 'Weak' | 'Balanced'
     score: number
     notes?: string[]
   }
   
-  // 有利元素分析
+  // Favorable Elements Analysis
   favorableElements?: {
     primary: string[]
     secondary?: string[]
@@ -45,7 +45,7 @@ export interface BaziData {
     notes?: string[]
   }
   
-  // 八宅分析
+  // Eight Mansions Analysis
   eightMansions?: {
     group: 'West' | 'East'
     lucky: {
@@ -62,14 +62,14 @@ export interface BaziData {
     }
   }
   
-  // 基本分析
+  // Basic Analysis
   lifeGua?: number
   nobleman?: string[]
   intelligence?: string
   skyHorse?: string
   peachBlossom?: string
   
-  // 大运信息
+  // Luck Pillar Information
   luckPillars?: {
     pillars: Array<{
       number: number
@@ -92,7 +92,7 @@ export interface BaziData {
     }
   }
   
-  // 相互作用分析
+  // Interaction Analysis
   interactions?: Array<{
     type: string
     participants: Array<{

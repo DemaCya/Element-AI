@@ -221,7 +221,7 @@ function DashboardContent() {
                           <div className="flex items-center gap-2 mb-2">
                             <Calendar className="w-4 h-4 text-purple-400" />
                             <span className="text-white font-medium">
-                              {report.name || `命理报告 - ${new Date(report.birth_date).toLocaleDateString()}`}
+                              {report.name || `Destiny Report - ${new Date(report.birth_date).toLocaleDateString()}`}
                             </span>
                             {report.is_paid && (
                               <span className="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">

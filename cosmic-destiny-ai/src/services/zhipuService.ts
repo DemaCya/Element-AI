@@ -125,69 +125,70 @@ export class ZhipuService {
    * 构建系统提示词
    */
   private getSystemPrompt(): string {
-    return `你是一位资深且智慧的命理师，同时也是一位充满同情心和智慧的人生导师。请根据用户提供的八字信息，生成一份专业、详细且充满积极引导的命理分析报告。
+    return `You are a seasoned and wise astrologer, as well as a compassionate and intelligent life coach. Based on the user's Bazi information, please generate a professional, detailed, and positively guided astrological analysis report in English.
 
 ═══════════════════════════════════════════════════════════
-【核心要求】
+【Core Requirements】
 ═══════════════════════════════════════════════════════════
-1. 【近况分析】客观直接，具体准确，旨在帮助用户更好地理解自己
-   - 不要用"可能"、"大概"、"也许"等模糊词汇
-   - 要具体到事件和时间，结合当前大运分析
-   - 放在报告最前面，作为重点内容
+1. 【Recent Situation Analysis】Be objective, direct, specific, and accurate to help the user better understand themselves.
+   - Avoid vague words like "might," "probably," or "maybe."
+   - Be specific about events and timing, analyzing in conjunction with the current Luck Pillar.
+   - Place this at the very beginning of the report as a key section.
 
-2. 【当前大运】是关键分析点
-   - 必须结合当前大运的五行特点分析近况
-   - 说明当前大运对用户的整体影响
-   - 预测未来几年的大运走势
+2. 【Current Luck Pillar】This is the key point of analysis.
+   - You must analyze the recent situation based on the characteristics of the five elements of the current Luck Pillar.
+   - Explain the overall impact of the current Luck Pillar on the user.
+   - Predict the trend of the Luck Pillars for the next few years.
 
-3. 【性格分析】要以优势为导向
-   - 深入分析性格优势，并就如何改善劣势提供积极建议
-   - 重点是发掘用户的潜能和天赋
+3. 【Personality Analysis】Focus on strengths.
+   - Provide an in-depth analysis of personality strengths and offer positive suggestions on how to improve weaknesses.
+   - The focus is on uncovering the user's potential and talents.
 
-4. 【建议要具体且赋能】
-   - 所有建议都要具体可操作，并充满鼓励性
-   - 帮助用户看到未来的可能性，而不是宿命论
+4. 【Actionable and Empowering Advice】
+   - All advice should be specific, actionable, and encouraging.
+   - Help the user see future possibilities, not a fatalistic view.
 
-5. 【格式与风格要求】
-   - 字数控制在10000字左右
-   - 使用Markdown格式，结构清晰
-   - 语言风格专业、温和、积极、富有启发性，旨在赋能用户
-
-═══════════════════════════════════════════════════════════
-【报告结构（必须包含）】
-═══════════════════════════════════════════════════════════
-1. **近况分析** - 客观直接，具体分析过去一年发生的事件（最重要的部分，放最前面）
-2. **当前大运分析** - 结合当前大运分析运势走向和特点
-3. 出生信息概览
-4. 八字详细分析
-5. 日主强弱分析
-6. 五行平衡分析
-7. **性格特质分析**（深入挖掘优势，并提供劣势的改进建议）
-8. **事业运势指导**（发掘职业潜能，提供积极发展方向）
-9. **财富运势分析**（提供积极的财富增长策略）
-10. **感情婚姻分析**（分析感情模式，并提出积极的经营建议）
-11. **健康养生指导**（分析体质特点，提供积极的养生方案）
-12. 大运流年分析（具体时间节点，包括未来大运预测）
-13. 有利不利因素分析（将不利因素转化为成长机会）
-14. **人生发展建议**（具体且充满鼓励的行动建议）
-15. 综合总结
+5. 【Format and Style Requirements】
+   - The report should be in English.
+   - Word count should be around 10,000 words.
+   - Use Markdown format for a clear structure.
+   - The language style should be professional, gentle, positive, and inspiring, aimed at empowering the user.
 
 ═══════════════════════════════════════════════════════════
-【特别强调】
+【Report Structure (Must Include)】
 ═══════════════════════════════════════════════════════════
-- 近况分析要客观直接，结合当前大运，具体到事件和时间
-- 当前大运是分析的核心，必须详细说明其影响
-- 性格分析要以优势为主，劣势部分要提供建设性意见
-- 感情分析要聚焦于积极的相处之道和经营策略
-- 所有建议都要具体可操作，并充满鼓励性
-- 通篇采用积极、鼓励和赋能的语言风格，帮助用户看到自身潜力和未来的光明前景。`
+1. **Recent Situation Analysis** - Objective, direct, and specific analysis of events in the past year (the most important part, place at the beginning).
+2. **Current Luck Pillar Analysis** - Analyze the trend and characteristics of fortune in conjunction with the current Luck Pillar.
+3. Birth Information Overview
+4. Detailed Bazi Analysis
+5. Day Master Strength Analysis
+6. Five Elements Balance Analysis
+7. **Personality Trait Analysis** (In-depth exploration of strengths with suggestions for improving weaknesses).
+8. **Career Path Guidance** (Discovering professional potential and providing positive development directions).
+9. **Wealth Fortune Analysis** (Providing positive wealth-building strategies).
+10. **Relationship and Marriage Analysis** (Analyzing relationship patterns and offering positive advice for managing them).
+11. **Health and Wellness Guidance** (Analyzing physical constitution and providing positive health regimens).
+12. Luck Pillar and Annual Cycle Analysis (Specific time points, including future Luck Pillar predictions).
+13. Favorable and Unfavorable Factors Analysis (Turning unfavorable factors into growth opportunities).
+14. **Life Development Advice** (Specific and encouraging action plans).
+15. Comprehensive Summary
+
+═══════════════════════════════════════════════════════════
+【Special Emphasis】
+═══════════════════════════════════════════════════════════
+- The recent situation analysis must be objective and direct, linked to the current Luck Pillar, and specific to events and timing.
+- The current Luck Pillar is the core of the analysis and its impact must be detailed.
+- Personality analysis should focus on strengths, with weaknesses framed as constructive advice.
+- Relationship analysis should focus on positive interaction and management strategies.
+- All advice must be specific, actionable, and encouraging.
+- The entire report should adopt a positive, encouraging, and empowering tone to help the user see their potential and a bright future. The final report must be in English.`
   }
 
   /**
    * 构建用户提示词
    */
   private buildPrompt(birthData: BirthData, baziData: BaziData): string {
-    // 获取当前时间信息
+    // Get current time information
     const now = new Date()
     const currentYear = now.getFullYear()
     const currentMonth = now.getMonth() + 1
@@ -195,194 +196,175 @@ export class ZhipuService {
     const currentDate = `${currentYear}-${currentMonth.toString().padStart(2, '0')}-${currentDay.toString().padStart(2, '0')}`
     
     const currentTimeInfo = `
-【当前时间信息】
+【Current Time Information】
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  • 当前日期：${currentDate}
-  • 当前年份：${currentYear}年
-  • 当前月份：${currentMonth}月
-  • 当前日期：${currentDay}日
-  • 分析时间范围：${currentYear - 1}年${currentMonth}月${currentDay}日 至 ${currentDate}
+  • Current Date: ${currentDate}
+  • Current Year: ${currentYear}
+  • Current Month: ${currentMonth}
+  • Current Day: ${currentDay}
+  • Analysis Period: ${currentYear - 1}-${currentMonth}-${currentDay} to ${currentDate}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 `
 
     const birthInfo = `
-【出生信息】
+【Birth Information】
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  • 出生日期：${birthData.birthDate}
-  • 出生时间：${birthData.birthTime || '12:00'}${birthData.isTimeKnownInput ? ' ✓(用户提供)' : ' (系统默认)'}
-  • 性别：${birthData.gender === 'male' ? '男' : '女'}
-  • 时区：${birthData.timeZone}
+  • Birth Date: ${birthData.birthDate}
+  • Birth Time: ${birthData.birthTime || '12:00'}${birthData.isTimeKnownInput ? ' ✓(User Provided)' : ' (System Default)'}
+  • Gender: ${birthData.gender === 'male' ? 'Male' : 'Female'}
+  • Time Zone: ${birthData.timeZone}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 `
 
     const baziInfo = `
-【八字基础信息（核心数据）】
+【Bazi Foundation (Core Data)】
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-四柱信息：
-  • 年柱：${baziData.yearPillar}
-  • 月柱：${baziData.monthPillar}
-  • 日柱：${baziData.dayPillar}
-  • 时柱：${baziData.hourPillar || '未知'}
+Four Pillars:
+  • Year Pillar: ${baziData.yearPillar}
+  • Month Pillar: ${baziData.monthPillar}
+  • Day Pillar: ${baziData.dayPillar}
+  • Hour Pillar: ${baziData.hourPillar || 'Unknown'}
 
-天干地支分解：
-  • 天干序列：${baziData.heavenlyStems.join('、')}（年干、月干、日干、时干）
-  • 地支序列：${baziData.earthlyBranches.join('、')}（年支、月支、日支、时支）
-  • 藏干信息：${baziData.hiddenStems.join('、') || '无'}
+Heavenly Stems & Earthly Branches:
+  • Heavenly Stems Sequence: ${baziData.heavenlyStems.join(', ')} (Year, Month, Day, Hour)
+  • Earthly Branches Sequence: ${baziData.earthlyBranches.join(', ')} (Year, Month, Day, Hour)
+  • Hidden Stems: ${baziData.hiddenStems.join(', ') || 'None'}
 
-日主核心信息：
-  • 日主天干：${baziData.dayMaster}
-  • 阴阳属性：${baziData.dayMasterNature === 'Yang' ? '阳' : '阴'}
-  • 五行属性：${baziData.dayMasterElement === 'WOOD' ? '木' : baziData.dayMasterElement === 'FIRE' ? '火' : baziData.dayMasterElement === 'EARTH' ? '土' : baziData.dayMasterElement === 'METAL' ? '金' : '水'}
+Day Master Core Information:
+  • Day Master Stem: ${baziData.dayMaster}
+  • Yin/Yang: ${baziData.dayMasterNature}
+  • Five Elements: ${baziData.dayMasterElement}
 
-五行能量分布（分析日主强弱的关键）：
-  • 木元素：${baziData.elements.wood} 分
-  • 火元素：${baziData.elements.fire} 分
-  • 土元素：${baziData.elements.earth} 分
-  • 金元素：${baziData.elements.metal} 分
-  • 水元素：${baziData.elements.water} 分
-  • 五行总分：${baziData.elements.wood + baziData.elements.fire + baziData.elements.earth + baziData.elements.metal + baziData.elements.water} 分
+Five Elements Energy Distribution (Key for Day Master Strength):
+  • Wood Element: ${baziData.elements.wood} points
+  • Fire Element: ${baziData.elements.fire} points
+  • Earth Element: ${baziData.elements.earth} points
+  • Metal Element: ${baziData.elements.metal} points
+  • Water Element: ${baziData.elements.water} points
+  • Total Score: ${baziData.elements.wood + baziData.elements.fire + baziData.elements.earth + baziData.elements.metal + baziData.elements.water} points
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 `
 
     const strengthInfo = baziData.dayMasterStrength ? `
-【日主强弱分析（关键判断）】
+【Day Master Strength Analysis (Key Judgment)】
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  • 强弱判断：${baziData.dayMasterStrength.strength === 'Strong' ? '强' : baziData.dayMasterStrength.strength === 'Weak' ? '弱' : '平衡'}
-  • 强弱得分：${baziData.dayMasterStrength.score} 分（正数为强，负数为弱）
-  • 判断依据：
-${baziData.dayMasterStrength.notes ? baziData.dayMasterStrength.notes.map(note => `    - ${note}`).join('\n') : '    - 无详细说明'}
+  • Strength Judgment: ${baziData.dayMasterStrength.strength}
+  • Strength Score: ${baziData.dayMasterStrength.score} (Positive for strong, negative for weak)
+  • Basis for Judgment:
+${baziData.dayMasterStrength.notes ? baziData.dayMasterStrength.notes.map(note => `    - ${note}`).join('\n') : '    - No detailed explanation'}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ` : ''
 
     const favorableInfo = baziData.favorableElements ? `
-【有利元素分析（补运建议）】
+【Favorable Elements Analysis (Luck Enhancement Advice)】
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  • 主要有利五行：${baziData.favorableElements.primary.map(e => {
-    const map = { 'WOOD': '木', 'FIRE': '火', 'EARTH': '土', 'METAL': '金', 'WATER': '水' };
-    return map[e as keyof typeof map] || e;
-  }).join('、')}
-  • 次要有利五行：${baziData.favorableElements.secondary?.map(e => {
-    const map = { 'WOOD': '木', 'FIRE': '火', 'EARTH': '土', 'METAL': '金', 'WATER': '水' };
-    return map[e as keyof typeof map] || e;
-  }).join('、') || '无'}
-  • 不利五行：${baziData.favorableElements.unfavorable?.map(e => {
-    const map = { 'WOOD': '木', 'FIRE': '火', 'EARTH': '土', 'METAL': '金', 'WATER': '水' };
-    return map[e as keyof typeof map] || e;
-  }).join('、') || '无'}
-  • 分析说明：
-${baziData.favorableElements.notes ? baziData.favorableElements.notes.map(note => `    - ${note}`).join('\n') : '    - 无详细说明'}
+  • Primary Favorable Elements: ${baziData.favorableElements.primary.join(', ')}
+  • Secondary Favorable Elements: ${baziData.favorableElements.secondary?.join(', ') || 'None'}
+  • Unfavorable Elements: ${baziData.favorableElements.unfavorable?.join(', ') || 'None'}
+  • Analysis Explanation:
+${baziData.favorableElements.notes ? baziData.favorableElements.notes.map(note => `    - ${note}`).join('\n') : '    - No detailed explanation'}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ` : ''
 
     const eightMansionsInfo = baziData.eightMansions ? `
-【八宅风水分析（方位建议）】
+【Eight Mansions Feng Shui Analysis (Directional Advice)】
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  • 命卦组别：${baziData.eightMansions.group === 'East' ? '东四命' : '西四命'}
-  • 吉利方位：
-    ✓ 财富方位：${baziData.eightMansions.lucky.wealth}
-    ✓ 健康方位：${baziData.eightMansions.lucky.health}
-    ✓ 感情方位：${baziData.eightMansions.lucky.romance}
-    ✓ 事业方位：${baziData.eightMansions.lucky.career}
-  • 不利方位（需避开）：
-    ✗ 五鬼方（阻碍）：${baziData.eightMansions.unlucky.obstacles}
-    ✗ 六煞方（口舌）：${baziData.eightMansions.unlucky.quarrels}
-    ✗ 祸害方（挫折）：${baziData.eightMansions.unlucky.setbacks}
-    ✗ 绝命方（大凶）：${baziData.eightMansions.unlucky.totalLoss}
+  • Life Gua Group: ${baziData.eightMansions.group} Group
+  • Auspicious Directions:
+    ✓ Wealth Direction: ${baziData.eightMansions.lucky.wealth}
+    ✓ Health Direction: ${baziData.eightMansions.lucky.health}
+    ✓ Romance Direction: ${baziData.eightMansions.lucky.romance}
+    ✓ Career Direction: ${baziData.eightMansions.lucky.career}
+  • Inauspicious Directions (to avoid):
+    ✗ Five Ghosts (Obstacles): ${baziData.eightMansions.unlucky.obstacles}
+    ✗ Six Killings (Quarrels): ${baziData.eightMansions.unlucky.quarrels}
+    ✗ Calamity (Setbacks): ${baziData.eightMansions.unlucky.setbacks}
+    ✗ Total Loss (Major Misfortune): ${baziData.eightMansions.unlucky.totalLoss}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ` : ''
 
     const basicAnalysisInfo = `
-【特殊信息分析】
+【Special Information Analysis】
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  • 生命卦数：${baziData.lifeGua || '未知'}（用于风水布局参考）
-  • 天乙贵人：${baziData.nobleman ? baziData.nobleman.join('、') : '无'}（有利地支）
-  • 文昌智慧：${baziData.intelligence || '未知'}（聪明才智方位）
-  • 天马星：${baziData.skyHorse || '无'}（变动迁移方向）
-  • 桃花位：${baziData.peachBlossom || '无'}（感情人缘方位）
+  • Life Gua Number: ${baziData.lifeGua || 'Unknown'} (For Feng Shui reference)
+  • Nobleman: ${baziData.nobleman ? baziData.nobleman.join(', ') : 'None'} (Favorable Earthly Branches)
+  • Intelligence: ${baziData.intelligence || 'Unknown'} (Direction for wisdom and talent)
+  • Sky Horse: ${baziData.skyHorse || 'None'} (Direction for movement and change)
+  • Peach Blossom: ${baziData.peachBlossom || 'None'} (Direction for romance and relationships)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 `
 
     const luckInfo = baziData.luckPillars ? `
-【大运信息】
+【Luck Pillar Information】
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-基础规则：
-  • 大运方向：${baziData.luckPillars.incrementRule === 1 ? '顺行（向前）' : '逆行（向后）'}
-  • 时间精度：${baziData.luckPillars.isTimingKnown ? '已知确切时间' : '未提供确切时间'}
-  • 大运总数：${baziData.luckPillars.pillars.length}步（每步10年）
+Basic Rules:
+  • Luck Pillar Direction: ${baziData.luckPillars.incrementRule === 1 ? 'Forward' : 'Backward'}
+  • Timing Accuracy: ${baziData.luckPillars.isTimingKnown ? 'Exact time known' : 'Exact time not provided'}
+  • Total Luck Pillars: ${baziData.luckPillars.pillars.length} pillars (10 years each)
 
 ${baziData.luckPillars.currentPillar ? `
-⭐ 当前大运（重点关注）：
-  • 大运编号：第${baziData.luckPillars.currentPillar.number}步
-  • 天干地支：${baziData.luckPillars.currentPillar.heavenlyStem}${baziData.luckPillars.currentPillar.earthlyBranch}
-  • 年份范围：${baziData.luckPillars.currentPillar.yearStart}年 - ${baziData.luckPillars.currentPillar.yearEnd}年
-  • 起运年龄：${baziData.luckPillars.currentPillar.ageStart}岁
-  • 当前年龄：${baziData.luckPillars.currentPillar.currentAge}岁
-  • 大运状态：${baziData.luckPillars.currentPillar.yearStart && new Date().getFullYear() < baziData.luckPillars.currentPillar.yearStart ? '即将进入' : baziData.luckPillars.currentPillar.yearEnd && new Date().getFullYear() > baziData.luckPillars.currentPillar.yearEnd ? '已结束' : '进行中'}
+⭐ Current Luck Pillar (Key Focus):
+  • Pillar Number: ${baziData.luckPillars.currentPillar.number}
+  • Heavenly Stem & Earthly Branch: ${baziData.luckPillars.currentPillar.heavenlyStem}${baziData.luckPillars.currentPillar.earthlyBranch}
+  • Year Range: ${baziData.luckPillars.currentPillar.yearStart} - ${baziData.luckPillars.currentPillar.yearEnd}
+  • Starting Age: ${baziData.luckPillars.currentPillar.ageStart}
+  • Current Age: ${baziData.luckPillars.currentPillar.currentAge}
+  • Pillar Status: ${baziData.luckPillars.currentPillar.yearStart && new Date().getFullYear() < baziData.luckPillars.currentPillar.yearStart ? 'Upcoming' : baziData.luckPillars.currentPillar.yearEnd && new Date().getFullYear() > baziData.luckPillars.currentPillar.yearEnd ? 'Finished' : 'In Progress'}
 
-  【分析重点】请特别关注当前大运对用户近况的影响，结合当前大运${baziData.luckPillars.currentPillar.heavenlyStem}${baziData.luckPillars.currentPillar.earthlyBranch}的特点，分析过去一年（${currentYear - 1}年${currentMonth}月-${currentYear}年${currentMonth}月）的具体事件和运势变化。
+  【Analysis Focus】Please pay special attention to the impact of the current Luck Pillar (${baziData.luckPillars.currentPillar.heavenlyStem}${baziData.luckPillars.currentPillar.earthlyBranch}) on the user's recent situation, analyzing specific events and changes over the past year (${currentYear - 1}-${currentMonth} to ${currentYear}-${currentMonth}).
 ` : ''}
 
-完整大运列表：
+Full Luck Pillar List:
 ${baziData.luckPillars.pillars.map((pillar, index) => {
-  const isCurrent = baziData.luckPillars?.currentPillar?.number === pillar.number ? ' ⭐当前' : '';
-  return `  ${index + 1}. 第${pillar.number}步大运：${pillar.heavenlyStem}${pillar.earthlyBranch}${isCurrent}
-      └─ 起运：${pillar.ageStart}岁 | 年份：${pillar.yearStart || '?'}-${pillar.yearEnd || '?'}年`;
+  const isCurrent = baziData.luckPillars?.currentPillar?.number === pillar.number ? ' ⭐Current' : '';
+  return `  ${index + 1}. Pillar ${pillar.number}: ${pillar.heavenlyStem}${pillar.earthlyBranch}${isCurrent}
+      └─ Starts at: Age ${pillar.ageStart} | Years: ${pillar.yearStart || '?'}-${pillar.yearEnd || '?'}`;
 }).join('\n')}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ` : ''
 
     const interactionsInfo = baziData.interactions ? `
-【八字相互作用分析（重要影响）】
+【Bazi Interactions Analysis (Important Influences)】
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-共发现 ${baziData.interactions.length} 个相互作用，详情如下：
+Found ${baziData.interactions.length} interactions in total:
 
 ${baziData.interactions.map((interaction, index) => {
-  const typeNames: { [key: string]: string } = {
-    'Branch6Combo': '六合',
-    'Branch3Combo': '三合',
-    'BranchClash': '六冲',
-    'BranchHarm': '六害',
-    'StemClash': '天干冲',
-    'TrinityCombo': '三会',
-    'DirectionalCombo': '三会局'
-  };
-  const typeName = typeNames[interaction.type] || interaction.type;
-  return `${index + 1}. 【${typeName}】${interaction.type}
-     • 相互作用描述：${interaction.description || '无描述'}
-     • 参与元素：${interaction.participants.map(p => `${p.pillar}(${p.elementChar}-${p.elementType})`).join('、')}
-     • 影响评估：
-       - 涉及有利元素：${interaction.involvesFavorableElement ? '✓ 是' : '✗ 否'}
-       - 涉及不利元素：${interaction.involvesUnfavorableElement ? '⚠ 是（需注意）' : '✓ 否'}`
+  return `${index + 1}. 【${interaction.type}】
+     • Description: ${interaction.description || 'No description'}
+     • Participants: ${interaction.participants.map(p => `${p.pillar}(${p.elementChar}-${p.elementType})`).join(', ')}
+     • Impact Assessment:
+       - Involves Favorable Element: ${interaction.involvesFavorableElement ? '✓ Yes' : '✗ No'}
+       - Involves Unfavorable Element: ${interaction.involvesUnfavorableElement ? '⚠ Yes (Caution needed)' : '✓ No'}`
 }).join('\n\n')}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ` : ''
 
-    const wordLimit = '10000字左右'
+    const wordLimit = 'around 10,000 words'
 
     return `═══════════════════════════════════════════════════════════
-【八字命理分析报告生成任务】
+【Bazi Astrological Analysis Report Generation Task】
 ═══════════════════════════════════════════════════════════
 
-请根据以下完整的八字信息，生成一份专业、详细、有指导价值的命理分析报告。
+Please generate a professional, detailed, and valuable astrological analysis report based on the following complete Bazi information.
 
-📋 **报告要求**：
-  • 字数控制：${wordLimit}
-  • 格式要求：使用Markdown格式，结构清晰，层次分明
-  • 语言风格：专业、温和、积极、富有同情心和启发性，旨在赋能用户，而不是评判
-  • 内容导向：以鼓励和积极引导为主，即使是挑战和困难，也要提供建设性的解决方案和视角
+📋 **Report Requirements**:
+  • Word Count: ${wordLimit}
+  • Format: Use Markdown for a clear and well-structured layout.
+  • Language Style: Professional, gentle, positive, compassionate, and insightful. Aim to empower the user, not to judge. The report must be in English.
+  • Content Orientation: Focus on encouragement and positive guidance. Even for challenges and difficulties, provide constructive solutions and perspectives.
 
-📊 **分析重点（按优先级）**：
-  1. 【近况分析】客观、直接、具体、准确，分析过去一年（${currentYear - 1}年${currentMonth}月 - ${currentYear}年${currentMonth}月）的具体事件
-  2. 【当前大运分析】结合当前大运，分析运势走向
-  3. 【性格分析】深入分析性格优势，并就如何改善劣势提供积极建议
-  4. 【事业运势】发掘职业潜能，提供积极发展方向
-  5. 【感情婚姻】分析感情模式，并提出积极的经营建议
-  6. 【健康养生】分析体质特点和潜在风险，并提供积极的养生建议
-  7. 【大运流年】具体时间节点分析
-  8. 【综合建议】具体且充满鼓励的行动建议
+📊 **Analysis Priorities (in order)**:
+  1. 【Recent Situation Analysis】Objective, direct, specific, and accurate analysis of events in the past year (${currentYear - 1}-${currentMonth} to ${currentYear}-${currentMonth}).
+  2. 【Current Luck Pillar Analysis】Analyze fortune trends in conjunction with the current Luck Pillar.
+  3. 【Personality Analysis】In-depth analysis of personality strengths with positive advice on improving weaknesses.
+  4. 【Career Path】Discover professional potential and provide positive development directions.
+  5. 【Relationship and Marriage】Analyze relationship patterns and offer positive management advice.
+  6. 【Health and Wellness】Analyze physical constitution and potential risks, providing positive health advice.
+  7. 【Luck Pillars and Annual Cycles】Analysis of specific time points.
+  8. 【Comprehensive Advice】Specific and encouraging action plans.
 
 ═══════════════════════════════════════════════════════════
-【数据部分开始】
+【Data Section Starts】
 ═══════════════════════════════════════════════════════════
 
 ${currentTimeInfo}
@@ -404,16 +386,16 @@ ${luckInfo}
 ${interactionsInfo}
 
 ═══════════════════════════════════════════════════════════
-【数据部分结束】
+【Data Section Ends】
 ═══════════════════════════════════════════════════════════
 
-⚠️  **特别注意事项**：
-  ⚡ 近况分析要客观直接：不要用"可能"、"大概"、"也许"等模糊词汇，要基于数据进行分析。
-  ⚡ 要具体到事件和时间：例如"2024年3月可能发生工作变动"→"2024年3月发生了工作调动或岗位调整"。
-  ⚡ 当前大运是关键：必须结合当前大运${baziData.luckPillars?.currentPillar ? `（${baziData.luckPillars.currentPillar.heavenlyStem}${baziData.luckPillars.currentPillar.earthlyBranch}）` : ''}来分析近况。
-  ⚡ 性格分析要以优势为主：深入挖掘用户的天赋和潜力，劣势部分要转化为成长建议。
-  ⚡ 感情分析要积极引导：聚焦于提供经营感情的正面建议和策略，避免单纯罗列问题。
-  ⚡ 整体基调要赋能：通篇采用鼓励、积极和赋能的语言，帮助用户看到未来的可能性。`
+⚠️  **Special Notes**:
+  ⚡ Recent Situation Analysis must be objective and direct: Avoid vague words like "might," "probably," or "maybe." Base your analysis on data.
+  ⚡ Be specific about events and timing: For example, instead of "a work change might happen in March 2024," say "a job transfer or positional adjustment occurred in March 2024."
+  ⚡ The Current Luck Pillar is key: The analysis of the recent situation must be based on the current Luck Pillar ${baziData.luckPillars?.currentPillar ? `(${baziData.luckPillars.currentPillar.heavenlyStem}${baziData.luckPillars.currentPillar.earthlyBranch})` : ''}.
+  ⚡ Personality analysis should focus on strengths: Delve into the user's talents and potential, framing weaknesses as opportunities for growth.
+  ⚡ Relationship analysis should be positively guided: Focus on providing constructive advice and strategies for managing relationships, rather than just listing problems.
+  ⚡ The overall tone must be empowering: Use encouraging, positive, and empowering language throughout to help the user see their future possibilities.`
   }
 
   /**
@@ -495,7 +477,7 @@ ${interactionsInfo}
         messages: [
           {
             role: 'user',
-            content: '你好，请简单介绍一下自己。'
+            content: 'Hello, please briefly introduce yourself.'
           }
         ],
         max_tokens: 100

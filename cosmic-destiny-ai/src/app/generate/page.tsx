@@ -146,10 +146,10 @@ function GenerateReportContent() {
       
       // Print Bazi calculation results for verification
       console.log('🔮 [Generate] Bazi Calculation Results:')
-      console.log('📊 [Generate] Heavenly Stems (天干):', baziData.heavenlyStems)
-      console.log('📊 [Generate] Earthly Branches (地支):', baziData.earthlyBranches)
-      console.log('👑 [Generate] Day Master (日主):', baziData.dayMaster)
-      console.log('⚖️ [Generate] Elements (五行):', baziData.elements)
+      console.log('📊 [Generate] Heavenly Stems:', baziData.heavenlyStems)
+      console.log('📊 [Generate] Earthly Branches:', baziData.earthlyBranches)
+      console.log('👑 [Generate] Day Master:', baziData.dayMaster)
+      console.log('⚖️ [Generate] Elements:', baziData.elements)
       
       // Create empty report record first
       const reportInsertData = {
@@ -206,60 +206,60 @@ function GenerateReportContent() {
   }
 
   const generatePreviewReport = (birthData: BirthData, baziData: any): string => {
-    return `# 您的命理概览
+    return `# Your Astrological Overview
 
-## 出生信息
-- 出生日期：${birthData.birthDate}
-- 出生时间：${birthData.birthTime || '未知'}
-- 性别：${birthData.gender === 'male' ? '男' : '女'}
-- 时区：${birthData.timeZone}
+## Birth Information
+- Birth Date: ${birthData.birthDate}
+- Birth Time: ${birthData.birthTime || 'Unknown'}
+- Gender: ${birthData.gender === 'male' ? 'Male' : 'Female'}
+- Time Zone: ${birthData.timeZone}
 
-## 八字信息
-- 天干：${baziData.heavenlyStems.join('、')}
-- 地支：${baziData.earthlyBranches.join('、')}
-- 日主：${baziData.dayMaster}
-- 五行分布：木${baziData.elements.wood}、火${baziData.elements.fire}、土${baziData.elements.earth}、金${baziData.elements.metal}、水${baziData.elements.water}
+## Bazi Information
+- Heavenly Stems: ${baziData.heavenlyStems.join(', ')}
+- Earthly Branches: ${baziData.earthlyBranches.join(', ')}
+- Day Master: ${baziData.dayMaster}
+- Five Elements Distribution: Wood ${baziData.elements.wood}, Fire ${baziData.elements.fire}, Earth ${baziData.elements.earth}, Metal ${baziData.elements.metal}, Water ${baziData.elements.water}
 
-## 核心性格特征
-基于您的八字分析，您的日主为${baziData.dayMaster}，这赋予了您独特的个性魅力。您是一个充满智慧和创造力的人，善于观察和思考，总能在细节中发现别人忽视的价值。您的内心深处有着对完美的追求，这使您在做事时格外认真细致。同时，您具有很强的直觉力和同理心，能够敏锐地感知他人的情绪变化。
+## Core Personality Traits
+Based on your Bazi analysis, your Day Master is ${baziData.dayMaster}, which endows you with a unique personality charm. You are a person full of wisdom and creativity, adept at observation and thinking, always able to find value in details that others overlook. Deep down, you have a pursuit of perfection, which makes you exceptionally serious and meticulous in your work. At the same time, you have strong intuition and empathy, able to keenly perceive the emotional changes of others.
 
-## 天赋潜能
-您最突出的天赋在于创新思维和沟通能力。您天生具有将复杂概念简单化的能力，善于用独特的视角解决问题。在艺术创作、策略规划或人际交往方面，您都展现出超乎常人的天赋。特别是在需要创意和灵感的领域，您总能迸发出令人惊喜的想法。
+## Talents and Potential
+Your most prominent talents lie in innovative thinking and communication skills. You are naturally gifted at simplifying complex concepts and are good at solving problems from a unique perspective. In artistic creation, strategic planning, or interpersonal communication, you show extraordinary talent. Especially in fields that require creativity and inspiration, you can always come up with surprising ideas.
 
-## 事业方向
-根据您的五行配置，最适合您的职业方向是创意产业和知识服务业。设计、媒体、教育、咨询等需要创造力和沟通能力的行业都很适合您。您也适合担任团队的智囊角色，为组织提供战略性建议。创业也是不错的选择，特别是在文化创意或科技创新领域。
+## Career Path
+According to your Five Elements configuration, the most suitable career paths for you are in the creative and knowledge service industries. Industries such as design, media, education, and consulting, which require creativity and communication skills, are very suitable for you. You are also suited to play the role of a think tank in a team, providing strategic advice to the organization. Entrepreneurship is also a good choice, especially in the fields of cultural creativity or technological innovation.
 
-## 感情运势
-在感情方面，您追求心灵层面的共鸣。您需要一个能够理解您内心世界、与您进行深度交流的伴侣。您的感情表达方式含蓄而深情，更喜欢用行动而非言语来表达爱意。建议您在选择伴侣时，重视精神契合度，寻找能够共同成长的人生伴侣。
+## Relationship Luck
+In terms of relationships, you seek spiritual resonance. You need a partner who can understand your inner world and engage in deep communication with you. Your way of expressing affection is subtle and deep, preferring to show love through actions rather than words. It is recommended that you prioritize spiritual compatibility when choosing a partner, looking for a life partner with whom you can grow together.
 
 ---
 
-**想要了解更多详细内容吗？**
+**Want to learn more?**
 
-完整报告包含：
-- 深度人格分析和成长建议
-- 详细职业规划和财富策略  
-- 全面感情分析和最佳配对
-- 人生使命和关键转折点
-- 个性化健康养生方案
-- 以及更多专属于您的命理指导...
+The full report includes:
+- In-depth personality analysis and growth advice
+- Detailed career planning and wealth strategies
+- Comprehensive relationship analysis and best matches
+- Life mission and key turning points
+- Personalized health and wellness plans
+- And much more guidance tailored to you...
 
-立即解锁完整报告，开启您的命运探索之旅！`
+Unlock the full report now to begin your journey of destiny exploration!`
   }
 
   const generateFullReport = (birthData: BirthData, baziData: any): string => {
     return generatePreviewReport(birthData, baziData) + `
 
-## 完整版内容（付费解锁）
+## Full Version Content (Unlock with Payment)
 
-### 详细职业规划
-根据您的五行配置，最适合您的职业方向是创意产业和知识服务业。设计、媒体、教育、咨询等需要创造力和沟通能力的行业都很适合您。您也适合担任团队的智囊角色，为组织提供战略性建议。创业也是不错的选择，特别是在文化创意或科技创新领域。
+### Detailed Career Planning
+According to your Five Elements configuration, the most suitable career paths for you are in the creative and knowledge service industries. Industries such as design, media, education, and consulting, which require creativity and communication skills, are very suitable for you. You are also suited to play the role of a think tank in a team, providing strategic advice to the organization. Entrepreneurship is also a good choice, especially in the fields of cultural creativity or technological innovation.
 
-### 感情运势分析
-在感情方面，您追求心灵层面的共鸣。您需要一个能够理解您内心世界、与您进行深度交流的伴侣。您的感情表达方式含蓄而深情，更喜欢用行动而非言语来表达爱意。建议您在选择伴侣时，重视精神契合度，寻找能够共同成长的人生伴侣。
+### Relationship Luck Analysis
+In terms of relationships, you seek spiritual resonance. You need a partner who can understand your inner world and engage in deep communication with you. Your way of expressing affection is subtle and deep, preferring to show love through actions rather than words. It is recommended that you prioritize spiritual compatibility when choosing a partner, looking for a life partner with whom you can grow together.
 
-### 健康养生建议
-您的体质偏向于需要平衡的调理。建议多进行户外活动，保持心情愉悦，避免过度思虑。在饮食方面，多食用新鲜蔬果，少食辛辣刺激食物。定期进行冥想或瑜伽练习，有助于平衡身心。`
+### Health and Wellness Advice
+Your constitution tends to require balanced conditioning. It is recommended to engage in more outdoor activities, maintain a cheerful mood, and avoid overthinking. In terms of diet, eat more fresh fruits and vegetables and less spicy and irritating foods. Regular meditation or yoga practice will help balance your body and mind.`
   }
 
   if (authLoading) {

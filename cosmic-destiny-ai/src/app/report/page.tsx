@@ -236,7 +236,7 @@ function ReportContent() {
               } else if (data.type === 'error') {
                 console.error('❌ [Report] Stream error:', data.error)
                 setIsStreaming(false)
-                alert('流式传输出现错误: ' + data.error)
+                alert('An error occurred during streaming: ' + data.error)
               }
             } catch (e) {
               console.error('❌ [Report] Failed to parse SSE message:', e, line)
@@ -247,7 +247,7 @@ function ReportContent() {
     } catch (error) {
       console.error('❌ [Report] Stream error:', error)
       setIsStreaming(false)
-      alert('流式传输失败: ' + (error instanceof Error ? error.message : 'Unknown error'))
+      alert('Streaming failed: ' + (error instanceof Error ? error.message : 'Unknown error'))
     }
   }, [fetchReport])
 
@@ -451,15 +451,15 @@ We are confirming your payment information. This usually takes a few seconds. Th
       // 如果是未付费用户，只显示预览版（前1800字符）
       if (!report.is_paid) {
         if (streamingContent.length <= PREVIEW_BOUNDARY) {
-          return streamingContent + (isStreaming ? '\n\n*正在生成中...*' : '')
+          return streamingContent + (isStreaming ? '\n\n*Generating...*' : '')
         } else {
           // 到达预览边界，停止显示新内容，但保持"正在生成中"提示
           const preview = streamingContent.substring(0, PREVIEW_BOUNDARY)
-          return preview + (isStreaming ? '\n\n---\n\n**想要了解更多详细内容吗？**\n\n完整报告包含：\n- 深度人格分析和成长建议\n- 详细职业规划和财富策略\n- 全面感情分析和最佳配对\n- 人生使命和关键转折点\n- 个性化健康养生方案\n- 大运流年详细分析\n- 有利不利因素深度解读\n- 以及更多专属于您的命理指导...\n\n立即解锁完整报告，开启您的命运探索之旅！\n\n*完整报告正在后台生成中...*' : '')
+          return preview + (isStreaming ? '\n\n---\n\n**Want to learn more?**\n\nThe full report includes:\n- In-depth personality analysis and growth advice\n- Detailed career planning and wealth strategies\n- Comprehensive relationship analysis and best matches\n- Life mission and key turning points\n- Personalized health and wellness plans\n- Detailed analysis of Luck Pillars and Annual Cycles\n- In-depth interpretation of favorable and unfavorable factors\n- And much more guidance tailored to you...\n\nUnlock the full report now to begin your journey of destiny exploration!\n\n*Full report is being generated in the background...*' : '')
         }
       } else {
         // 已付费用户显示完整流式内容
-        return streamingContent + (isStreaming ? '\n\n*正在生成中...*' : '')
+        return streamingContent + (isStreaming ? '\n\n*Generating...*' : '')
       }
     }
 
@@ -564,7 +564,7 @@ We are confirming your payment information. This usually takes a few seconds. Th
                   <div className="text-center text-purple-400">
                     <div className="inline-flex items-center gap-2">
                       <div className="animate-spin rounded-full h-4 w-4 border-2 border-purple-400 border-t-transparent"></div>
-                      <span>正在生成报告内容...</span>
+                      <span>Generating report content...</span>
                     </div>
                   </div>
                 )}
@@ -617,7 +617,7 @@ We are confirming your payment information. This usually takes a few seconds. Th
                   <div className="mt-4 text-center text-purple-400">
                     <div className="inline-flex items-center gap-2">
                       <div className="animate-spin rounded-full h-4 w-4 border-2 border-purple-400 border-t-transparent"></div>
-                      <span>正在生成报告内容...</span>
+                      <span>Generating report content...</span>
                     </div>
                   </div>
                 )}
