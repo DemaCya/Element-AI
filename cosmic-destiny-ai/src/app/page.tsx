@@ -7,6 +7,7 @@ import Navigation from '@/components/Navigation'
 import BirthForm from '@/components/BirthForm'
 import FAQAccordion from '@/components/FAQAccordion'
 import AuthModal from '@/components/auth/AuthModal'
+import PolicyModal from '@/components/PolicyModal'
 import { Button } from '@/components/ui/button'
 import { ChevronDown, Sparkles } from 'lucide-react'
 import { BirthData } from '@/types'
@@ -15,6 +16,8 @@ import { useUser } from '@/contexts/UserContext'
 export default function Home() {
   const [showForm, setShowForm] = useState(false)
   const [showAuthModal, setShowAuthModal] = useState(false)
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false)
+  const [showTermsModal, setShowTermsModal] = useState(false)
   const { user, profile } = useUser()
   const router = useRouter()
 
@@ -159,10 +162,27 @@ export default function Home() {
 
         {/* Footer */}
         <footer className="py-12 px-4 border-t border-purple-500/20">
-          <div className="container mx-auto max-w-4xl text-center">
-            <p className="text-gray-300">
-              © 2025 <span className="bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent font-semibold">Cosmic Destiny AI</span>. For entertainment purposes only.
-            </p>
+          <div className="container mx-auto max-w-4xl">
+            <div className="flex flex-col items-center space-y-4">
+              <p className="text-gray-300 text-center">
+                © 2025 <span className="bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent font-semibold">Cosmic Destiny AI</span>. For entertainment purposes only.
+              </p>
+              <div className="flex flex-wrap gap-4 justify-center">
+                <button
+                  onClick={() => setShowPrivacyModal(true)}
+                  className="text-sm text-gray-400 hover:text-purple-300 transition-colors duration-200 underline underline-offset-4 hover:underline-offset-2"
+                >
+                  Privacy Policy
+                </button>
+                <span className="text-gray-500">|</span>
+                <button
+                  onClick={() => setShowTermsModal(true)}
+                  className="text-sm text-gray-400 hover:text-purple-300 transition-colors duration-200 underline underline-offset-4 hover:underline-offset-2"
+                >
+                  Terms of Service
+                </button>
+              </div>
+            </div>
           </div>
         </footer>
       </div>
@@ -185,6 +205,20 @@ export default function Home() {
           }}
         />
       )}
+
+      {/* Privacy Policy Modal */}
+      <PolicyModal
+        isOpen={showPrivacyModal}
+        onClose={() => setShowPrivacyModal(false)}
+        type="privacy"
+      />
+
+      {/* Terms of Service Modal */}
+      <PolicyModal
+        isOpen={showTermsModal}
+        onClose={() => setShowTermsModal(false)}
+        type="terms"
+      />
     </div>
   )
 }
