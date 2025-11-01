@@ -154,6 +154,8 @@ export class ZhipuService {
    - Use Markdown format for a clear structure.
    - The language style should be professional, gentle, positive, and inspiring, aimed at empowering the user.
 
+6. 【Direct Start】Do not include any greetings, introductions, or conversational filler (like "Dearest Friend,"). The report must start directly with the first section: "Recent Situation Analysis".
+
 ═══════════════════════════════════════════════════════════
 【Report Structure (Must Include)】
 ═══════════════════════════════════════════════════════════
@@ -181,6 +183,7 @@ export class ZhipuService {
 - Personality analysis should focus on strengths, with weaknesses framed as constructive advice.
 - Relationship analysis should focus on positive interaction and management strategies.
 - All advice must be specific, actionable, and encouraging.
+- Start the report directly with the "Recent Situation Analysis" section. Do not add any introductory paragraphs or greetings.
 - The entire report should adopt a positive, encouraging, and empowering tone to help the user see their potential and a bright future. The final report must be in English.`
   }
 
