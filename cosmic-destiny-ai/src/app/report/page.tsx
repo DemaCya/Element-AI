@@ -42,7 +42,7 @@ function ReportContent() {
   const supabase = useSupabase()
 
   // Preview boundary (character count)
-  const PREVIEW_BOUNDARY = 1800
+  const PREVIEW_BOUNDARY = 3500
 
   
 

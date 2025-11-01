@@ -95,7 +95,7 @@ export class ZhipuService {
           type: 'disabled'
         },
         temperature: 0.8,
-        max_tokens: 12000,
+        max_tokens: 15000,
         stream: false
       } as any)
 
@@ -153,9 +153,11 @@ export class ZhipuService {
    - Help users see future possibilities, not fatalism.
 
 5. 【Format and Style Requirements】
-   - The word count should be around 10,000 characters.
+   - The word count should be around 12,500 characters.
    - Use Markdown format for a clear structure.
    - The language style should be professional, gentle, positive, and inspiring, aiming to empower the user.
+
+6. 【Analysis Depth and Substance】Due to the nature of the English language, prioritize depth and detailed insights over simple word count. Ensure the analysis is as profound, comprehensive, and insightful as a report originally written in a more information-dense language like Chinese. Avoid filler text and focus on providing substantial, meaningful content in every section.
 
 ═══════════════════════════════════════════════════════════
 【Report Structure (Must Include)】
@@ -435,7 +437,7 @@ ${interactionsInfo}
           type: 'disabled'
         },
         temperature: 0.8,
-        max_tokens: 12000,
+        max_tokens: 15000,
         stream: true
       } as any) as any // 类型断言，因为流式响应的类型定义可能不完整
 
