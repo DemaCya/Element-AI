@@ -49,7 +49,7 @@ export async function GET() {
     SUPABASE_SERVICE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY ? 'SET ✅' : '❌ NOT SET',
   }
 
-  // 测试 Creem API 连接
+  // 测试 Creem API 连接 
   if (CREEM_API_KEY && CREEM_PRODUCT_ID) {
     try {
       console.log('[Test] Testing Creem API connection...')
