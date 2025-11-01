@@ -18,18 +18,29 @@ export async function GET() {
       checks: {}
     }
 
-  // 检查环境变量
-  const CREEM_API_KEY = process.env.CREEM_API_KEY || process.env.CREEM_API_KEY_TEST
-  const CREEM_PRODUCT_ID = process.env.CREEM_PRODUCT_ID
+  // 根据模式选择配置（与 paymentService.ts 保持一致）
+  const IS_TEST_MODE = process.env.CREEM_MODE === 'test'
+  const CREEM_API_BASE_PROD = 'https://api.creem.io/v1'
+  const CREEM_API_BASE_TEST = 'https://test-api.creem.io/v1'
+  const CREEM_API_BASE = IS_TEST_MODE ? CREEM_API_BASE_TEST : CREEM_API_BASE_PROD
+  
+  const CREEM_API_KEY = IS_TEST_MODE 
+    ? process.env.CREEM_API_KEY_TEST || '' 
+    : process.env.CREEM_API_KEY || ''
+  const CREEM_PRODUCT_ID = IS_TEST_MODE 
+    ? process.env.CREEM_PRODUCT_ID_TEST || '' 
+    : process.env.CREEM_PRODUCT_ID || ''
   const APP_URL = process.env.NEXT_PUBLIC_APP_URL
 
   results.checks.env_vars = {
+    CREEM_MODE: IS_TEST_MODE ? 'test' : 'live',
     CREEM_API_KEY: CREEM_API_KEY ? `${CREEM_API_KEY.substring(0, 15)}...` : '❌ NOT SET',
     CREEM_API_KEY_EXISTS: !!CREEM_API_KEY,
     CREEM_API_KEY_FORMAT: CREEM_API_KEY ? 
       (CREEM_API_KEY.startsWith('creem_test_') ? 'TEST' : 
        CREEM_API_KEY.startsWith('creem_live_') ? 'LIVE' : 'INVALID') : 
       'NOT SET',
+    CREEM_API_BASE: CREEM_API_BASE,
     CREEM_PRODUCT_ID: CREEM_PRODUCT_ID || '❌ NOT SET',
     CREEM_PRODUCT_ID_FORMAT: CREEM_PRODUCT_ID?.startsWith('prod_') ? 'VALID' : 'INVALID',
     APP_URL: APP_URL || '❌ NOT SET',
@@ -42,8 +53,10 @@ export async function GET() {
   if (CREEM_API_KEY && CREEM_PRODUCT_ID) {
     try {
       console.log('[Test] Testing Creem API connection...')
+      console.log('[Test] Using API base:', CREEM_API_BASE)
+      console.log('[Test] Mode:', IS_TEST_MODE ? 'TEST' : 'LIVE')
       
-      const response = await fetch('https://api.creem.io/v1/checkouts', {
+      const response = await fetch(`${CREEM_API_BASE}/checkouts`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
