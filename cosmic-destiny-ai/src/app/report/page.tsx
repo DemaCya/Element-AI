@@ -6,7 +6,7 @@ import { useUser } from '@/contexts/UserContext'
 import { useSupabase } from '@/contexts/SupabaseContext'
 import { Button } from '@/components/ui/button'
 
-// 强制动态渲染
+// Force dynamic rendering
 export const dynamic = 'force-dynamic'
 import {
   ArrowLeft,
@@ -25,23 +25,23 @@ import { PostgrestError } from '@supabase/supabase-js'
 
 type CosmicReport = Database['public']['Tables']['user_reports']['Row']
 
-// 使用useSearchParams的组件
+// Component using useSearchParams
 function ReportContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { user, loading: authLoading } = useUser()
   const [report, setReport] = useState<CosmicReport | null>(null)
   const [loading, setLoading] = useState(true)
-  const [isVerifying, setIsVerifying] = useState(false) // 新增状态，用于验证支付
-  const [pageLoadId] = useState(() => `page-load-${Date.now()}`) // 用于追踪日志
-  const [streamingContent, setStreamingContent] = useState<string>('') // 流式传输的内容
-  const [isStreaming, setIsStreaming] = useState(false) // 是否正在流式传输
-  const [isStreamComplete, setIsStreamComplete] = useState(false) // 流式传输是否完成
-  const [autoScroll, setAutoScroll] = useState(false) // 是否自动滚动（关闭自动滚动）
-  const contentContainerRef = React.useRef<HTMLDivElement>(null) // 内容容器引用
+  const [isVerifying, setIsVerifying] = useState(false) // New state for payment verification
+  const [pageLoadId] = useState(() => `page-load-${Date.now()}`) // For tracking logs
+  const [streamingContent, setStreamingContent] = useState<string>('') // Streaming content
+  const [isStreaming, setIsStreaming] = useState(false) // Is streaming
+  const [isStreamComplete, setIsStreamComplete] = useState(false) // Is stream complete
+  const [autoScroll, setAutoScroll] = useState(false) // Auto scroll (disabled)
+  const contentContainerRef = React.useRef<HTMLDivElement>(null) // Content container reference
   const supabase = useSupabase()
 
-  // 预览边界（字符数）
+  // Preview boundary (character count)
   const PREVIEW_BOUNDARY = 1800
 
   
@@ -54,14 +54,14 @@ function ReportContent() {
     }
   }, [pageLoadId])
 
-  // 自动滚动已关闭：保留占位逻辑但不执行滚动
+  // Auto-scroll disabled: placeholder logic retained but scrolling not executed
   useEffect(() => {
     // no-op when autoScroll is disabled
   }, [streamingContent, autoScroll, isStreaming])
 
-  // 检测用户手动滚动
+  // Detect manual user scroll
   const handleScroll = () => {
-    // 用户手动控制滚动时，保持关闭自动滚动
+    // When user scrolls manually, keep auto-scroll disabled
     if (autoScroll) setAutoScroll(false)
   }
 
@@ -69,7 +69,7 @@ function ReportContent() {
     const reportId = searchParams.get('id')
     const logPrefix = `[${pageLoadId}]`
     
-    // 只有在第一次加载时才记录日志
+    // Log only on first load
     if (!isRetry) {
       console.log(`${logPrefix} 📄 Report: fetchReport called with:`, { reportId, userId: user?.id })
     }
@@ -78,17 +78,17 @@ function ReportContent() {
       console.log(`${logPrefix} ❌ Report: No report ID, redirecting to dashboard`)
       setLoading(false)
       router.push('/dashboard')
-      return null // 返回 null 表示失败
+      return null // return null indicates failure
     }
     
     if (!user) {
-      // 只有在第一次加载时才记录日志
+      // Log only on first load
       if (!isRetry) console.log(`${logPrefix} ⏳ Report: No user yet, waiting...`)
-      return null // 返回 null 表示失败
+      return null // return null indicates failure
     }
 
     try {
-      // 第一次加载时显示全屏加载动画
+      // Show full screen loading animation on first load
       if (!isRetry) {
         console.log(`${logPrefix} 🔍 Report: Starting to fetch report with ID:`, reportId, 'for user:', user.id)
         setLoading(true)
@@ -117,7 +117,7 @@ function ReportContent() {
           alert('Could not load report, returning to dashboard. Error: ' + error.message)
           router.push('/dashboard')
         }
-        return null // 在重试时返回 null 表示失败
+        return null // Return null on retry indicates failure
       }
 
       if (!data) {
@@ -126,16 +126,16 @@ function ReportContent() {
           alert('Report not found or you do not have permission to view it')
           router.push('/dashboard')
         }
-        return null // 在重试时返回 null
+        return null // Return null on retry
       }
 
-      // 只有在第一次加载时才记录成功日志
+      // Log success only on first load
       if (!isRetry) {
         console.log(`${logPrefix} ✅ Report: Report fetched successfully`, data)
       }
       
       setReport(data)
-      return data // 返回获取到的报告数据
+      return data // Return fetched report data
 
     } catch (error) {
       if (!isRetry) {
@@ -144,21 +144,21 @@ function ReportContent() {
         alert('Error loading report, returning to dashboard. Error: ' + (error instanceof Error ? error.message : String(error)))
         router.push('/dashboard')
       }
-      return null // 在重试时返回 null
+      return null // Return null on retry
     } finally {
-      // 确保只有在非重试的主流程中才停止全屏加载
+      // Ensure full screen loading is stopped only in the main non-retry flow
       if (!isRetry) {
         setLoading(false)
       }
     }
   }, [searchParams, user?.id, supabase, router, pageLoadId])
 
-  // 启动流式传输（依赖 fetchReport，放在其后定义）
+  // Start streaming (depends on fetchReport, defined after it)
   const startStreaming = useCallback(async (reportId: string) => {
     try {
       setIsStreaming(true)
       
-      // 从sessionStorage获取birthData
+      // Get birthData from sessionStorage
       const birthDataStr = sessionStorage.getItem(`birthData_${reportId}`)
       if (!birthDataStr) {
         console.error('❌ [Report] No birthData found in sessionStorage')
@@ -167,7 +167,7 @@ function ReportContent() {
       
       const birthData = JSON.parse(birthDataStr)
       
-      // 发起流式请求
+      // Initiate streaming request
       const response = await fetch('/api/reports/generate-stream', {
         method: 'POST',
         headers: {
@@ -199,18 +199,18 @@ function ReportContent() {
           console.log('✅ [Report] Stream complete')
           setIsStreaming(false)
           setIsStreamComplete(true)
-          // 清理sessionStorage
+          // Clean up sessionStorage
           sessionStorage.removeItem(`birthData_${reportId}`)
-          // 重新获取报告数据
+          // Re-fetch report data
           await fetchReport(true)
           break
         }
 
         buffer += decoder.decode(value, { stream: true })
         
-        // 处理SSE消息
+        // Process SSE messages
         const lines = buffer.split('\n')
-        buffer = lines.pop() || '' // 保留最后一个不完整的行
+        buffer = lines.pop() || '' // Keep the last incomplete line
 
         for (const line of lines) {
           if (line.startsWith('data: ')) {
@@ -223,7 +223,7 @@ function ReportContent() {
                   return newContent
                 })
                 
-                // 定期刷新报告数据（从数据库获取最新内容）
+                // Periodically refresh report data (get latest content from database)
                 if (data.totalLength % 5000 === 0) {
                   fetchReport(true)
                 }
@@ -236,7 +236,7 @@ function ReportContent() {
               } else if (data.type === 'error') {
                 console.error('❌ [Report] Stream error:', data.error)
                 setIsStreaming(false)
-                alert('An error occurred during streaming: ' + data.error)
+                alert('Streaming error: ' + data.error)
               }
             } catch (e) {
               console.error('❌ [Report] Failed to parse SSE message:', e, line)
@@ -266,7 +266,7 @@ function ReportContent() {
       fetchReport().then(fetchedReport => {
         if (!fetchedReport) return
         
-        // 检查是否需要启动流式传输
+        // Check if streaming needs to be started
         const shouldStream = searchParams.get('stream') === 'true'
         const reportId = searchParams.get('id')
         
@@ -277,7 +277,7 @@ function ReportContent() {
           })
         }
         
-        // 检查是否从支付成功页面跳转过来（通过URL参数判断）
+        // Check if redirected from successful payment page (via URL parameter)
         const fromPayment = searchParams.get('from') === 'payment'
         
         console.log(`${logPrefix} Initial fetch completed.`, {
@@ -285,21 +285,21 @@ function ReportContent() {
             fromPayment: fromPayment
         });
         
-        // 只有在从支付页面跳转过来且报告未支付时，才进行支付验证轮询
+        // Start payment verification polling only when redirected from payment page and report is unpaid
         if (fetchedReport && !fetchedReport.is_paid && fromPayment) {
           console.log(`${logPrefix} ✅ Report: Conditions met. Starting payment verification polling...`)
           setIsVerifying(true)
           
           let attempts = 0
-          const maxAttempts = 15 // 增加到15次 (45秒)
-          const initialDelay = 1000 // 第一次检查延迟1秒
-          const intervalTime = 3000 // 后续每3秒检查一次
+          const maxAttempts = 15 // Increased to 15 times (45 seconds)
+          const initialDelay = 1000 // First check delayed by 1 second
+          const intervalTime = 3000 // Subsequent checks every 3 seconds
 
           const pollingLogic = async () => {
             attempts++
             console.log(`${logPrefix} 🔄 Report: Polling attempt #${attempts}`)
             
-            const updatedReport = await fetchReport(true) // true表示是重试
+            const updatedReport = await fetchReport(true) // true indicates retry
             
             if (updatedReport?.is_paid) {
                 clearInterval(interval)
@@ -314,10 +314,10 @@ function ReportContent() {
           };
 
           let interval: NodeJS.Timeout;
-          // 第一次快速检查
+          // First quick check
           setTimeout(() => {
             pollingLogic();
-            // 然后设置定期检查
+            // Then set up periodic checks
             interval = setInterval(pollingLogic, intervalTime);
           }, initialDelay);
         } else {
@@ -331,7 +331,7 @@ function ReportContent() {
     }
   }, [user?.id, authLoading, fetchReport, router, searchParams, pageLoadId, startStreaming])
 
-  // （已前置定义）
+  // (Defined above)
 
   const handleUpgrade = async () => {
     if (!report?.id) {
@@ -393,52 +393,52 @@ function ReportContent() {
     return null // Will redirect
   }
 
-  // 解析报告内容，将Markdown格式转换为可显示的内容
+  // Parse report content, convert Markdown to displayable content
   const parseReportContent = (content: string) => {
     if (!content) return ''
     
     return content
-      // 标题处理
+      // Handle titles
       .replace(/^# (.*$)/gim, '<h1 class="text-3xl font-bold text-white mb-6 border-b border-purple-500/30 pb-2">$1</h1>')
       .replace(/^## (.*$)/gim, '<h2 class="text-2xl font-bold text-purple-300 mb-4 mt-8">$1</h2>')
       .replace(/^### (.*$)/gim, '<h3 class="text-xl font-semibold text-purple-200 mb-3 mt-6">$1</h3>')
       .replace(/^#### (.*$)/gim, '<h4 class="text-lg font-semibold text-purple-100 mb-2 mt-4">$1</h4>')
       
-      // 列表处理
+      // Handle lists
       .replace(/^\- (.*$)/gim, '<li class="flex items-start gap-2 text-gray-300 mb-2"><div class="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div><span>$1</span></li>')
       .replace(/^\* (.*$)/gim, '<li class="flex items-start gap-2 text-gray-300 mb-2"><div class="w-2 h-2 bg-purple-400 rounded-full mt-2 flex-shrink-0"></div><span>$1</span></li>')
       .replace(/^\d+\. (.*$)/gim, '<li class="flex items-start gap-2 text-gray-300 mb-2"><span class="text-purple-400 font-semibold mr-2">$1</span></li>')
       
-      // 文本格式处理
+      // Handle text formatting
       .replace(/\*\*(.*?)\*\*/g, '<strong class="text-purple-200 font-semibold">$1</strong>')
       .replace(/\*(.*?)\*/g, '<em class="text-purple-100 italic">$1</em>')
       .replace(/`(.*?)`/g, '<code class="bg-purple-900/50 text-purple-200 px-2 py-1 rounded text-sm font-mono">$1</code>')
       
-      // 链接处理
+      // Handle links
       .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-purple-300 hover:text-purple-200 underline" target="_blank" rel="noopener noreferrer">$1</a>')
       
-      // 分割线处理
+      // Handle horizontal rules
       .replace(/^---$/gim, '<hr class="border-purple-500/30 my-6">')
       .replace(/^___$/gim, '<hr class="border-purple-500/30 my-6">')
       
-      // 引用处理
+      // Handle blockquotes
       .replace(/^> (.*$)/gim, '<blockquote class="border-l-4 border-purple-500/50 pl-4 py-2 bg-purple-900/20 text-gray-300 italic">$1</blockquote>')
       
-      // 段落处理
+      // Handle paragraphs
       .replace(/\n\n/g, '</p><p class="text-gray-200 leading-relaxed mb-4">')
       .replace(/^(?!<[h|l|b|c|a|q])/gm, '<p class="text-gray-200 leading-relaxed mb-4">')
       .replace(/<p class="text-gray-200 leading-relaxed mb-4"><\/p>/g, '')
       
-      // 清理多余的空段落
+      // Clean up extra empty paragraphs
       .replace(/<p class="text-gray-200 leading-relaxed mb-4"><\/p>/g, '')
       .replace(/<p class="text-gray-200 leading-relaxed mb-4">\s*<\/p>/g, '')
   }
 
-  // 获取报告内容
+  // Get report content
   const getReportContent = () => {
     if (!report) return ''
     
-    // 如果正在验证支付，插入一个提示
+    // If verifying payment, insert a notice
     if (isVerifying) {
       return `# Verifying Payment Status...
       
@@ -446,35 +446,35 @@ function ReportContent() {
 We are confirming your payment information. This usually takes a few seconds. The page will refresh automatically.`
     }
 
-    // 如果有流式内容，优先使用流式内容
+    // If there is streaming content, use it first
     if (streamingContent) {
-      // 如果是未付费用户，只显示预览版（前1800字符）
+      // If user has not paid, only show preview (first 1800 characters)
       if (!report.is_paid) {
         if (streamingContent.length <= PREVIEW_BOUNDARY) {
           return streamingContent + (isStreaming ? '\n\n*Generating...*' : '')
         } else {
-          // 到达预览边界，停止显示新内容，但保持"正在生成中"提示
+          // Reached preview boundary, stop showing new content, but keep "Generating..." message
           const preview = streamingContent.substring(0, PREVIEW_BOUNDARY)
-          return preview + (isStreaming ? '\n\n---\n\n**Want to learn more?**\n\nThe full report includes:\n- In-depth personality analysis and growth advice\n- Detailed career planning and wealth strategies\n- Comprehensive relationship analysis and best matches\n- Life mission and key turning points\n- Personalized health and wellness plans\n- Detailed analysis of Luck Pillars and Annual Cycles\n- In-depth interpretation of favorable and unfavorable factors\n- And much more guidance tailored to you...\n\nUnlock the full report now to begin your journey of destiny exploration!\n\n*Full report is being generated in the background...*' : '')
+          return preview + (isStreaming ? '\n\n---\n\n**Want to learn more?**\n\nThe full report includes:\n- In-depth personality analysis and growth suggestions\n- Detailed career planning and wealth strategies\n- Comprehensive relationship analysis and best matches\n- Life mission and key turning points\n- Personalized health and wellness plan\n- Detailed analysis of luck pillars and annual cycles\n- In-depth interpretation of favorable and unfavorable factors\n- And more exclusive numerology guidance for you...\n\nUnlock the full report now and start your journey of destiny exploration!\n\n*Full report is being generated in the background...*' : '')
         }
       } else {
-        // 已付费用户显示完整流式内容
+        // Paid users see full streaming content
         return streamingContent + (isStreaming ? '\n\n*Generating...*' : '')
       }
     }
 
-    // 如果没有流式内容，使用数据库中的内容
-    // 如果有预览报告且未付费，显示预览
+    // If no streaming content, use content from database
+    // If there is a preview report and not paid, show preview
     if (!report.is_paid && report.preview_report) {
       return report.preview_report
     }
     
-    // 如果有完整报告，显示完整报告
+    // If there is a full report, show full report
     if (report.full_report) {
       return report.full_report
     }
     
-    // 如果没有报告内容，显示精简占位语
+    // If no report content, show a concise placeholder
     return `# Your astrological report is on its way...`
   }
 
@@ -537,7 +537,7 @@ We are confirming your payment information. This usually takes a few seconds. Th
           {/* Report Content */}
           <div className="space-y-8">
             {!report.is_paid ? (
-              // 未付费：显示预览内容和升级提示
+              // Unpaid: show preview content and upgrade prompt
               <>
                 <div 
                   ref={contentContainerRef}
@@ -593,7 +593,7 @@ We are confirming your payment information. This usually takes a few seconds. Th
                 </div>
               </>
             ) : (
-              // 已付费：显示完整的报告内容
+              // Paid: show full report content
               <div 
                 ref={contentContainerRef}
                 onScroll={handleScroll}
@@ -637,7 +637,7 @@ We are confirming your payment information. This usually takes a few seconds. Th
   )
 }
 
-// 主页面组件，用Suspense包装
+// Main page component, wrapped with Suspense
 export default function ReportPage() {
   return (
     <Suspense fallback={

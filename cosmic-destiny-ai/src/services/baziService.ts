@@ -68,7 +68,7 @@ export class BaziService {
   static async calculateBazi(birthData: BirthData): Promise<BaziData> {
     try {
       // 🌍 Log server timezone information before Bazi calculation
-      console.log('🌍 [BaziService] ===== Bazi Calculation Start =====');
+      console.log('🌍 [BaziService] ===== Starting Bazi Calculation =====');
       console.log(`🌍 [BaziService] Current server timezone: ${Intl.DateTimeFormat().resolvedOptions().timeZone}`);
       console.log(`🌍 [BaziService] Current environment TZ: ${process.env.TZ || 'Not set'}`);
       console.log(`🌍 [BaziService] Current system time: ${new Date().toString()}`);
@@ -88,14 +88,14 @@ export class BaziService {
 
       let birthDateTimeString;
       if(birthData.isTimeKnownInput){
-        // When user provides a specific time, use user input
+        // When the user provides a specific time, use the user's input time
         birthDateTimeString = `${birthData.birthDate}T${birthData.birthTime}:00`
       }else{
-        // When user does not provide a time, use default time 12:00:00
+        // When the user does not provide a time, use the default time 12:00:00
         birthDateTimeString = `${birthData.birthDate}T12:00:00`
       }
 
-      console.log('🔮 [BaziService] Birth date-time string:', birthDateTimeString)
+      console.log('🔮 [BaziService] Birth date and time string:', birthDateTimeString)
       console.log('🔮 [BaziService] Is birth time known:', birthData.isTimeKnownInput)
       console.log('🔮 [BaziService] User input birth time:', birthData.birthTime)
       console.log('🔮 [BaziService] Time zone:', birthData.timeZone)
@@ -119,7 +119,7 @@ export class BaziService {
       // Print complete Bazi analysis details
       console.log('🔮 [BaziService] ===== Complete Bazi Analysis Details =====');
       
-      // Print four pillars information
+      // 打印四柱信息
       if (analysis?.mainPillars) {
         console.log('🔮 [BaziService] mainPillars:');
         console.log('  - year:', analysis.mainPillars.year);
@@ -128,7 +128,7 @@ export class BaziService {
         console.log('  - time:', analysis.mainPillars.time);
       }
       
-      // Print detailed pillars information
+      // 打印详细柱信息
       if (analysis?.detailedPillars) {
         console.log('🔮 [BaziService] detailedPillars:');
         console.log('  - year:', analysis.detailedPillars.year);
@@ -137,7 +137,7 @@ export class BaziService {
         console.log('  - hour:', analysis.detailedPillars.hour);
       }
       
-      // Print basic analysis
+      // 打印基础分析
       if (analysis?.basicAnalysis) {
         console.log('🔮 [BaziService] basicAnalysis:');
         console.log('  - dayMaster:', analysis.basicAnalysis.dayMaster);
@@ -152,9 +152,9 @@ export class BaziService {
         console.log('  - peachBlossom:', analysis.basicAnalysis.peachBlossom);
       }
       
-      console.log('🔮 [BaziService] ===== Bazi Analysis Details End =====');
+      console.log('🔮 [BaziService] ===== End of Bazi Analysis Details =====');
       
-      // Print 8 characters of Heavenly Stems and Earthly Branches
+      // 打印天干地支8个字
       if (analysis?.mainPillars) {
         const yearPillar = analysis.mainPillars.year;
         const monthPillar = analysis.mainPillars.month;
@@ -175,11 +175,11 @@ export class BaziService {
           hourPillar?.chinese
         ].filter(Boolean).join('');
         
-        console.log(`🔮 [BaziService] Bazi 8 Characters: ${eightCharacters}`);
+        console.log(`🔮 [BaziService] Bazi 8 characters: ${eightCharacters}`);
         
         // If individual stem and branch characters are needed, they can be obtained from detailedPillars
         if (analysis.detailedPillars) {
-          console.log("🔮 [BaziService] Detailed Heavenly Stem and Earthly Branch Information:");
+          console.log("🔮 [BaziService] Detailed Heavenly Stems and Earthly Branches Information:");
           console.log(`Year Stem: ${analysis.detailedPillars.year?.heavenlyStem?.character || ''}`);
           console.log(`Year Branch: ${analysis.detailedPillars.year?.earthlyBranch?.character || ''}`);
           console.log(`Month Stem: ${analysis.detailedPillars.month?.heavenlyStem?.character || ''}`);
@@ -193,7 +193,7 @@ export class BaziService {
       const luckPillars = calculator.calculateLuckPillars();
       const interactions = calculator.calculateInteractions();
       
-      // 使用库的方法获取当前大运（更准确）
+      // Use the library's method to get the current luck pillar (more accurate)
       let currentPillar = null;
       try {
         const currentDate = new Date();
@@ -213,7 +213,7 @@ export class BaziService {
             age--;
           }
           
-          // Convert data returned from the library to our format
+          // Convert the data returned by the library to our format
           currentPillar = {
             number: currentPillarFromLib.number,
             heavenlyStem: currentPillarFromLib.heavenlyStem.character,
@@ -224,7 +224,7 @@ export class BaziService {
             currentAge: age
           };
           
-          console.log('✅ [BaziService] Successfully obtained current luck pillar using library method:', currentPillarFromLib.number);
+          console.log('✅ [BaziService] Successfully retrieved current luck pillar using library method:', currentPillarFromLib.number);
         } else {
           console.warn('⚠️ [BaziService] Library method returned null, will use fallback method for calculation');
         }
@@ -232,7 +232,7 @@ export class BaziService {
         console.warn('⚠️ [BaziService] Failed to get current luck pillar using library method:', error);
       }
       
-      // Fallback method: if library method fails, use our own calculation
+      // Fallback method: if the library method fails, use our own calculation method
       if (!currentPillar && luckPillars && luckPillars.pillars.length > 0) {
         const currentYear = new Date().getFullYear();
         const currentDate = new Date();
@@ -267,13 +267,13 @@ export class BaziService {
           }
         }
         
-        // If current luck pillar is not found, check if it's before or after the luck periods
+        // If the current luck pillar is not found, check if it's before the start or after the end
         if (!currentPillar && luckPillars.pillars.length > 0) {
           const firstPillar = luckPillars.pillars[0];
           const lastPillar = luckPillars.pillars[luckPillars.pillars.length - 1];
           
           if (firstPillar.yearStart !== null && currentYear < firstPillar.yearStart) {
-            // Not yet in a luck period, return the first luck pillar (upcoming)
+            // Not yet started, return the first luck pillar (upcoming)
             currentPillar = {
               number: firstPillar.number,
               heavenlyStem: firstPillar.heavenlyStem.character,
@@ -284,7 +284,7 @@ export class BaziService {
               currentAge: age
             };
           } else if (lastPillar.yearEnd !== null && currentYear > lastPillar.yearEnd) {
-            // Past the last luck period, return the last luck pillar
+            // Has exceeded the last luck pillar, return the last one
             currentPillar = {
               number: lastPillar.number,
               heavenlyStem: lastPillar.heavenlyStem.character,
@@ -315,11 +315,11 @@ export class BaziService {
           const isAfterEnd = currentPillar.yearEnd !== null && year > currentPillar.yearEnd;
           let status = '';
           if (isBeforeStart) {
-            status = '(Upcoming)';
+            status = ' (Upcoming)';
           } else if (isAfterEnd) {
-            status = '(Finished)';
+            status = ' (Ended)';
           } else {
-            status = '(In Progress)';
+            status = ' (Ongoing)';
           }
           
           console.log('  - Current Luck Pillar:');
@@ -335,15 +335,15 @@ export class BaziService {
         console.log('  - All Luck Pillars:');
         luckPillars.pillars.forEach((pillar, index) => {
           const isCurrent = currentPillar && pillar.number === currentPillar.number;
-          const marker = isCurrent ? ' ⭐Current' : '';
+          const marker = isCurrent ? ' ⭐ Current' : '';
           console.log(`  ${index + 1}. Luck Pillar ${pillar.number}${marker}:`);
           console.log(`    Heavenly Stem: ${pillar.heavenlyStem.character}`);
           console.log(`    Earthly Branch: ${pillar.earthlyBranch.character}`);
-          console.log(`    Years: ${pillar.yearStart}-${pillar.yearEnd}`);
-          console.log(`    Start Age: ${pillar.ageStart}`);
+          console.log(`    Year: ${pillar.yearStart}-${pillar.yearEnd}`);
+          console.log(`    Starting Age: ${pillar.ageStart}`);
         });
       }
-      console.log('🔮 [BaziService] ===== Luck Pillar Information Details End =====');
+      console.log('🔮 [BaziService] ===== End of Luck Pillar Information Details =====');
       
       if (!analysis) {
         throw new Error('Failed to calculate Bazi analysis')

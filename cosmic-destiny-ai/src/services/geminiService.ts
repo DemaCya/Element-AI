@@ -19,194 +19,194 @@ export class GeminiService {
 
   // 生成预览报告（免费版本，500-800字）
   static async generatePreviewReport(birthData: BirthData, baziData: BaziData): Promise<string> {
-    const prompt = `As a senior Chinese astrologer, please generate a brief astrological preview report (500-800 words) based on the following information, in English:
+    const prompt = `作为一位资深的中国命理学家，请基于以下信息生成一份简短的命理预览报告（500-800字）：
 
-## Birth Information
-- Birth Date: ${birthData.birthDate}
-- Birth Time: ${birthData.birthTime || 'Not provided'}${birthData.isTimeKnownInput ? ' (User provided)' : ' (System default 12:00)'}
-- Gender: ${birthData.gender}
-- Time Zone: ${birthData.timeZone}
+## 出生信息
+- 出生日期：${birthData.birthDate}
+- 出生时间：${birthData.birthTime || '未提供'}${birthData.isTimeKnownInput ? ' (用户提供)' : ' (系统默认12:00)'}
+- 性别：${birthData.gender}
+- 时区：${birthData.timeZone}
 
-## Bazi Information
-- Heavenly Stems: ${baziData.heavenlyStems.join(', ')}
-- Earthly Branches: ${baziData.earthlyBranches.join(', ')}
-- Day Master: ${baziData.dayMaster}
-- Five Elements Distribution: Wood ${baziData.elements.wood}, Fire ${baziData.elements.fire}, Earth ${baziData.elements.earth}, Metal ${baziData.elements.metal}, Water ${baziData.elements.water}
+## 八字信息
+- 天干：${baziData.heavenlyStems.join('、')}
+- 地支：${baziData.earthlyBranches.join('、')}
+- 日主：${baziData.dayMaster}
+- 五行分布：木${baziData.elements.wood}、火${baziData.elements.fire}、土${baziData.elements.earth}、金${baziData.elements.metal}、水${baziData.elements.water}
 
-Please generate a preview report that includes:
+请生成一份预览报告，包含：
 
-# Your Astrological Overview
+# 您的命理概览
 
-## Core Personality Traits
-Briefly describe their 2-3 most prominent personality traits (around 150 words).
+## 核心性格特征
+简要描述其最突出的2-3个性格特点（150字左右）
 
-## Talents and Potential
-Point out their main talents and strengths (around 150 words).
+## 天赋潜能
+指出其最主要的天赋和优势（150字左右）
 
-## Career Path
-Briefly describe 1-2 most suitable career directions (around 150 words).
+## 事业方向
+简述最适合的1-2个职业方向（150字左右）
 
-## Relationship Luck
-Briefly analyze their relationship characteristics and provide suggestions (around 150 words).
+## 感情运势
+简要分析其感情特点和建议（150字左右）
 
 ---
 
-**Want to learn more?**
-The full report includes:
-- In-depth personality analysis and growth advice
-- Detailed career planning and wealth strategies
-- Comprehensive relationship analysis and best matches
-- Life mission and key turning points
-- Personalized health and wellness plans
-- And much more guidance tailored to you...
+**想要了解更多详细内容吗？**
+完整报告包含：
+- 深度人格分析和成长建议
+- 详细职业规划和财富策略
+- 全面感情分析和最佳配对
+- 人生使命和关键转折点
+- 个性化健康养生方案
+- 以及更多专属于您的命理指导...
 
-Unlock the full report now to begin your journey of destiny exploration!
+立即解锁完整报告，开启您的命运探索之旅！
 
-Please write in a warm, engaging tone to make readers feel the charm of astrology and spark their interest in learning more. The report must be in English.`
+请用温暖、吸引人的语言撰写，让读者感受到命理的魅力，并产生了解更多的兴趣。`
 
     return await this.generateContent(prompt)
   }
   static async analyzePersonality(birthData: BirthData, baziData: BaziData): Promise<string> {
-    const prompt = `As a professional Chinese astrologer and psychologist, please conduct an in-depth personality analysis based on the following information, in English:
+    const prompt = `作为一位专业的中国命理学家和心理学家，请基于以下信息进行深度的人格分析：
 
-Birth Information:
-- Birth Date: ${birthData.birthDate}
-- Gender: ${birthData.gender}
-- Time Zone: ${birthData.timeZone}
+出生信息：
+- 出生日期：${birthData.birthDate}
+- 性别：${birthData.gender}
+- 时区：${birthData.timeZone}
 
-Bazi Information:
-- Heavenly Stems: ${baziData.heavenlyStems.join(', ')}
-- Earthly Branches: ${baziData.earthlyBranches.join(', ')}
-- Day Master: ${baziData.dayMaster}
-- Five Elements Distribution: Wood ${baziData.elements.wood}, Fire ${baziData.elements.fire}, Earth ${baziData.elements.earth}, Metal ${baziData.elements.metal}, Water ${baziData.elements.water}
+八字信息：
+- 天干：${baziData.heavenlyStems.join('、')}
+- 地支：${baziData.earthlyBranches.join('、')}
+- 日主：${baziData.dayMaster}
+- 五行分布：木${baziData.elements.wood}、火${baziData.elements.fire}、土${baziData.elements.earth}、金${baziData.elements.metal}、水${baziData.elements.water}
 
-Please generate a detailed personality analysis report, including:
-1. Core personality traits and characteristics
-2. Main strengths and talents
-3. Areas for improvement and challenges
-4. Social style and interpersonal relationship patterns
-5. Emotional expression style
-6. Learning and development suggestions
-7. Leadership style and team role
+请生成一份详细的人格分析报告，包括：
+1. 核心人格特质和性格特征
+2. 主要优势和天赋
+3. 需要改进的方面和挑战
+4. 社交风格和人际关系模式
+5. 情感表达方式
+6. 学习和发展建议
+7. 领导风格和团队角色
 
-Please answer in English. The language should be professional yet easy to understand, well-structured, and provide in-depth, practical content.`
+请用中文回答，语言要专业但易懂，结构清晰，内容要有深度和实用性。`
 
     return await this.generateContent(prompt)
   }
 
   static async analyzeCareer(birthData: BirthData, baziData: BaziData): Promise<string> {
-    const prompt = `As a professional career planner and astrologer, please provide a career development analysis based on the following information, in English:
+    const prompt = `作为一位专业的职业规划师和命理学家，请基于以下信息进行职业发展分析：
 
-Birth Information:
-- Birth Date: ${birthData.birthDate}
-- Gender: ${birthData.gender}
-- Time Zone: ${birthData.timeZone}
+出生信息：
+- 出生日期：${birthData.birthDate}
+- 性别：${birthData.gender}
+- 时区：${birthData.timeZone}
 
-Bazi Information:
-- Heavenly Stems: ${baziData.heavenlyStems.join(', ')}
-- Earthly Branches: ${baziData.earthlyBranches.join(', ')}
-- Day Master: ${baziData.dayMaster}
-- Five Elements Distribution: Wood ${baziData.elements.wood}, Fire ${baziData.elements.fire}, Earth ${baziData.elements.earth}, Metal ${baziData.elements.metal}, Water ${baziData.elements.water}
+八字信息：
+- 天干：${baziData.heavenlyStems.join('、')}
+- 地支：${baziData.earthlyBranches.join('、')}
+- 日主：${baziData.dayMaster}
+- 五行分布：木${baziData.elements.wood}、火${baziData.elements.fire}、土${baziData.elements.earth}、金${baziData.elements.metal}、水${baziData.elements.water}
 
-Please generate a detailed career development analysis report, including:
-1. Recommended most suitable career fields and industries
-2. Entrepreneurial potential assessment and startup advice
-3. Wealth accumulation strategies and financial advice
-4. Ideal workplace environment and work style
-5. Key opportunities and stages for career development
-6. Specific suggestions for income improvement
-7. Advice on handling workplace relationships
+请生成一份详细的职业发展分析报告，包括：
+1. 最适合的职业领域和行业推荐
+2. 创业潜质评估和创业建议
+3. 财富累积策略和理财建议
+4. 理想的职场环境和工作方式
+5. 职业发展的关键时机和阶段
+6. 收入提升的具体建议
+7. 职场人际关系处理建议
 
-Please answer in English. The language should be professional yet easy to understand, providing specific, actionable advice.`
+请用中文回答，语言要专业但易懂，提供具体可操作的建议。`
 
     return await this.generateContent(prompt)
   }
 
   static async analyzeRelationships(birthData: BirthData, baziData: BaziData): Promise<string> {
-    const prompt = `As a professional relationship counselor and astrologer, please provide a relationship analysis based on the following information, in English:
+    const prompt = `作为一位专业的情感咨询师和命理学家，请基于以下信息进行情感关系分析：
 
-Birth Information:
-- Birth Date: ${birthData.birthDate}
-- Gender: ${birthData.gender}
-- Time Zone: ${birthData.timeZone}
+出生信息：
+- 出生日期：${birthData.birthDate}
+- 性别：${birthData.gender}
+- 时区：${birthData.timeZone}
 
-Bazi Information:
-- Heavenly Stems: ${baziData.heavenlyStems.join(', ')}
-- Earthly Branches: ${baziData.earthlyBranches.join(', ')}
-- Day Master: ${baziData.dayMaster}
-- Five Elements Distribution: Wood ${baziData.elements.wood}, Fire ${baziData.elements.fire}, Earth ${baziData.elements.earth}, Metal ${baziData.elements.metal}, Water ${baziData.elements.water}
+八字信息：
+- 天干：${baziData.heavenlyStems.join('、')}
+- 地支：${baziData.earthlyBranches.join('、')}
+- 日主：${baziData.dayMaster}
+- 五行分布：木${baziData.elements.wood}、火${baziData.elements.fire}、土${baziData.elements.earth}、金${baziData.elements.metal}、水${baziData.elements.water}
 
-Please generate a detailed relationship analysis report, including:
-1. Love patterns and emotional preferences
-2. Best match types and compatibility analysis
-3. Communication style and expression methods
-4. Core emotional needs and expectations
-5. Marriage luck and long-term relationship advice
-6. Ways of handling family relationships
-7. Friendship and social patterns
-8. Practical dating and relationship advice
+请生成一份详细的情感关系分析报告，包括：
+1. 爱情模式和情感偏好
+2. 最佳配对类型和兼容性分析
+3. 沟通风格和表达方式
+4. 情感需求核心和期望
+5. 婚姻运势和长期关系建议
+6. 家庭关系处理方式
+7. 友谊和社交模式
+8. 实用的恋爱和关系建议
 
-Please answer in English. The language should be warm and practical, providing specific relationship guidance.`
+请用中文回答，语言要温暖且实用，提供具体的关系指导。`
 
     return await this.generateContent(prompt)
   }
 
   static async analyzeLifePath(birthData: BirthData, baziData: BaziData): Promise<string> {
-    const prompt = `As a professional spiritual mentor and astrologer, please provide a life mission analysis based on the following information, in English:
+    const prompt = `作为一位专业的灵性导师和命理学家，请基于以下信息进行人生使命分析：
 
-Birth Information:
-- Birth Date: ${birthData.birthDate}
-- Gender: ${birthData.gender}
-- Time Zone: ${birthData.timeZone}
+出生信息：
+- 出生日期：${birthData.birthDate}
+- 性别：${birthData.gender}
+- 时区：${birthData.timeZone}
 
-Bazi Information:
-- Heavenly Stems: ${baziData.heavenlyStems.join(', ')}
-- Earthly Branches: ${baziData.earthlyBranches.join(', ')}
-- Day Master: ${baziData.dayMaster}
-- Five Elements Distribution: Wood ${baziData.elements.wood}, Fire ${baziData.elements.fire}, Earth ${baziData.elements.earth}, Metal ${baziData.elements.metal}, Water ${baziData.elements.water}
+八字信息：
+- 天干：${baziData.heavenlyStems.join('、')}
+- 地支：${baziData.earthlyBranches.join('、')}
+- 日主：${baziData.dayMaster}
+- 五行分布：木${baziData.elements.wood}、火${baziData.elements.fire}、土${baziData.elements.earth}、金${baziData.elements.metal}、水${baziData.elements.water}
 
-Please generate a detailed life mission analysis report, including:
-1. Core life mission and soul tasks
-2. Main life lessons and learning themes
-3. Life development stages and key turning points
-4. Spiritual growth path and inner cultivation
-5. Challenges to overcome and directions for transformation
-6. Uncovering hidden talents and potential
-7. Areas of legacy and contribution
-8. Practical advice for soul growth
+请生成一份详细的人生使命分析报告，包括：
+1. 生命核心使命和灵魂任务
+2. 主要人生功课和学习主题
+3. 人生发展阶段和关键转折点
+4. 精神成长路径和内在修炼
+5. 需要突破的挑战和转化方向
+6. 隐藏的天赋和潜能发掘
+7. 人生传承和贡献领域
+8. 实用的灵魂成长建议
 
-Please answer in English. The language should be spiritual and inspiring, providing deep life guidance.`
+请用中文回答，语言要富有灵性和启发性，提供深度的人生指导。`
 
     return await this.generateContent(prompt)
   }
 
   static async analyzeHealth(birthData: BirthData, baziData: BaziData): Promise<string> {
-    const prompt = `As a professional traditional Chinese medicine wellness expert and astrologer, please provide a health analysis based on the following information, in English:
+    const prompt = `作为一位专业的中医养生专家和命理学家，请基于以下信息进行健康分析：
 
-Birth Information:
-- Birth Date: ${birthData.birthDate}
-- Gender: ${birthData.gender}
-- Time Zone: ${birthData.timeZone}
+出生信息：
+- 出生日期：${birthData.birthDate}
+- 性别：${birthData.gender}
+- 时区：${birthData.timeZone}
 
-Bazi Information:
-- Heavenly Stems: ${baziData.heavenlyStems.join(', ')}
-- Earthly Branches: ${baziData.earthlyBranches.join(', ')}
-- Day Master: ${baziData.dayMaster}
-- Five Elements Distribution: Wood ${baziData.elements.wood}, Fire ${baziData.elements.fire}, Earth ${baziData.elements.earth}, Metal ${baziData.elements.metal}, Water ${baziData.elements.water}
+八字信息：
+- 天干：${baziData.heavenlyStems.join('、')}
+- 地支：${baziData.earthlyBranches.join('、')}
+- 日主：${baziData.dayMaster}
+- 五行分布：木${baziData.elements.wood}、火${baziData.elements.fire}、土${baziData.elements.earth}、金${baziData.elements.metal}、水${baziData.elements.water}
 
-Please generate a detailed health and wellness analysis report, including:
-1. Constitutional characteristics and innate strengths
-2. Health areas that need attention
-3. Seasonal wellness tips (spring, summer, autumn, winter)
-4. Suitable exercise methods and intensity
-5. Dietary guidance and nutritional advice
-6. Stress management and relaxation techniques
-7. Methods for maintaining mental health
-8. Recommendations for regular health check-ups
-9. Daily wellness tips
-10. Traditional Chinese medicine-based wellness and conditioning advice
+请生成一份详细的健康养生分析报告，包括：
+1. 体质特点和先天优势
+2. 需要关注的健康领域
+3. 季节性养生建议（春夏秋冬）
+4. 适合的运动方式和强度
+5. 饮食指导和营养建议
+6. 压力管理和放松技巧
+7. 心理健康维护方法
+8. 定期健康检查建议
+9. 日常养生小贴士
+10. 中医养生和调理建议
 
-Please answer in English, combining traditional Chinese medicine theory with modern health concepts to provide practical wellness guidance.`
+请用中文回答，结合传统中医理论和现代健康理念，提供实用的养生指导。`
 
     return await this.generateContent(prompt)
   }
@@ -243,101 +243,101 @@ Please answer in English, combining traditional Chinese medicine theory with mod
 
   // 新增：单次API调用生成完整报告
   static async generateSingleComprehensiveReport(birthData: BirthData, baziData: BaziData): Promise<string> {
-    const prompt = `As a senior Chinese astrologer, psychologist, career planner, relationship counselor, spiritual mentor, and traditional Chinese medicine wellness expert, please generate a comprehensive and detailed astrological analysis report based on the following information, in English:
+    const prompt = `作为一位资深的中国命理学家、心理学家、职业规划师、情感咨询师、灵性导师和中医养生专家，请基于以下信息生成一份全面详细的命理分析报告：
 
-## Birth Information
-- Birth Date: ${birthData.birthDate}
-- Birth Time: ${birthData.birthTime || 'Not provided'}${birthData.isTimeKnownInput ? ' (User provided)' : ' (System default 12:00)'}
-- Gender: ${birthData.gender}
-- Time Zone: ${birthData.timeZone}
+## 出生信息
+- 出生日期：${birthData.birthDate}
+- 出生时间：${birthData.birthTime || '未提供'}${birthData.isTimeKnownInput ? ' (用户提供)' : ' (系统默认12:00)'}
+- 性别：${birthData.gender}
+- 时区：${birthData.timeZone}
 
-## Bazi Information
-- Heavenly Stems: ${baziData.heavenlyStems.join(', ')}
-- Earthly Branches: ${baziData.earthlyBranches.join(', ')}
-- Day Master: ${baziData.dayMaster}
-- Five Elements Distribution: Wood ${baziData.elements.wood}, Fire ${baziData.elements.fire}, Earth ${baziData.elements.earth}, Metal ${baziData.elements.metal}, Water ${baziData.elements.water}
+## 八字信息
+- 天干：${baziData.heavenlyStems.join('、')}
+- 地支：${baziData.earthlyBranches.join('、')}
+- 日主：${baziData.dayMaster}
+- 五行分布：木${baziData.elements.wood}、火${baziData.elements.fire}、土${baziData.elements.earth}、金${baziData.elements.metal}、水${baziData.elements.water}
 
-Please generate a detailed astrological analysis report of over 3000 words, including all of the following sections:
+请生成一份超过3000字的详细命理分析报告，包含以下所有部分：
 
-# I. Personality Trait Analysis
-## Core Personality Traits
-Detailed analysis of their personality traits, behavioral patterns, thinking styles, and emotional expression.
+# 一、人格特质分析
+## 核心性格特征
+详细分析其性格特点、行为模式、思维方式和情感表达方式。
 
-## Talents and Strengths
-Analysis of their innate talents, abilities, and areas of strength.
+## 天赋与优势
+分析其与生俱来的天赋、才能和优势领域。
 
-## Areas for Improvement
-Identifying aspects of their personality that need adjustment and refinement.
+## 需要改进的方面
+指出性格中需要调整和完善的地方。
 
-## Social Style
-Analysis of their interpersonal skills and social preferences.
+## 社交风格
+分析其人际关系处理方式和社交偏好。
 
-# II. Career Development Guidance
-## Most Suitable Career Fields
-Recommending the most suitable industries and career paths based on their Bazi.
+# 二、职业发展指导
+## 最适合的职业领域
+基于八字分析推荐最适合的行业和职业方向。
 
-## Entrepreneurial Potential Assessment
-Analyzing their entrepreneurial abilities and suitable business ventures.
+## 创业潜质评估
+分析其创业能力和适合的创业方向。
 
-## Wealth Accumulation Strategies
-Providing specific financial advice and wealth-building methods.
+## 财富累积策略
+提供具体的理财建议和财富增长方法。
 
-## Career Development Advice
-Giving concrete steps and timing for career advancement.
+## 职场发展建议
+给出职业发展的具体步骤和时机。
 
-# III. Relationship Analysis
-## Love Patterns
-Analyzing their approach to love and emotional expression.
+# 三、情感关系分析
+## 爱情模式
+分析其恋爱方式和情感表达特点。
 
-## Best Match Types
-Analyzing the most compatible partner types based on the principles of five elements.
+## 最佳配对类型
+基于五行相生相克分析最适合的伴侣类型。
 
-## Marriage Luck
-Analyzing marital prospects and providing long-term relationship advice.
+## 婚姻运势
+分析婚姻状况和长期关系建议。
 
-## Family Relationships
-Offering guidance on handling family relationships.
+## 家庭关系
+提供家庭关系处理的指导建议。
 
-# IV. Life Mission and Growth
-## Core Life Mission
-Analyzing their life purpose and soul tasks.
+# 四、人生使命与成长
+## 生命核心使命
+分析其人生目标和灵魂任务。
 
-## Life Development Stages
-Describing the developmental focus at different ages.
+## 人生发展阶段
+详细描述不同年龄段的发展重点。
 
-## Spiritual Growth Path
-Providing advice on inner cultivation and spiritual growth.
+## 精神成长路径
+提供内在修炼和心灵成长的建议。
 
-## Key Life Turning Points
-Identifying important opportunities and turning points in life.
+## 关键人生转折点
+指出人生中的重要时机和转折点。
 
-# V. Health and Wellness Guidance
-## Constitutional Characteristics
-Analyzing their innate physical constitution and health strengths.
+# 五、健康养生指导
+## 体质特点
+分析其先天体质和健康优势。
 
-## Health Areas to Focus On
-Pointing out body parts and health issues that require special attention.
+## 需要关注的健康领域
+指出需要特别注意的身体部位和健康问题。
 
-## Seasonal Wellness
-Providing wellness advice for spring, summer, autumn, and winter.
+## 季节性养生
+提供春夏秋冬四季的养生建议。
 
-## Exercise and Diet
-Recommending suitable exercise methods and dietary adjustments.
+## 运动与饮食
+推荐适合的运动方式和饮食调理。
 
-## Mental Health
-Providing methods for stress management and emotional regulation.
+## 心理健康
+提供压力管理和情绪调节的方法。
 
-# VI. Comprehensive Advice and Summary
-## Life Planning Suggestions
-Giving comprehensive life planning advice based on the analysis.
+# 六、综合建议与总结
+## 人生规划建议
+基于以上分析给出综合的人生规划建议。
 
-## Recent Development Focus
-Highlighting areas to focus on in the current stage.
+## 近期发展重点
+指出当前阶段需要重点关注的事项。
 
-## Long-term Development Goals
-Setting long-term development goals for the next 3-5 years.
+## 长期发展目标
+设定3-5年的长期发展目标。
 
-Please write in professional yet easy-to-understand English. The language should be warm and inspiring, with concrete, actionable content, avoiding clichés. Each section should have in-depth analysis and provide practical guidance. The report must be in English.`
+请用专业但易懂的中文撰写，语言要温暖且有启发性，内容要具体可操作，避免空洞的套话。每个部分都要有深度分析，提供实用的指导建议。`
 
     return await this.generateContent(prompt)
   }

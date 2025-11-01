@@ -125,73 +125,69 @@ export class ZhipuService {
    * 构建系统提示词
    */
   private getSystemPrompt(): string {
-    return `You are a seasoned and wise astrologer, as well as a compassionate and intelligent life coach. Based on the user's Bazi information, please generate a professional, detailed, and positively guided astrological analysis report in English.
+    return `You are a senior and wise numerologist, as well as a compassionate and intelligent life coach. Please generate a professional, detailed, and positively guided numerology analysis report based on the user's Bazi information.
 
 ═══════════════════════════════════════════════════════════
 【Core Requirements】
 ═══════════════════════════════════════════════════════════
-1. 【Recent Situation Analysis】Be objective, direct, specific, and accurate to help the user better understand themselves.
-   - Avoid vague words like "might," "probably," or "maybe."
-   - Be specific about events and timing, analyzing in conjunction with the current Luck Pillar.
-   - Place this at the very beginning of the report as a key section.
+1. 【Recent Situation Analysis】Objective, direct, specific, and accurate, aiming to help users better understand themselves.
+   - Do not use vague words like "possible," "probably," or "maybe."
+   - Be specific about events and times, combined with the current Luck Pillar analysis.
+   - Place this at the very beginning of the report as the main content.
 
-2. 【Current Luck Pillar】This is the key point of analysis.
-   - You must analyze the recent situation based on the characteristics of the five elements of the current Luck Pillar.
+2. 【Current Luck Pillar】is the key point of analysis.
+   - You must analyze the recent situation in conjunction with the five-element characteristics of the current Luck Pillar.
    - Explain the overall impact of the current Luck Pillar on the user.
    - Predict the trend of the Luck Pillars for the next few years.
 
-3. 【Personality Analysis】Focus on strengths.
-   - Provide an in-depth analysis of personality strengths and offer positive suggestions on how to improve weaknesses.
-   - The focus is on uncovering the user's potential and talents.
+3. 【Personality Analysis】should be strengths-oriented.
+   - In-depth analysis of personality strengths and provide positive suggestions on how to improve weaknesses.
+   - The focus is on discovering the user's potential and talents.
 
-4. 【Actionable and Empowering Advice】
-   - All advice should be specific, actionable, and encouraging.
-   - Help the user see future possibilities, not a fatalistic view.
+4. 【Suggestions should be specific and empowering.】
+   - All suggestions must be concrete, actionable, and encouraging.
+   - Help users see future possibilities, not fatalism.
 
 5. 【Format and Style Requirements】
-   - The report should be in English.
-   - Word count should be around 10,000 words.
+   - The word count should be around 10,000 characters.
    - Use Markdown format for a clear structure.
-   - The language style should be professional, gentle, positive, and inspiring, aimed at empowering the user.
-
-6. 【Direct Start】Do not include any greetings, introductions, or conversational filler (like "Dearest Friend,"). The report must start directly with the first section: "Recent Situation Analysis".
+   - The language style should be professional, gentle, positive, and inspiring, aiming to empower the user.
 
 ═══════════════════════════════════════════════════════════
 【Report Structure (Must Include)】
 ═══════════════════════════════════════════════════════════
-1. **Recent Situation Analysis** - Objective, direct, and specific analysis of events in the past year (the most important part, place at the beginning).
-2. **Current Luck Pillar Analysis** - Analyze the trend and characteristics of fortune in conjunction with the current Luck Pillar.
+1. **Recent Situation Analysis** - Objective, direct, specific analysis of events in the past year (most important part, place at the beginning).
+2. **Current Luck Pillar Analysis** - Analyze the fortune trend and characteristics in combination with the current Luck Pillar.
 3. Birth Information Overview
 4. Detailed Bazi Analysis
 5. Day Master Strength Analysis
 6. Five Elements Balance Analysis
-7. **Personality Trait Analysis** (In-depth exploration of strengths with suggestions for improving weaknesses).
-8. **Career Path Guidance** (Discovering professional potential and providing positive development directions).
-9. **Wealth Fortune Analysis** (Providing positive wealth-building strategies).
-10. **Relationship and Marriage Analysis** (Analyzing relationship patterns and offering positive advice for managing them).
-11. **Health and Wellness Guidance** (Analyzing physical constitution and providing positive health regimens).
-12. Luck Pillar and Annual Cycle Analysis (Specific time points, including future Luck Pillar predictions).
-13. Favorable and Unfavorable Factors Analysis (Turning unfavorable factors into growth opportunities).
-14. **Life Development Advice** (Specific and encouraging action plans).
+7. **Personality Trait Analysis** (In-depth exploration of strengths and suggestions for improving weaknesses).
+8. **Career Fortune Guidance** (Discover career potential and provide positive development directions).
+9. **Wealth Fortune Analysis** (Provide positive wealth growth strategies).
+10. **Relationship and Marriage Analysis** (Analyze relationship patterns and offer positive management advice).
+11. **Health and Wellness Guidance** (Analyze physical constitution and provide positive wellness plans).
+12. Luck Pillar and Annual Cycle Analysis (Specific time points, including predictions for future Luck Pillars).
+13. Favorable and Unfavorable Factor Analysis (Turn unfavorable factors into growth opportunities).
+14. **Life Development Suggestions** (Specific and encouraging action plans).
 15. Comprehensive Summary
 
 ═══════════════════════════════════════════════════════════
 【Special Emphasis】
 ═══════════════════════════════════════════════════════════
-- The recent situation analysis must be objective and direct, linked to the current Luck Pillar, and specific to events and timing.
-- The current Luck Pillar is the core of the analysis and its impact must be detailed.
-- Personality analysis should focus on strengths, with weaknesses framed as constructive advice.
-- Relationship analysis should focus on positive interaction and management strategies.
-- All advice must be specific, actionable, and encouraging.
-- Start the report directly with the "Recent Situation Analysis" section. Do not add any introductory paragraphs or greetings.
-- The entire report should adopt a positive, encouraging, and empowering tone to help the user see their potential and a bright future. The final report must be in English.`
+- The recent situation analysis must be objective and direct, combined with the current Luck Pillar, specific to events and times.
+- The current Luck Pillar is the core of the analysis and its impact must be explained in detail.
+- Personality analysis should focus on strengths, with constructive suggestions for weaknesses.
+- Relationship analysis should focus on positive ways of getting along and management strategies.
+- All suggestions must be concrete, actionable, and encouraging.
+- The entire report should adopt a positive, encouraging, and empowering tone to help users see their potential and a bright future.`
   }
 
   /**
    * 构建用户提示词
    */
   private buildPrompt(birthData: BirthData, baziData: BaziData): string {
-    // Get current time information
+    // 获取当前时间信息
     const now = new Date()
     const currentYear = now.getFullYear()
     const currentMonth = now.getMonth() + 1
@@ -205,7 +201,7 @@ export class ZhipuService {
   • Current Year: ${currentYear}
   • Current Month: ${currentMonth}
   • Current Day: ${currentDay}
-  • Analysis Period: ${currentYear - 1}-${currentMonth}-${currentDay} to ${currentDate}
+  • Analysis Time Range: From ${currentYear - 1}-${currentMonth.toString().padStart(2, '0')}-${currentDay.toString().padStart(2, '0')} to ${currentDate}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 `
 
@@ -220,31 +216,31 @@ export class ZhipuService {
 `
 
     const baziInfo = `
-【Bazi Foundation (Core Data)】
+【Bazi Basic Information (Core Data)】
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Four Pillars:
+Four Pillars Information:
   • Year Pillar: ${baziData.yearPillar}
   • Month Pillar: ${baziData.monthPillar}
   • Day Pillar: ${baziData.dayPillar}
   • Hour Pillar: ${baziData.hourPillar || 'Unknown'}
 
-Heavenly Stems & Earthly Branches:
+Heavenly Stems and Earthly Branches Breakdown:
   • Heavenly Stems Sequence: ${baziData.heavenlyStems.join(', ')} (Year, Month, Day, Hour)
   • Earthly Branches Sequence: ${baziData.earthlyBranches.join(', ')} (Year, Month, Day, Hour)
-  • Hidden Stems: ${baziData.hiddenStems.join(', ') || 'None'}
+  • Hidden Stems Information: ${baziData.hiddenStems.join(', ') || 'None'}
 
 Day Master Core Information:
-  • Day Master Stem: ${baziData.dayMaster}
-  • Yin/Yang: ${baziData.dayMasterNature}
-  • Five Elements: ${baziData.dayMasterElement}
+  • Day Master Heavenly Stem: ${baziData.dayMaster}
+  • Yin/Yang Attribute: ${baziData.dayMasterNature}
+  • Five Elements Attribute: ${baziData.dayMasterElement}
 
-Five Elements Energy Distribution (Key for Day Master Strength):
+Five Elements Energy Distribution (Key for analyzing Day Master strength):
   • Wood Element: ${baziData.elements.wood} points
   • Fire Element: ${baziData.elements.fire} points
   • Earth Element: ${baziData.elements.earth} points
   • Metal Element: ${baziData.elements.metal} points
   • Water Element: ${baziData.elements.water} points
-  • Total Score: ${baziData.elements.wood + baziData.elements.fire + baziData.elements.earth + baziData.elements.metal + baziData.elements.water} points
+  • Total Five Elements Score: ${baziData.elements.wood + baziData.elements.fire + baziData.elements.earth + baziData.elements.metal + baziData.elements.water} points
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 `
 
@@ -252,7 +248,7 @@ Five Elements Energy Distribution (Key for Day Master Strength):
 【Day Master Strength Analysis (Key Judgment)】
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
   • Strength Judgment: ${baziData.dayMasterStrength.strength}
-  • Strength Score: ${baziData.dayMasterStrength.score} (Positive for strong, negative for weak)
+  • Strength Score: ${baziData.dayMasterStrength.score} points (Positive for strong, negative for weak)
   • Basis for Judgment:
 ${baziData.dayMasterStrength.notes ? baziData.dayMasterStrength.notes.map(note => `    - ${note}`).join('\n') : '    - No detailed explanation'}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -261,9 +257,9 @@ ${baziData.dayMasterStrength.notes ? baziData.dayMasterStrength.notes.map(note =
     const favorableInfo = baziData.favorableElements ? `
 【Favorable Elements Analysis (Luck Enhancement Advice)】
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  • Primary Favorable Elements: ${baziData.favorableElements.primary.join(', ')}
-  • Secondary Favorable Elements: ${baziData.favorableElements.secondary?.join(', ') || 'None'}
-  • Unfavorable Elements: ${baziData.favorableElements.unfavorable?.join(', ') || 'None'}
+  • Primary Favorable Five Elements: ${baziData.favorableElements.primary.join(', ')}
+  • Secondary Favorable Five Elements: ${baziData.favorableElements.secondary?.join(', ') || 'None'}
+  • Unfavorable Five Elements: ${baziData.favorableElements.unfavorable?.join(', ') || 'None'}
   • Analysis Explanation:
 ${baziData.favorableElements.notes ? baziData.favorableElements.notes.map(note => `    - ${note}`).join('\n') : '    - No detailed explanation'}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -272,7 +268,7 @@ ${baziData.favorableElements.notes ? baziData.favorableElements.notes.map(note =
     const eightMansionsInfo = baziData.eightMansions ? `
 【Eight Mansions Feng Shui Analysis (Directional Advice)】
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  • Life Gua Group: ${baziData.eightMansions.group} Group
+  • Life Gua Group: ${baziData.eightMansions.group === 'East' ? 'East' : 'West'} Group
   • Auspicious Directions:
     ✓ Wealth Direction: ${baziData.eightMansions.lucky.wealth}
     ✓ Health Direction: ${baziData.eightMansions.lucky.health}
@@ -289,10 +285,10 @@ ${baziData.favorableElements.notes ? baziData.favorableElements.notes.map(note =
     const basicAnalysisInfo = `
 【Special Information Analysis】
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-  • Life Gua Number: ${baziData.lifeGua || 'Unknown'} (For Feng Shui reference)
+  • Life Gua Number: ${baziData.lifeGua || 'Unknown'} (For Feng Shui layout reference)
   • Nobleman: ${baziData.nobleman ? baziData.nobleman.join(', ') : 'None'} (Favorable Earthly Branches)
   • Intelligence: ${baziData.intelligence || 'Unknown'} (Direction for wisdom and talent)
-  • Sky Horse: ${baziData.skyHorse || 'None'} (Direction for movement and change)
+  • Sky Horse: ${baziData.skyHorse || 'None'} (Direction for change and travel)
   • Peach Blossom: ${baziData.peachBlossom || 'None'} (Direction for romance and relationships)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 `
@@ -302,7 +298,7 @@ ${baziData.favorableElements.notes ? baziData.favorableElements.notes.map(note =
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Basic Rules:
   • Luck Pillar Direction: ${baziData.luckPillars.incrementRule === 1 ? 'Forward' : 'Backward'}
-  • Timing Accuracy: ${baziData.luckPillars.isTimingKnown ? 'Exact time known' : 'Exact time not provided'}
+  • Time Precision: ${baziData.luckPillars.isTimingKnown ? 'Exact time known' : 'Exact time not provided'}
   • Total Luck Pillars: ${baziData.luckPillars.pillars.length} pillars (10 years each)
 
 ${baziData.luckPillars.currentPillar ? `
@@ -312,24 +308,24 @@ ${baziData.luckPillars.currentPillar ? `
   • Year Range: ${baziData.luckPillars.currentPillar.yearStart} - ${baziData.luckPillars.currentPillar.yearEnd}
   • Starting Age: ${baziData.luckPillars.currentPillar.ageStart}
   • Current Age: ${baziData.luckPillars.currentPillar.currentAge}
-  • Pillar Status: ${baziData.luckPillars.currentPillar.yearStart && new Date().getFullYear() < baziData.luckPillars.currentPillar.yearStart ? 'Upcoming' : baziData.luckPillars.currentPillar.yearEnd && new Date().getFullYear() > baziData.luckPillars.currentPillar.yearEnd ? 'Finished' : 'In Progress'}
+  • Pillar Status: ${baziData.luckPillars.currentPillar.yearStart && new Date().getFullYear() < baziData.luckPillars.currentPillar.yearStart ? 'Upcoming' : baziData.luckPillars.currentPillar.yearEnd && new Date().getFullYear() > baziData.luckPillars.currentPillar.yearEnd ? 'Ended' : 'Ongoing'}
 
-  【Analysis Focus】Please pay special attention to the impact of the current Luck Pillar (${baziData.luckPillars.currentPillar.heavenlyStem}${baziData.luckPillars.currentPillar.earthlyBranch}) on the user's recent situation, analyzing specific events and changes over the past year (${currentYear - 1}-${currentMonth} to ${currentYear}-${currentMonth}).
+  【Analysis Focus】Please pay special attention to the impact of the current Luck Pillar on the user's recent situation. Analyze specific events and fortune changes over the past year (from ${currentYear - 1}-${currentMonth.toString().padStart(2, '0')}-${currentDay.toString().padStart(2, '0')} to ${currentDate}) based on the characteristics of the current Luck Pillar ${baziData.luckPillars.currentPillar.heavenlyStem}${baziData.luckPillars.currentPillar.earthlyBranch}.
 ` : ''}
 
 Full Luck Pillar List:
 ${baziData.luckPillars.pillars.map((pillar, index) => {
-  const isCurrent = baziData.luckPillars?.currentPillar?.number === pillar.number ? ' ⭐Current' : '';
+  const isCurrent = baziData.luckPillars?.currentPillar?.number === pillar.number ? ' ⭐ Current' : '';
   return `  ${index + 1}. Pillar ${pillar.number}: ${pillar.heavenlyStem}${pillar.earthlyBranch}${isCurrent}
-      └─ Starts at: Age ${pillar.ageStart} | Years: ${pillar.yearStart || '?'}-${pillar.yearEnd || '?'}`;
+      └─ Starts at: ${pillar.ageStart} years old | Year: ${pillar.yearStart || '?'}-${pillar.yearEnd || '?'} `;
 }).join('\n')}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ` : ''
 
     const interactionsInfo = baziData.interactions ? `
-【Bazi Interactions Analysis (Important Influences)】
+【Bazi Interaction Analysis (Important Influences)】
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Found ${baziData.interactions.length} interactions in total:
+Found ${baziData.interactions.length} interactions, details as follows:
 
 ${baziData.interactions.map((interaction, index) => {
   return `${index + 1}. 【${interaction.type}】
@@ -337,37 +333,37 @@ ${baziData.interactions.map((interaction, index) => {
      • Participants: ${interaction.participants.map(p => `${p.pillar}(${p.elementChar}-${p.elementType})`).join(', ')}
      • Impact Assessment:
        - Involves Favorable Element: ${interaction.involvesFavorableElement ? '✓ Yes' : '✗ No'}
-       - Involves Unfavorable Element: ${interaction.involvesUnfavorableElement ? '⚠ Yes (Caution needed)' : '✓ No'}`
+       - Involves Unfavorable Element: ${interaction.involvesUnfavorableElement ? '⚠ Yes (Attention needed)' : '✓ No'}`
 }).join('\n\n')}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ` : ''
 
-    const wordLimit = 'around 10,000 words'
+    const wordLimit = 'about 10,000 characters'
 
     return `═══════════════════════════════════════════════════════════
-【Bazi Astrological Analysis Report Generation Task】
+【Bazi Numerology Analysis Report Generation Task】
 ═══════════════════════════════════════════════════════════
 
-Please generate a professional, detailed, and valuable astrological analysis report based on the following complete Bazi information.
+Please generate a professional, detailed, and valuable numerology analysis report based on the following complete Bazi information.
 
 📋 **Report Requirements**:
   • Word Count: ${wordLimit}
-  • Format: Use Markdown for a clear and well-structured layout.
-  • Language Style: Professional, gentle, positive, compassionate, and insightful. Aim to empower the user, not to judge. The report must be in English.
-  • Content Orientation: Focus on encouragement and positive guidance. Even for challenges and difficulties, provide constructive solutions and perspectives.
+  • Format Requirements: Use Markdown format, with a clear and hierarchical structure
+  • Language Style: Professional, gentle, positive, compassionate, and inspiring, aiming to empower the user, not to judge
+  • Content Orientation: Focus on encouragement and positive guidance. Even for challenges and difficulties, provide constructive solutions and perspectives
 
 📊 **Analysis Priorities (in order)**:
-  1. 【Recent Situation Analysis】Objective, direct, specific, and accurate analysis of events in the past year (${currentYear - 1}-${currentMonth} to ${currentYear}-${currentMonth}).
-  2. 【Current Luck Pillar Analysis】Analyze fortune trends in conjunction with the current Luck Pillar.
-  3. 【Personality Analysis】In-depth analysis of personality strengths with positive advice on improving weaknesses.
-  4. 【Career Path】Discover professional potential and provide positive development directions.
-  5. 【Relationship and Marriage】Analyze relationship patterns and offer positive management advice.
-  6. 【Health and Wellness】Analyze physical constitution and potential risks, providing positive health advice.
-  7. 【Luck Pillars and Annual Cycles】Analysis of specific time points.
-  8. 【Comprehensive Advice】Specific and encouraging action plans.
+  1. 【Recent Situation Analysis】Objective, direct, specific, and accurate analysis of events in the past year (from ${currentYear - 1}-${currentMonth.toString().padStart(2, '0')} to ${currentDate})
+  2. 【Current Luck Pillar Analysis】Analyze the fortune trend in combination with the current Luck Pillar
+  3. 【Personality Analysis】In-depth analysis of personality strengths and provide positive suggestions on how to improve weaknesses
+  4. 【Career Fortune】Discover career potential and provide positive development directions
+  5. 【Relationship and Marriage】Analyze relationship patterns and offer positive management advice
+  6. 【Health and Wellness】Analyze physical constitution and potential risks, and provide positive wellness advice
+  7. 【Luck Pillar and Annual Cycle】Analysis of specific time points
+  8. 【Comprehensive Suggestions】Specific and encouraging action plans
 
 ═══════════════════════════════════════════════════════════
-【Data Section Starts】
+【Data Section Start】
 ═══════════════════════════════════════════════════════════
 
 ${currentTimeInfo}
@@ -389,16 +385,16 @@ ${luckInfo}
 ${interactionsInfo}
 
 ═══════════════════════════════════════════════════════════
-【Data Section Ends】
+【Data Section End】
 ═══════════════════════════════════════════════════════════
 
 ⚠️  **Special Notes**:
-  ⚡ Recent Situation Analysis must be objective and direct: Avoid vague words like "might," "probably," or "maybe." Base your analysis on data.
-  ⚡ Be specific about events and timing: For example, instead of "a work change might happen in March 2024," say "a job transfer or positional adjustment occurred in March 2024."
-  ⚡ The Current Luck Pillar is key: The analysis of the recent situation must be based on the current Luck Pillar ${baziData.luckPillars?.currentPillar ? `(${baziData.luckPillars.currentPillar.heavenlyStem}${baziData.luckPillars.currentPillar.earthlyBranch})` : ''}.
-  ⚡ Personality analysis should focus on strengths: Delve into the user's talents and potential, framing weaknesses as opportunities for growth.
-  ⚡ Relationship analysis should be positively guided: Focus on providing constructive advice and strategies for managing relationships, rather than just listing problems.
-  ⚡ The overall tone must be empowering: Use encouraging, positive, and empowering language throughout to help the user see their future possibilities.`
+  ⚡ Recent situation analysis must be objective and direct: Do not use vague words like "possible," "probably," or "maybe." Analyze based on data.
+  ⚡ Be specific about events and times: For example, "A work change may occur in March 2024" → "A work transfer or job adjustment occurred in March 2024."
+  ⚡ The current Luck Pillar is key: The recent situation must be analyzed in conjunction with the current Luck Pillar ${baziData.luckPillars?.currentPillar ? `(${baziData.luckPillars.currentPillar.heavenlyStem}${baziData.luckPillars.currentPillar.earthlyBranch})` : ''}.
+  ⚡ Personality analysis should be strengths-oriented: Deeply explore the user's talents and potential, and turn weaknesses into growth suggestions.
+  ⚡ Relationship analysis should be positively guided: Focus on providing positive advice and strategies for managing relationships, avoiding simply listing problems.
+  ⚡ The overall tone should be empowering: Use encouraging, positive, and empowering language throughout to help the user see future possibilities.`
   }
 
   /**

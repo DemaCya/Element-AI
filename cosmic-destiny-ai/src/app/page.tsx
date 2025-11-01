@@ -55,8 +55,8 @@ export default function Home() {
   const handleBirthFormSubmit = async (data: BirthData & { reportName?: string }) => {
     setShowForm(false)
     
-    // Redirect to the dedicated report generation page
-    // Pass data via URL parameters
+    // 重定向到专门的报告生成页面
+    // 将数据通过URL参数传递
     const params = new URLSearchParams({
       birthDate: data.birthDate,
       birthTime: data.birthTime || '',
