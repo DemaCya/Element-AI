@@ -26,9 +26,9 @@ const CREEM_PRODUCT_ID = IS_TEST_MODE
 // IMPORTANT: You need to configure this in Creem dashboard:
 // 1. Go to Creem Dashboard -> Products -> Your Product
 // 2. Set "Customer Support Email" field
-// 3. OR set it as environment variable: CREEM_SUPPORT_EMAIL=support@yourdomain.com
+// 3. OR set it as environment variable: CREEM_SUPPORT_EMAIL=contact@yourdomain.com
 // This email must be reachable and able to receive customer inquiries.
-const CREEM_SUPPORT_EMAIL = process.env.CREEM_SUPPORT_EMAIL || 'support@starwhisper.ai'
+const CREEM_SUPPORT_EMAIL = process.env.CREEM_SUPPORT_EMAIL || 'contact@starwhisperai.com'
 
 const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL ||

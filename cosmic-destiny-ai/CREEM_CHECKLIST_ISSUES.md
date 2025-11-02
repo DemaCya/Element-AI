@@ -41,7 +41,7 @@
 
 **修复内容：**
 - 在 `src/services/paymentService.ts` 中添加了 `CREEM_SUPPORT_EMAIL` 环境变量配置
-- 默认邮箱：`support@starwhisper.ai`
+- 默认邮箱：`contact@starwhisperai.com`
 - 更新了 `env.example` 文件，添加了配置说明
 - 添加了详细的注释，说明如何在 Creem dashboard 中配置支持邮箱
 

@@ -87,7 +87,7 @@ export default function PaymentCancelPage() {
           {/* Additional Info */}
           <div className="mt-8 text-center text-gray-400 text-sm">
             <p>
-              Questions? Contact us at support@starwhisper.ai
+              Questions? Contact us at contact@starwhisperai.com
             </p>
           </div>
         </div>

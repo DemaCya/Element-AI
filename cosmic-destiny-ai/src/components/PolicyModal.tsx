@@ -116,7 +116,7 @@ export default function PolicyModal({ isOpen, onClose, type }: PolicyModalProps)
         heading: '10. Contact Us',
         content: [
           'If you have questions about this Privacy Policy, please contact us at:',
-          'Email: privacy@cosmicdestinyai.com'
+          'Email: contact@starwhisperai.com'
         ]
       }
     ]
@@ -235,7 +235,7 @@ export default function PolicyModal({ isOpen, onClose, type }: PolicyModalProps)
         heading: '13. Contact Information',
         content: [
           'For questions about these Terms of Service, please contact us at:',
-          'Email: legal@cosmicdestinyai.com'
+          'Email: contact@starwhisperai.com'
         ]
       }
     ]
