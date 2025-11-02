@@ -30,7 +30,7 @@ npm run deploy:dynamic  # 部署到Vercel
 ## 📁 文件结构
 
 ```
-cosmic-destiny-ai/
+star-whisper-ai/
 ├── src/app/
 │   ├── api/                    # 完整API路由 (动态模式使用)
 │   ├── report/

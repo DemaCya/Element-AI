@@ -1,6 +1,6 @@
 # 🎉 Creem 支付集成完成！
 
-> Cosmic Destiny AI 现已完整集成 Creem 支付系统
+> StarWhisperAI 现已完整集成 Creem 支付系统
 
 ## 📦 交付内容
 
@@ -94,7 +94,7 @@ npm run dev
 ## 🗂️ 文件结构
 
 ```
-cosmic-destiny-ai/
+star-whisper-ai/
 ├── src/
 │   ├── services/
 │   │   └── paymentService.ts          ← Creem 支付核心服务

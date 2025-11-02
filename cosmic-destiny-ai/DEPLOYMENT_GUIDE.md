@@ -43,7 +43,7 @@ npm run deploy:dynamic
 ## 📁 文件结构说明
 
 ```
-cosmic-destiny-ai/
+star-whisper-ai/
 ├── src/app/
 │   ├── api/                    # API路由 (动态模式使用)
 │   │   ├── health/            # 健康检查

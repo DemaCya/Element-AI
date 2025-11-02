@@ -11,7 +11,7 @@ interface LogEntry {
 }
 
 class PersistentLogger {
-  private storageKey = 'cosmic-destiny-logs'
+  private storageKey = 'starwhisper-logs'
   private maxLogs = 100
   private enabled = typeof window !== 'undefined'
 
@@ -140,7 +140,7 @@ export const logger = new PersistentLogger()
 
 // 在浏览器环境中暴露到 window 对象，方便调试
 if (typeof window !== 'undefined') {
-  (window as any).cosmicLogger = {
+  (window as any).starWhisperLogger = {
     printLogs: () => logger.printLogs(),
     exportLogs: () => logger.exportLogs(),
     clearLogs: () => logger.clearLogs(),
@@ -148,9 +148,9 @@ if (typeof window !== 'undefined') {
   }
   
   console.log('💡 调试工具已加载！使用以下命令：')
-  console.log('  - cosmicLogger.printLogs()  // 打印所有持久化日志')
-  console.log('  - cosmicLogger.exportLogs() // 导出日志为文本')
-  console.log('  - cosmicLogger.clearLogs()  // 清除所有日志')
+  console.log('  - starWhisperLogger.printLogs()  // 打印所有持久化日志')
+  console.log('  - starWhisperLogger.exportLogs() // 导出日志为文本')
+  console.log('  - starWhisperLogger.clearLogs()  // 清除所有日志')
 }
 
 export default logger

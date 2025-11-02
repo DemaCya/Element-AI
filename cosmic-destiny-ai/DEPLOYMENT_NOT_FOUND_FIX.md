@@ -8,7 +8,7 @@
 # 1. 确保所有更改已提交
 git add .
 git commit -m "Fix DEPLOYMENT_NOT_FOUND: Complete static deployment config"
-git push origin cosmic-destiny-v1
+git push origin main
 
 # 2. 在Vercel控制台重新部署
 # 或者等待自动部署触发

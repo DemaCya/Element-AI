@@ -44,7 +44,7 @@ npm run build
 ## 📁 项目结构
 
 ```
-cosmic-destiny-ai/
+star-whisper-ai/
 ├── out/                    # 静态导出目录（构建后生成）
 ├── src/
 │   ├── app/               # Next.js App Router

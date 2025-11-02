@@ -41,7 +41,7 @@
 
 **修复内容：**
 - 在 `src/services/paymentService.ts` 中添加了 `CREEM_SUPPORT_EMAIL` 环境变量配置
-- 默认邮箱：`support@cosmic-destiny.ai`
+- 默认邮箱：`support@starwhisper.ai`
 - 更新了 `env.example` 文件，添加了配置说明
 - 添加了详细的注释，说明如何在 Creem dashboard 中配置支持邮箱
 
@@ -58,7 +58,7 @@
 
 1. ✅ **Privacy Policy and Terms of Service** - 已完整实现在 `PolicyModal.tsx` 中
 2. ✅ **Product visibility** - 产品描述清晰，用户可以理解产品是什么
-3. ✅ **Product name** - "Cosmic Destiny AI" 看起来不侵犯现有商标
+3. ✅ **Product name** - "StarWhisperAI" 看起来不侵犯现有商标
 4. ✅ **Compliance with acceptable use** - 产品是合法的占星服务，属于可接受使用范围
 5. ✅ **Compliance with prohibited product list** - 不在禁止产品列表中
 

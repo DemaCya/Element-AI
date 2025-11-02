@@ -15,16 +15,16 @@ npm run dev
 3. 在控制台中，你应该看到欢迎消息：
    ```
    💡 调试工具已加载！使用以下命令：
-     - cosmicLogger.printLogs()  // 打印所有持久化日志
-     - cosmicLogger.exportLogs() // 导出日志为文本
-     - cosmicLogger.clearLogs()  // 清除所有日志
+     - starWhisperLogger.printLogs()  // 打印所有持久化日志
+     - starWhisperLogger.exportLogs() // 导出日志为文本
+     - starWhisperLogger.clearLogs()  // 清除所有日志
    ```
 
 4. 导航到不同页面（Dashboard、Report 等）
 5. **清除控制台**（Ctrl+L 或 Cmd+K）
 6. 运行命令：
    ```javascript
-   cosmicLogger.printLogs()
+   starWhisperLogger.printLogs()
    ```
 7. **验证**：你应该能看到所有之前的日志，包括清除控制台之前的日志
 
@@ -32,14 +32,14 @@ npm run dev
 
 1. 清除日志（可选）：
    ```javascript
-   cosmicLogger.clearLogs()
+   starWhisperLogger.clearLogs()
    ```
 
 2. 刷新页面
 
 3. 查看日志：
    ```javascript
-   cosmicLogger.printLogs()
+   starWhisperLogger.printLogs()
    ```
 
 4. **预期输出**（第一次加载）：
@@ -52,7 +52,7 @@ npm run dev
 
 5. 导航到 Dashboard，然后运行：
    ```javascript
-   cosmicLogger.printLogs()
+   starWhisperLogger.printLogs()
    ```
 
 6. **预期输出**（应该看到）：
@@ -74,7 +74,7 @@ npm run dev
 
 3. 在控制台查看日志：
    ```javascript
-   cosmicLogger.printLogs()
+   starWhisperLogger.printLogs()
    ```
 
 4. **预期日志流程**：
@@ -104,7 +104,7 @@ npm run dev
 
 3. 查看控制台日志：
    ```javascript
-   cosmicLogger.printLogs()
+   starWhisperLogger.printLogs()
    ```
 
 4. **预期日志流程**：
@@ -132,7 +132,7 @@ npm run dev
 
 2. 查看完整日志：
    ```javascript
-   cosmicLogger.printLogs()
+   starWhisperLogger.printLogs()
    ```
 
 3. **验证 Supabase 客户端创建**：
@@ -141,7 +141,7 @@ npm run dev
    - 其余都应该是 "Returning existing global client"
 
 4. **查看统计**：
-   ```javascript
+   ```
    // 在控制台运行（如果暴露了这个函数）
    console.log('Init count:', globalSupabaseState.initCount)
    ```
@@ -158,7 +158,7 @@ npm run dev
 2. 快速在多个页面间切换
 3. 查看日志：
    ```javascript
-   cosmicLogger.printLogs()
+   starWhisperLogger.printLogs()
    ```
 4. **验证**：
    - ✅ 没有错误
@@ -169,9 +169,9 @@ npm run dev
 
 ## 常见问题排查
 
-### 问题 1：看不到 cosmicLogger
+### 问题 1：看不到 starWhisperLogger
 
-**症状**：在控制台输入 `cosmicLogger` 显示 undefined
+**症状**：在控制台输入 `starWhisperLogger` 显示 undefined
 
 **排查**：
 1. 确保页面已经完全加载
@@ -186,7 +186,7 @@ npm run dev
 **排查**：
 1. 检查是否有多个 SupabaseProvider
 2. 检查 layout.tsx 是否正确配置
-3. 运行 `cosmicLogger.clearLogs()` 清除旧日志后重新测试
+3. 运行 `starWhisperLogger.clearLogs()` 清除旧日志后重新测试
 
 ### 问题 3：报告页面仍然卡在 loading
 
@@ -195,7 +195,7 @@ npm run dev
 **排查**：
 1. 查看日志：
    ```javascript
-   cosmicLogger.printLogs()
+   starWhisperLogger.printLogs()
    ```
 2. 搜索 "Report:" 相关日志
 3. 检查是否有错误日志
@@ -214,9 +214,9 @@ npm run dev
 2. 某些浏览器扩展干扰
 
 **解决方案**：
-1. 使用持久化日志：`cosmicLogger.printLogs()`
+1. 使用持久化日志：`starWhisperLogger.printLogs()`
 2. 检查浏览器控制台设置，启用 "Preserve log"
-3. 使用 `cosmicLogger.exportLogs()` 导出日志文本
+3. 使用 `starWhisperLogger.exportLogs()` 导出日志文本
 
 ---
 
@@ -224,7 +224,7 @@ npm run dev
 
 所有以下条件都应该满足：
 
-- ✅ `cosmicLogger` 在浏览器控制台可用
+- ✅ `starWhisperLogger` 在浏览器控制台可用
 - ✅ Supabase 客户端只创建一次
 - ✅ 页面导航流畅，无卡顿
 - ✅ Dashboard 正常加载报告列表
@@ -243,7 +243,7 @@ npm run dev
 // 每 3 秒自动打印日志
 setInterval(() => {
   console.clear()
-  cosmicLogger.printLogs()
+  starWhisperLogger.printLogs()
 }, 3000)
 ```
 
@@ -251,14 +251,14 @@ setInterval(() => {
 
 ```javascript
 // 导出日志
-const logs = cosmicLogger.exportLogs()
+const logs = starWhisperLogger.exportLogs()
 
 // 创建下载
 const blob = new Blob([logs], { type: 'text/plain' })
 const url = URL.createObjectURL(blob)
 const a = document.createElement('a')
 a.href = url
-a.download = 'cosmic-destiny-logs.txt'
+a.download = 'starwhisper-logs.txt'
 a.click()
 ```
 
@@ -266,7 +266,7 @@ a.click()
 
 ```javascript
 // 只查看 Supabase 相关日志
-const logs = cosmicLogger.getLogs()
+const logs = starWhisperLogger.getLogs()
 const supabaseLogs = logs.filter(log => log.message.includes('Supabase'))
 console.table(supabaseLogs)
 ```
@@ -274,7 +274,7 @@ console.table(supabaseLogs)
 ### 4. 统计日志级别
 
 ```javascript
-const logs = cosmicLogger.getLogs()
+const logs = starWhisperLogger.getLogs()
 const stats = logs.reduce((acc, log) => {
   acc[log.level] = (acc[log.level] || 0) + 1
   return acc
@@ -288,7 +288,7 @@ console.log('日志统计:', stats)
 
 如果在测试过程中遇到任何问题，请：
 
-1. 运行 `cosmicLogger.exportLogs()` 导出日志
+1. 运行 `starWhisperLogger.exportLogs()` 导出日志
 2. 截图错误信息
 3. 记录重现步骤
 4. 提供浏览器和环境信息
