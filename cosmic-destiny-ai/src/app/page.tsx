@@ -144,7 +144,7 @@ export default function Home() {
               <div className="text-center">
                 <div className="mb-4">
                   <span className="text-5xl font-bold bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent">
-                    $4.99
+                    $4.49
                   </span>
                   <span className="text-gray-300 text-lg ml-2">USD</span>
                 </div>
