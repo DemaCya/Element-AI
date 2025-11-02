@@ -21,6 +21,15 @@ const CREEM_PRODUCT_ID = IS_TEST_MODE
   ? process.env.CREEM_PRODUCT_ID_TEST || '' 
   : process.env.CREEM_PRODUCT_ID || ''
 
+// Customer Support Email for Creem receipts
+// Note: This email will be displayed in the payment receipt email that customers receive.
+// IMPORTANT: You need to configure this in Creem dashboard:
+// 1. Go to Creem Dashboard -> Products -> Your Product
+// 2. Set "Customer Support Email" field
+// 3. OR set it as environment variable: CREEM_SUPPORT_EMAIL=support@yourdomain.com
+// This email must be reachable and able to receive customer inquiries.
+const CREEM_SUPPORT_EMAIL = process.env.CREEM_SUPPORT_EMAIL || 'support@cosmic-destiny.ai'
+
 const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL ||
   (process.env.VERCEL_URL

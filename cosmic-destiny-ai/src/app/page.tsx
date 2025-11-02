@@ -122,6 +122,54 @@ export default function Home() {
 
       {/* Content Section */}
       <div id="content" className="relative z-20 bg-slate-900">
+        {/* Pricing Section */}
+        <section className="py-20 px-4 bg-slate-800/30">
+          <div className="container mx-auto max-w-4xl">
+            <h2 className="text-4xl font-bold text-center mb-12 text-glow bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent">
+              Simple, Transparent Pricing
+            </h2>
+            
+            <div className="bg-gradient-to-br from-purple-900/50 via-pink-900/50 to-purple-900/50 backdrop-blur-sm rounded-2xl p-8 border border-purple-500/30 shadow-2xl max-w-2xl mx-auto">
+              <div className="text-center">
+                <div className="mb-6">
+                  <span className="text-6xl font-bold bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent">
+                    $4.99
+                  </span>
+                  <span className="text-gray-300 text-xl ml-2">USD</span>
+                </div>
+                <p className="text-gray-300 text-lg mb-4">
+                  Complete Cosmic Destiny Report
+                </p>
+                <p className="text-gray-400 text-sm mb-6">
+                  Get your full personalized Bazi analysis report with detailed insights on personality, career, relationships, and life path.
+                </p>
+                <ul className="text-left text-gray-300 space-y-2 mb-8 max-w-md mx-auto">
+                  <li className="flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-purple-400 flex-shrink-0" />
+                    <span>Free preview available (15% of content)</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-purple-400 flex-shrink-0" />
+                    <span>One-time payment, lifetime access</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-purple-400 flex-shrink-0" />
+                    <span>3000+ words of personalized content</span>
+                  </li>
+                </ul>
+                <Button
+                  variant="cosmic"
+                  size="lg"
+                  onClick={handleChartMyCosmos}
+                  className="w-full sm:w-auto px-8"
+                >
+                  Get Started
+                </Button>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* FAQ Section */}
         <section className="py-20 px-4">
           <div className="container mx-auto max-w-4xl">
@@ -130,33 +178,6 @@ export default function Home() {
             </h2>
 
             <FAQAccordion items={faqItems} />
-          </div>
-        </section>
-
-        {/* Testimonials Section */}
-        <section className="py-20 px-4 bg-slate-800/30">
-          <div className="container mx-auto max-w-4xl">
-            <h2 className="text-4xl font-bold text-center mb-12 text-glow bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent">
-              What Our Users Say
-            </h2>
-
-            <div className="space-y-8">
-              <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-6 border border-purple-500/20">
-                <blockquote className="text-white text-lg italic leading-relaxed">
-                  "The personality analysis was scarily accurate. It gave me a new language to
-                  understand myself and my relationships with others."
-                </blockquote>
-                <cite className="text-purple-200 mt-4 block text-lg">- Alex P.</cite>
-              </div>
-
-              <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-6 border border-purple-500/20">
-                <blockquote className="text-white text-lg italic leading-relaxed">
-                  "I was skeptical at first, but the career advice was genuinely insightful.
-                  Highly recommended for anyone at a crossroads in their professional life."
-                </blockquote>
-                <cite className="text-purple-200 mt-4 block text-lg">- Sarah J.</cite>
-              </div>
-            </div>
           </div>
         </section>
 

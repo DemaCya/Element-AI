@@ -130,7 +130,7 @@ export async function POST(request: NextRequest) {
         user_id: user.id,
         report_id: report.id,
         checkout_id: checkoutResult.checkoutId!,
-        amount: 19.99, // Default price, should match Creem product price
+        amount: 4.99, // Default price, should match Creem product price
         currency: 'USD',
         status: 'pending',
         payment_provider: 'creem',

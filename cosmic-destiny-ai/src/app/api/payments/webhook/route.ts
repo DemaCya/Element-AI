@@ -159,7 +159,7 @@ async function handlePaymentSuccess(data: any): Promise<void> {
       checkout_id: checkout_id, // 主键/唯一键
       user_id: report.user_id,
       report_id: report.id,
-      amount: amount_total ? amount_total / 100 : 19.99, // Creem通常以分为单位
+      amount: amount_total ? amount_total / 100 : 4.99, // Creem通常以分为单位
       currency: 'usd',
       status: 'completed',
       payment_provider: 'creem',

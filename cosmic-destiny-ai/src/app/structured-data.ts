@@ -35,7 +35,7 @@ export const serviceStructuredData = {
   "areaServed": "Worldwide",
   "offers": {
     "@type": "Offer",
-    "price": "19.99",
+    "price": "4.99",
     "priceCurrency": "USD",
     "availability": "https://schema.org/InStock"
   }
@@ -74,7 +74,7 @@ export const faqStructuredData = {
       "name": "How much does the full report cost?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "The full cosmic destiny report costs $19.99 USD. We offer a free preview with 15% of the content available at no cost."
+        "text": "The full cosmic destiny report costs $4.99 USD. We offer a free preview with 15% of the content available at no cost."
       }
     }
   ]
