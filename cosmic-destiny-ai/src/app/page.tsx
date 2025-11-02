@@ -186,7 +186,7 @@ export default function Home() {
           <div className="container mx-auto max-w-4xl">
             <div className="flex flex-col items-center space-y-4">
               <p className="text-gray-300 text-center">
-                © 2025 <span className="bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent font-semibold">Cosmic Destiny AI</span>. For entertainment purposes only.
+                © 2025 <span className="bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent font-semibold">StarWhisperAI</span>. For entertainment purposes only.
               </p>
               <div className="flex flex-wrap gap-4 justify-center">
                 <button
