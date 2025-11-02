@@ -122,6 +122,17 @@ export default function Home() {
 
       {/* Content Section */}
       <div id="content" className="relative z-20 bg-slate-900">
+        {/* FAQ Section */}
+        <section className="py-20 px-4">
+          <div className="container mx-auto max-w-4xl">
+            <h2 className="text-4xl font-bold text-center mb-12 text-glow bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent">
+              Frequently Asked Questions
+            </h2>
+
+            <FAQAccordion items={faqItems} />
+          </div>
+        </section>
+
         {/* Pricing Section */}
         <section className="py-20 px-4 bg-slate-800/30">
           <div className="container mx-auto max-w-4xl">
@@ -167,17 +178,6 @@ export default function Home() {
                 </Button>
               </div>
             </div>
-          </div>
-        </section>
-
-        {/* FAQ Section */}
-        <section className="py-20 px-4">
-          <div className="container mx-auto max-w-4xl">
-            <h2 className="text-4xl font-bold text-center mb-12 text-glow bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent">
-              Frequently Asked Questions
-            </h2>
-
-            <FAQAccordion items={faqItems} />
           </div>
         </section>
 
