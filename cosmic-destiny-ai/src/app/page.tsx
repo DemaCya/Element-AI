@@ -136,35 +136,35 @@ export default function Home() {
         {/* Pricing Section */}
         <section className="py-20 px-4 bg-slate-800/30">
           <div className="container mx-auto max-w-4xl">
-            <h2 className="text-4xl font-bold text-center mb-12 text-glow bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent">
+            <h2 className="text-4xl font-bold text-center mb-8 text-glow bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent">
               Simple, Transparent Pricing
             </h2>
             
-            <div className="bg-gradient-to-br from-purple-900/50 via-pink-900/50 to-purple-900/50 backdrop-blur-sm rounded-2xl p-8 border border-purple-500/30 shadow-2xl max-w-2xl mx-auto">
+            <div className="bg-gradient-to-br from-purple-900/50 via-pink-900/50 to-purple-900/50 backdrop-blur-sm rounded-xl p-6 border border-purple-500/30 shadow-2xl max-w-xl mx-auto">
               <div className="text-center">
-                <div className="mb-6">
-                  <span className="text-6xl font-bold bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent">
+                <div className="mb-4">
+                  <span className="text-5xl font-bold bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent">
                     $4.99
                   </span>
-                  <span className="text-gray-300 text-xl ml-2">USD</span>
+                  <span className="text-gray-300 text-lg ml-2">USD</span>
                 </div>
-                <p className="text-gray-300 text-lg mb-4">
+                <p className="text-gray-300 text-base mb-3">
                   Complete Cosmic Destiny Report
                 </p>
-                <p className="text-gray-400 text-sm mb-6">
+                <p className="text-gray-400 text-sm mb-5">
                   Get your full personalized Bazi analysis report with detailed insights on personality, career, relationships, and life path.
                 </p>
-                <ul className="text-left text-gray-300 space-y-2 mb-8 max-w-md mx-auto">
+                <ul className="text-left text-gray-300 space-y-2 mb-6 max-w-sm mx-auto text-sm">
                   <li className="flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-purple-400 flex-shrink-0" />
+                    <Sparkles className="w-4 h-4 text-purple-400 flex-shrink-0" />
                     <span>Free preview available (15% of content)</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-purple-400 flex-shrink-0" />
+                    <Sparkles className="w-4 h-4 text-purple-400 flex-shrink-0" />
                     <span>One-time payment, lifetime access</span>
                   </li>
                   <li className="flex items-center gap-2">
-                    <Sparkles className="w-5 h-5 text-purple-400 flex-shrink-0" />
+                    <Sparkles className="w-4 h-4 text-purple-400 flex-shrink-0" />
                     <span>3000+ words of personalized content</span>
                   </li>
                 </ul>
@@ -172,7 +172,7 @@ export default function Home() {
                   variant="cosmic"
                   size="lg"
                   onClick={handleChartMyCosmos}
-                  className="w-full sm:w-auto px-8"
+                  className="w-full sm:w-auto px-6"
                 >
                   Get Started
                 </Button>
