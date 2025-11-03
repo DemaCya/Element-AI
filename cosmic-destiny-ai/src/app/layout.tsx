@@ -3,6 +3,23 @@ import "./globals.css";
 import { SupabaseProvider } from "@/contexts/SupabaseContext";
 import { UserProvider } from "@/contexts/UserContext";
 import { structuredData, serviceStructuredData, faqStructuredData } from "./structured-data";
+import { existsSync } from "fs";
+import path from "path";
+
+// 调试：检查图标文件是否存在
+const appDir = path.join(process.cwd(), "src/app");
+const iconFiles = {
+  iconIco: path.join(appDir, "icon.ico"),
+  iconPng: path.join(appDir, "icon.png"),
+  appleIcon: path.join(appDir, "apple-icon.png"),
+  faviconIco: path.join(process.cwd(), "public/favicon.ico"),
+};
+
+console.log("🔍 [ICON DEBUG] 检查图标文件:");
+Object.entries(iconFiles).forEach(([name, filePath]) => {
+  const exists = existsSync(filePath);
+  console.log(`  ${name}: ${exists ? "✅ 存在" : "❌ 不存在"} - ${filePath}`);
+});
 
 export const metadata: Metadata = {
   title: 'Star Whisper AI - AI-Powered Chinese Astrology & Fortune Telling',
