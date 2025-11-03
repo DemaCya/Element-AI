@@ -75,6 +75,7 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
     }
   }
 
+  /*
   const handleGoogleSignIn = async () => {
     setLoading(true)
     setError('')
@@ -98,6 +99,7 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
       setLoading(false)
     }
   }
+  */
 
   return (
     <div className="max-w-md w-full mx-auto p-6">
@@ -186,6 +188,7 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
         </Button>
       </form>
 
+      {/*
       <div className="mt-6">
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
@@ -224,6 +227,7 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
           Continue with Google
         </Button>
       </div>
+      */}
 
       <div className="mt-6 text-center">
         <button
