@@ -75,6 +75,7 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
     }
   }
 
+
   return (
     <div className="max-w-md w-full mx-auto p-6">
       <div className="text-center mb-8">
