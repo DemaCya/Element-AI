@@ -129,14 +129,14 @@ export default function PolicyModal({ isOpen, onClose, type }: PolicyModalProps)
       {
         heading: '1. Acceptance of Terms',
         content: [
-          'By accessing and using Cosmic Destiny AI, you accept and agree to be bound by these Terms of Service.',
+          'By accessing and using Star Whisper AI, you accept and agree to be bound by these Terms of Service.',
           'If you do not agree to these terms, please do not use our service.'
         ]
       },
       {
         heading: '2. Description of Service',
         content: [
-          'Cosmic Destiny AI provides AI-powered astrological reports based on traditional Chinese Bazi (Four Pillars) calculations.',
+          'Star Whisper AI provides AI-powered astrological reports based on traditional Chinese Bazi (Four Pillars) calculations.',
           'Our service generates personalized reports including personality analysis, career guidance, and life path insights.',
           'This service is provided for entertainment and self-reflection purposes only.'
         ]
@@ -174,7 +174,7 @@ export default function PolicyModal({ isOpen, onClose, type }: PolicyModalProps)
       {
         heading: '6. Intellectual Property',
         content: [
-          'All content, including reports, algorithms, and website design, is owned by Cosmic Destiny AI.',
+          'All content, including reports, algorithms, and website design, is owned by Star Whisper AI.',
           'Users receive a license to view and use their personal reports for personal purposes only.',
           'Reports may not be reproduced, distributed, or used for commercial purposes without permission.',
           'You retain ownership of your personal data, but grant us license to use it for service provision.'
@@ -192,7 +192,7 @@ export default function PolicyModal({ isOpen, onClose, type }: PolicyModalProps)
       {
         heading: '8. Limitation of Liability',
         content: [
-          'To the maximum extent permitted by law, Cosmic Destiny AI shall not be liable for:',
+          'To the maximum extent permitted by law, Star Whisper AI shall not be liable for:',
           '• Any indirect, incidental, or consequential damages',
           '• Loss of data, profits, or business opportunities',
           '• Decisions or actions taken based on our reports',

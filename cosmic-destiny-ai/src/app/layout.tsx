@@ -5,8 +5,8 @@ import { UserProvider } from "@/contexts/UserContext";
 import { structuredData, serviceStructuredData, faqStructuredData } from "./structured-data";
 
 export const metadata: Metadata = {
-  title: 'Cosmic Destiny AI - AI-Powered Chinese Astrology & Fortune Telling',
-  description: 'Unlock your cosmic destiny with advanced AI analysis of your Bazi birth chart. Get personalized insights into personality, career, relationships, and life path. Free preview available.',
+  title: 'Star Whisper AI - AI-Powered Chinese Astrology & Fortune Telling',
+  description: 'Discover your future with Star Whisper AI. We provide advanced AI analysis of your Bazi birth chart for personalized insights into your personality, career, relationships, and life path. Get your free preview today.',
   keywords: [
     'Chinese astrology',
     'Bazi analysis',
@@ -21,9 +21,9 @@ export const metadata: Metadata = {
     'Chinese zodiac',
     'cosmic destiny'
   ],
-  authors: [{ name: 'Cosmic Destiny AI' }],
-  creator: 'Cosmic Destiny AI',
-  publisher: 'Cosmic Destiny AI',
+  authors: [{ name: 'Star Whisper AI' }],
+  creator: 'Star Whisper AI',
+  publisher: 'Star Whisper AI',
   robots: {
     index: true,
     follow: true,
@@ -39,14 +39,14 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: process.env.NEXT_PUBLIC_APP_URL,
-    title: 'Cosmic Destiny AI - AI-Powered Chinese Astrology & Fortune Telling',
-    description: 'Unlock your cosmic destiny with advanced AI analysis of your Bazi birth chart. Get personalized insights into personality, career, relationships, and life path.',
-    siteName: 'Cosmic Destiny AI',
+    title: 'Star Whisper AI - AI-Powered Chinese Astrology & Fortune Telling',
+    description: 'Discover your future with Star Whisper AI. We provide advanced AI analysis of your Bazi birth chart for personalized insights into your personality, career, relationships, and life path.',
+    siteName: 'Star Whisper AI',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Cosmic Destiny AI - AI-Powered Chinese Astrology & Fortune Telling',
-    description: 'Unlock your cosmic destiny with advanced AI analysis of your Bazi birth chart. Get personalized insights into personality, career, relationships, and life path.',
+    title: 'Star Whisper AI - AI-Powered Chinese Astrology & Fortune Telling',
+    description: 'Discover your future with Star Whisper AI. We provide advanced AI analysis of your Bazi birth chart for personalized insights into your personality, career, relationships, and life path.',
   },
   alternates: {
     canonical: process.env.NEXT_PUBLIC_APP_URL,

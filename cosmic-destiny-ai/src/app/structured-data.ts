@@ -1,7 +1,7 @@
 export const structuredData = {
   "@context": "https://schema.org",
   "@type": "WebSite",
-  "name": "Cosmic Destiny AI",
+  "name": "Star Whisper AI",
   "description": "AI-powered Chinese astrology and Bazi analysis for personal insights",
   "url": process.env.NEXT_PUBLIC_APP_URL,
   "potentialAction": {
@@ -14,7 +14,7 @@ export const structuredData = {
   },
   "publisher": {
     "@type": "Organization",
-    "name": "Cosmic Destiny AI",
+    "name": "Star Whisper AI",
     "logo": {
       "@type": "ImageObject",
       "url": `${process.env.NEXT_PUBLIC_APP_URL}/logo.png`
@@ -29,7 +29,7 @@ export const serviceStructuredData = {
   "description": "Personalized Chinese astrology and Bazi birth chart analysis using AI technology",
   "provider": {
     "@type": "Organization",
-    "name": "Cosmic Destiny AI"
+    "name": "Star Whisper AI"
   },
   "serviceType": "Astrology Consultation",
   "areaServed": "Worldwide",
@@ -47,7 +47,7 @@ export const faqStructuredData = {
   "mainEntity": [
     {
       "@type": "Question",
-      "name": "How does Cosmic Destiny AI work?",
+      "name": "How does Star Whisper AI work?",
       "acceptedAnswer": {
         "@type": "Answer",
         "text": "We combine traditional Chinese astrology (Bazi) with advanced AI analysis. Simply provide your birth details, and our system will generate a comprehensive personality and destiny report based on ancient wisdom and modern insights."

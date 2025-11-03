@@ -188,7 +188,7 @@ export default function Home() {
               <p className="text-gray-300 text-center">
                 © 2025 <span className="bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent font-semibold">StarWhisperAI</span>. For entertainment purposes only.
               </p>
-              <div className="flex flex-wrap gap-4 justify-center">
+              <div className="flex flex-wrap gap-4 justify-center items-center">
                 <button
                   onClick={() => setShowPrivacyModal(true)}
                   className="text-sm text-gray-400 hover:text-purple-300 transition-colors duration-200 underline underline-offset-4 hover:underline-offset-2"
@@ -203,6 +203,15 @@ export default function Home() {
                   Terms of Service
                 </button>
               </div>
+              <p className="text-sm text-gray-400 mt-2">
+                Questions? Contact us at{' '}
+                <a 
+                  href="mailto:contact@starwhisperai.com" 
+                  className="text-purple-300 hover:text-purple-200 underline underline-offset-4 hover:underline-offset-2 transition-colors"
+                >
+                  contact@starwhisperai.com
+                </a>
+              </p>
             </div>
           </div>
         </footer>

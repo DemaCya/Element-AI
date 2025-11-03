@@ -27,7 +27,7 @@ export default function InfoPanel({ activePanel, onClose }: InfoPanelProps) {
   if (!currentPanel) return null
 
   const aboutContent = {
-    title: 'About Cosmic Destiny AI',
+    title: 'About Star Whisper AI',
     sections: [
       {
         icon: Star,
@@ -63,7 +63,7 @@ export default function InfoPanel({ activePanel, onClose }: InfoPanelProps) {
       {
         icon: Sparkles,
         title: 'A Universe of Wisdom',
-        content: 'We unite the celestial wisdom of the East with the inquisitive spirit of the West. Cosmic Destiny AI is a global sanctuary for self-discovery, open to all who seek to understand their place in the universe.'
+        content: 'We unite the celestial wisdom of the East with the inquisitive spirit of the West. Star Whisper AI is a global sanctuary for self-discovery, open to all who seek to understand their place in the universe.'
       },
       {
         icon: Moon,
@@ -131,7 +131,7 @@ export default function InfoPanel({ activePanel, onClose }: InfoPanelProps) {
           {/* Footer */}
           <div className="p-6 border-t border-purple-500/20 bg-purple-500/5">
             <p className="text-sm text-gray-300 text-center">
-              <span className="bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent font-semibold">Cosmic Destiny AI</span> • Where Ancient Wisdom Meets Modern Technology
+              <span className="bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent font-semibold">Star Whisper AI</span> • Where Ancient Wisdom Meets Modern Technology
             </p>
           </div>
         </div>

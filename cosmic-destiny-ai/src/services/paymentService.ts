@@ -21,13 +21,14 @@ const CREEM_PRODUCT_ID = IS_TEST_MODE
   ? process.env.CREEM_PRODUCT_ID_TEST || '' 
   : process.env.CREEM_PRODUCT_ID || ''
 
-// Customer Support Email for Creem receipts
-// Note: This email will be displayed in the payment receipt email that customers receive.
-// IMPORTANT: You need to configure this in Creem dashboard:
-// 1. Go to Creem Dashboard -> Products -> Your Product
-// 2. Set "Customer Support Email" field
-// 3. OR set it as environment variable: CREEM_SUPPORT_EMAIL=contact@yourdomain.com
-// This email must be reachable and able to receive customer inquiries.
+// Customer Support Email for Creem account review
+// According to Creem's account review checklist, you need a reachable customer support email.
+// IMPORTANT: Creem Dashboard may not have a direct "Customer Support Email" field.
+// Instead, ensure:
+// 1. Your website clearly displays this contact email (e.g., in footer, Privacy Policy, Terms of Service)
+// 2. When submitting account review, provide this email in the application form
+// 3. This email must be reachable and able to receive customer inquiries
+// The email will be used for account review purposes and should be visible on your website.
 const CREEM_SUPPORT_EMAIL = process.env.CREEM_SUPPORT_EMAIL || 'contact@starwhisperai.com'
 
 const APP_URL =

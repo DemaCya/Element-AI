@@ -46,9 +46,15 @@
 - 添加了详细的注释，说明如何在 Creem dashboard 中配置支持邮箱
 
 **重要提示：**
-1. **方法一（推荐）：** 在 Creem Dashboard -> Products -> Your Product -> 设置 "Customer Support Email" 字段
-2. **方法二：** 在环境变量中设置 `CREEM_SUPPORT_EMAIL=your-support-email@domain.com`
-3. 确保邮箱地址真实可用，能够接收客户咨询邮件
+1. **Creem Dashboard 中可能没有直接的"Customer Support Email"字段**。这是正常的。
+2. **确保网站在以下位置显示支持邮箱**：
+   - 网站页脚（Footer）
+   - Privacy Policy（隐私政策）
+   - Terms of Service（服务条款）
+   - 支付成功/取消页面
+3. **在提交 Creem 账户审核时**，在申请表单中提供支持邮箱：`contact@starwhisperai.com`
+4. **确保邮箱真实可用**：邮箱必须能够正常接收邮件，Creem 可能会测试验证
+5. **环境变量**（可选）：在 `.env.local` 中设置 `CREEM_SUPPORT_EMAIL=contact@starwhisperai.com` 用于代码中的引用
 
 ---
 
