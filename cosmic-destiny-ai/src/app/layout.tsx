@@ -55,10 +55,8 @@ export const metadata: Metadata = {
   verification: {
     google: 'verification_token_here',
   },
-  icons: {
-    icon: '/assets/images/1024.png',
-    apple: '/assets/images/1024.png',
-  },
+  // Next.js 会自动从 app 目录加载 icon.png 和 apple-icon.png
+  // 无需在此手动配置
 };
 
 export default function RootLayout({
