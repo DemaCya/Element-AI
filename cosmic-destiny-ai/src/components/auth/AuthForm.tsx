@@ -29,13 +29,21 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
     try {
       if (isSignUp) {
         // 注册新用户
+        // 获取重定向 URL，优先使用环境变量，否则使用当前域名
+        const redirectUrl = typeof window !== 'undefined' 
+          ? `${window.location.origin}/auth/callback`
+          : process.env.NEXT_PUBLIC_APP_URL 
+            ? `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`
+            : 'http://localhost:3000/auth/callback'
+        
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
             data: {
               full_name: fullName
-            }
+            },
+            emailRedirectTo: redirectUrl
           }
         })
 
