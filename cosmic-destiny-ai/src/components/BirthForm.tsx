@@ -567,7 +567,7 @@ export default function BirthForm({ onSubmit, onClose, isLoading }: BirthFormPro
                           console.log('Setting isTimeKnownInput to:', isTimeKnown)
                           updateFormData('isTimeKnownInput', isTimeKnown)
                         }}
-                        label="Birth time (optional)"
+                        label="Birth time (optional but highly recommended)"
                       />
                     </div>
 
