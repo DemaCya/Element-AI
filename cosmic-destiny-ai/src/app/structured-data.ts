@@ -76,6 +76,14 @@ export const faqStructuredData = {
         "@type": "Answer",
         "text": "The full cosmic destiny report costs $4.49 USD. We offer a free preview with 15% of the content available at no cost."
       }
+    },
+    {
+      "@type": "Question",
+      "name": "Is this website free?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The preview report is free. If you find the AI-generated insights accurate, you can then purchase the full report."
+      }
     }
   ]
 }

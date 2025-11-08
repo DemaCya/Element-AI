@@ -41,6 +41,10 @@ export default function Home() {
     {
       question: "What's included in the full report?",
       answer: "The complete report includes detailed personality analysis, career guidance, relationship insights, life path predictions, and health considerations. Each report is personalized based on your unique birth data."
+    },
+    {
+      question: "Is this website free?",
+      answer: "The preview report is free. If you find the AI-generated insights accurate, you can then purchase the full report."
     }
   ]
 
