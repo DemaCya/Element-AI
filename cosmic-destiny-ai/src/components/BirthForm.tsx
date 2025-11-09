@@ -443,20 +443,20 @@ export default function BirthForm({ onSubmit, onClose, isLoading }: BirthFormPro
     <>
       {/* Backdrop with fade animation */}
       <div
-        className={`fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 transition-opacity duration-300 ${
+        className={`fixed inset-0 bg-black/60 backdrop-blur-sm flex items-start md:items-center justify-center z-50 transition-opacity duration-300 p-0 md:p-0 ${
           isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
         onClick={handleClose}
       >
         {/* Modal container with scale and slide animation */}
         <div
-          className={`relative max-w-xl w-full mx-4 transform transition-all duration-300 ease-out max-h-screen ${
+          className={`relative max-w-xl w-full mx-4 my-4 md:my-0 transform transition-all duration-300 ease-out max-h-[calc(100vh-2rem)] md:max-h-screen flex flex-col ${
             isVisible ? 'scale-100 translate-y-0' : 'scale-95 translate-y-4'
           }`}
           onClick={e => e.stopPropagation()}
         >
           {/* Main modal with glass morphism and modern design */}
-          <div className="relative bg-gradient-to-br from-slate-900/95 via-purple-900/20 to-slate-900/95 backdrop-blur-xl rounded-3xl border border-purple-500/30 shadow-2xl overflow-hidden">
+          <div className="relative bg-gradient-to-br from-slate-900/95 via-purple-900/20 to-slate-900/95 backdrop-blur-xl rounded-3xl border border-purple-500/30 shadow-2xl overflow-hidden flex flex-col h-full">
 
             {/* Animated gradient border */}
             <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-purple-500/20 animate-pulse" />
@@ -479,8 +479,8 @@ export default function BirthForm({ onSubmit, onClose, isLoading }: BirthFormPro
             </div>
 
             {/* Progress indicator */}
-            <div className="relative z-10 pt-6 px-8">
-              <div className="flex items-center justify-between mb-6">
+            <div className="relative z-10 pt-4 md:pt-6 px-4 md:px-8 flex-shrink-0">
+              <div className="flex items-center justify-between mb-4 md:mb-6">
                 {[1, 2].map((stepNum) => (
                   <div key={stepNum} className="flex items-center">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
@@ -501,9 +501,9 @@ export default function BirthForm({ onSubmit, onClose, isLoading }: BirthFormPro
             </div>
 
             {/* Content */}
-            <div className="relative z-10 p-8 min-h-[70vh]">
+            <div className="relative z-10 p-4 md:p-8 min-h-0 flex-1 overflow-y-auto">
               {/* Header */}
-              <div className="text-center mb-8">
+              <div className="text-center mb-6 md:mb-8">
                 <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-purple-500 via-pink-500 to-indigo-600 rounded-full mb-4 shadow-2xl">
                   <Sparkles className="w-10 h-10 text-white animate-pulse" />
                 </div>

@@ -47,6 +47,14 @@ export const faqStructuredData = {
   "mainEntity": [
     {
       "@type": "Question",
+      "name": "What does this website do?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Star Whisper AI is an online service that combines traditional Chinese astrology (Bazi) with advanced Artificial Intelligence. By providing your birth details, our AI generates a personalized destiny report. This report offers insights into various aspects of your life, including personality, career, relationships, and health, helping you understand yourself better and navigate future opportunities."
+      }
+    },
+    {
+      "@type": "Question",
       "name": "How does Star Whisper AI work?",
       "acceptedAnswer": {
         "@type": "Answer",
