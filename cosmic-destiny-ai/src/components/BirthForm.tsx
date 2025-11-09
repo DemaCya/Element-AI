@@ -501,7 +501,7 @@ export default function BirthForm({ onSubmit, onClose, isLoading }: BirthFormPro
             </div>
 
             {/* Content */}
-            <div className="relative z-10 p-4 md:p-8 min-h-0 flex-1 overflow-y-auto">
+            <div className="relative z-10 p-4 md:p-8 pb-20 md:pb-8 min-h-0 flex-1 overflow-y-auto">
               {/* Header */}
               <div className="text-center mb-6 md:mb-8">
                 <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-purple-500 via-pink-500 to-indigo-600 rounded-full mb-4 shadow-2xl">
@@ -524,7 +524,7 @@ export default function BirthForm({ onSubmit, onClose, isLoading }: BirthFormPro
               </button>
 
               {/* Form */}
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form onSubmit={handleSubmit} className="space-y-6 pb-4">
                 {/* Step 1: Birth Information & Gender */}
                 {step === 1 && (
                   <div className="space-y-6 animate-fade-in">
@@ -725,7 +725,7 @@ export default function BirthForm({ onSubmit, onClose, isLoading }: BirthFormPro
 
 
                 {/* Navigation Buttons */}
-                <div className="flex gap-3 pt-4">
+                <div className="flex gap-3 pt-4 pb-2 md:pb-0">
                   {step > 1 && (
                     <Button
                       type="button"
