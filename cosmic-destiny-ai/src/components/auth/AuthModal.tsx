@@ -152,8 +152,8 @@ export default function AuthModal({ isOpen, onClose, onSuccess }: AuthModalProps
                 </h2>
                 <p className="text-gray-400 text-sm">
                   {isSignUp
-                    ? 'Begin your cosmic journey today'
-                    : 'Sign in to access your destiny reports'
+                    ? 'Start your journey of self-discovery'
+                    : 'Sign in to access your analysis reports'
                   }
                 </p>
               </div>

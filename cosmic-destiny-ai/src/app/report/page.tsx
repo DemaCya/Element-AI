@@ -455,7 +455,7 @@ We are confirming your payment information. This usually takes a few seconds. Th
         } else {
           // Reached preview boundary, stop showing new content, but keep "Generating..." message
           const preview = streamingContent.substring(0, PREVIEW_BOUNDARY)
-          return preview + (isStreaming ? '\n\n---\n\n**Want to learn more?**\n\nThe full report includes:\n- In-depth personality analysis and growth suggestions\n- Detailed career planning and wealth strategies\n- Comprehensive relationship analysis and best matches\n- Life mission and key turning points\n- Personalized health and wellness plan\n- Detailed analysis of luck pillars and annual cycles\n- In-depth interpretation of favorable and unfavorable factors\n- And more exclusive numerology guidance for you...\n\nUnlock the full report now and start your journey of destiny exploration!\n\n*Full report is being generated in the background...*' : '')
+          return preview + (isStreaming ? '\n\n---\n\n**Want to learn more?**\n\nThe full report includes:\n- In-depth personality analysis and growth suggestions\n- Detailed career planning and wealth strategies\n- Comprehensive relationship analysis and best matches\n- Life mission and key turning points\n- Personalized health and wellness plan\n- Detailed analysis of life phases and cycles\n- In-depth interpretation of favorable and unfavorable factors\n- And more exclusive personal guidance for you...\n\nUnlock the full report now and start your journey of self-exploration!\n\n*Full report is being generated in the background...*' : '')
         }
       } else {
         // Paid users see full streaming content
@@ -482,7 +482,7 @@ We are confirming your payment information. This usually takes a few seconds. Th
     }
     
     // If no report content, show a concise placeholder
-    return `# Your astrological report is on its way...`
+    return `# Your analysis report is on its way...`
   }
 
   return (
@@ -514,7 +514,7 @@ We are confirming your payment information. This usually takes a few seconds. Th
             <div className="flex items-center justify-center gap-2 mb-4">
               <Sparkles className="w-8 h-8 text-purple-400" />
               <h1 className="text-4xl font-bold text-glow bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent">
-                {report.name || 'Your Cosmic Destiny Report'}
+                {report.name || 'Your Personal Analysis Report'}
               </h1>
               <Sparkles className="w-8 h-8 text-purple-400" />
             </div>
@@ -581,10 +581,10 @@ We are confirming your payment information. This usually takes a few seconds. Th
                   <div className="text-center">
                     <Sparkles className="w-12 h-12 text-purple-400 mx-auto mb-4" />
                     <h3 className="text-2xl font-bold text-white mb-4">
-                      Unlock Your Complete Destiny Report
+                      Unlock Your Complete Analysis Report
                     </h3>
                     <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
-                      The preview shows only a glimpse of your destiny analysis. The full report includes in-depth personality insights, detailed career guidance, comprehensive relationship advice, life purpose interpretation, and personalized health recommendations - over 3,000 words of content tailored exclusively for you.
+                      The preview shows only a glimpse of your personal analysis. The full report includes in-depth personality insights, detailed career guidance, comprehensive relationship advice, life purpose interpretation, and personalized health recommendations - over 3,000 words of content tailored exclusively for you.
                     </p>
                     <Button
                       onClick={handleUpgrade}
@@ -651,7 +651,7 @@ export default function ReportPage() {
       <div className="cosmic-bg min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
-          <p className="text-white">Loading your cosmic report...</p>
+          <p className="text-white">Loading your analysis report...</p>
         </div>
       </div>
     }>

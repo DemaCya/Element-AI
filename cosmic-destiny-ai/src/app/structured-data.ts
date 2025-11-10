@@ -25,7 +25,7 @@ export const structuredData = {
 export const serviceStructuredData = {
   "@context": "https://schema.org",
   "@type": "Service",
-  "name": "Cosmic Destiny Analysis",
+  "name": "Personalized Analysis Report",
   "description": "Personalized Chinese astrology and Bazi birth chart analysis using AI technology",
   "provider": {
     "@type": "Organization",
@@ -50,7 +50,7 @@ export const faqStructuredData = {
       "name": "What does this website do?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Star Whisper AI is an online service that combines traditional Chinese astrology (Bazi) with advanced Artificial Intelligence. By providing your birth details, our AI generates a personalized destiny report. This report offers insights into various aspects of your life, including personality, career, relationships, and health, helping you understand yourself better and navigate future opportunities."
+        "text": "Star Whisper AI is an online service that combines traditional wisdom (Bazi) with advanced Artificial Intelligence. By providing your birth details, our AI generates a personalized analysis report. This report offers insights into various aspects of your life, including personality, career, relationships, and health, helping you understand yourself better and navigate future opportunities."
       }
     },
     {
@@ -58,7 +58,7 @@ export const faqStructuredData = {
       "name": "How does Star Whisper AI work?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "We combine traditional Chinese astrology (Bazi) with advanced AI analysis. Simply provide your birth details, and our system will generate a comprehensive personality and destiny report based on ancient wisdom and modern insights."
+        "text": "We combine traditional wisdom (Bazi) with advanced AI analysis. Simply provide your birth details, and our system will generate a comprehensive personality and life path report based on ancient wisdom and modern insights."
       }
     },
     {
@@ -74,7 +74,7 @@ export const faqStructuredData = {
       "name": "What's included in the full report?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "The complete report includes detailed personality analysis, career guidance, relationship insights, life path predictions, and health considerations. Each report is personalized based on your unique birth data."
+        "text": "The complete report includes detailed personality analysis, career guidance, relationship insights, life path potentials, and health considerations. Each report is personalized based on your unique birth data."
       }
     },
     {
@@ -82,7 +82,7 @@ export const faqStructuredData = {
       "name": "How much does the full report cost?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "The full cosmic destiny report costs $4.49 USD. We offer a free preview with 15% of the content available at no cost."
+        "text": "The full personal analysis report costs $4.49 USD. We offer a free preview with 15% of the content available at no cost."
       }
     },
     {

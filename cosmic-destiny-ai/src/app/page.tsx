@@ -24,11 +24,11 @@ export default function Home() {
   const faqItems = [
     {
       question: "How does this work?",
-      answer: "We combine traditional Chinese astrology (Bazi) with advanced AI analysis. Simply provide your birth details, and our system will generate a comprehensive personality and destiny report based on ancient wisdom and modern insights."
+      answer: "We combine traditional wisdom (Bazi) with advanced AI analysis. Simply provide your birth details, and our system will generate a comprehensive personality and life path report based on ancient knowledge and modern insights."
     },
     {
       question: "What's the difference between giving my birth date to a generic AI and using your service?",
-      answer: "After extensive testing, we've found that general-purpose AIs often \"hallucinate\" or make errors when calculating Bazi charts directly from a birth date. This can result in a completely wrong chart, leading to a misleading destiny report. Our service ensures accuracy by first using a professional Bazi plotting engine to generate your correct chart. The AI then provides analysis based on this accurate foundation."
+      answer: "After extensive testing, we've found that general-purpose AIs often \"hallucinate\" or make errors when calculating Bazi charts directly from a birth date. This can result in a completely wrong chart, leading to a misleading analysis. Our service ensures accuracy by first using a professional Bazi plotting engine to generate your correct chart. The AI then provides analysis based on this accurate foundation."
     },
     {
       question: "Is this based on real astrology or science?",
@@ -40,7 +40,7 @@ export default function Home() {
     },
     {
       question: "What's included in the full report?",
-      answer: "The complete report includes detailed personality analysis, career guidance, relationship insights, life path predictions, and health considerations. Each report is personalized based on your unique birth data."
+      answer: "The complete report includes detailed personality analysis, career guidance, relationship insights, life path potentials, and health considerations. Each report is personalized based on your unique birth data."
     },
     {
       question: "Is this website free?",
@@ -93,7 +93,7 @@ export default function Home() {
         {/* Hero Content */}
         <div className="relative z-10 text-center text-white px-4 mt-128">
           <p className="text-xl md:text-2xl mb-8 text-gray-300 animate-fade-up">
-            Discover Your Destiny Through the Wisdom of the Stars
+            Discover Your Path Through Personalized Insights
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Button
@@ -105,7 +105,7 @@ export default function Home() {
               <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-indigo-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               <div className="relative flex items-center">
                 <Sparkles className="w-5 h-5 mr-2 group-hover:rotate-12 transition-transform duration-200" />
-                <span className="font-semibold">Chart My Cosmos</span>
+                <span className="font-semibold">Start My Analysis</span>
               </div>
             </Button>
           </div>
@@ -153,7 +153,7 @@ export default function Home() {
                   <span className="text-gray-300 text-lg ml-2">USD</span>
                 </div>
                 <p className="text-gray-300 text-base mb-3">
-                  Complete Cosmic Destiny Report
+                  Complete Personal Analysis Report
                 </p>
                 <p className="text-gray-400 text-sm mb-5">
                   Get your full personalized Bazi analysis report with detailed insights on personality, career, relationships, and life path.

@@ -96,14 +96,14 @@ export default function ReportPage({ params }: { params: { id: string } }) {
       // 生成静态演示报告
       const mockReport: CosmicReport = {
         id: params.id,
-        name: '演示命理报告',
+        name: '个人分析报告（演示版）',
         birth_date: '1990-01-01',
         birth_time: '12:00',
         timezone: 'Asia/Shanghai',
         gender: 'male',
         is_paid: false,
         created_at: new Date().toISOString(),
-        report_data: `# 您的命理概览
+        report_data: `# 您的个人分析概览
 
 ## 出生信息
 - 出生日期：1990-01-01
@@ -119,7 +119,7 @@ export default function ReportPage({ params }: { params: { id: string } }) {
 ## 事业方向
 根据您的五行配置，最适合您的职业方向是创意产业和知识服务业。设计、媒体、教育、咨询等需要创造力和沟通能力的行业都很适合您。您也适合担任团队的智囊角色，为组织提供战略性建议。创业也是不错的选择，特别是在文化创意或科技创新领域。
 
-## 感情运势
+## 情感洞察
 在感情方面，您追求心灵层面的共鸣。您需要一个能够理解您内心世界、与您进行深度交流的伴侣。您的感情表达方式含蓄而深情，更喜欢用行动而非言语来表达爱意。建议您在选择伴侣时，重视精神契合度，寻找能够共同成长的人生伴侣。
 
 ---
@@ -132,9 +132,9 @@ export default function ReportPage({ params }: { params: { id: string } }) {
 - 全面感情分析和最佳配对
 - 人生使命和关键转折点
 - 个性化健康养生方案
-- 以及更多专属于您的命理指导...
+- 以及更多专属于您的个人成长指导...
 
-立即解锁完整报告，开启您的命运探索之旅！`
+立即解锁完整报告，开启您的自我探索之旅！`
       }
 
       setReport(mockReport)
@@ -262,10 +262,10 @@ export default function ReportPage({ params }: { params: { id: string } }) {
                   <div className="text-center">
                     <Sparkles className="w-12 h-12 text-purple-400 mx-auto mb-4" />
                     <h3 className="text-2xl font-bold text-white mb-4">
-                      解锁您的完整命理报告
+                      解锁您的完整分析报告
                     </h3>
                     <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
-                      预览仅展示了您命理分析的一小部分。完整报告包含深度人格分析、详细职业规划、
+                      预览仅展示了您个人分析的一小部分。完整报告包含深度人格分析、详细职业规划、
                       全面感情指导、人生使命解读和个性化健康养生方案，总计超过3000字的专属内容。
                     </p>
                     <Button

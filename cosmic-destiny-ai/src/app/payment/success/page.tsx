@@ -54,7 +54,7 @@ function SuccessContent() {
               <h1 className="text-3xl font-bold mb-4">Payment Successful! 🎉</h1>
               
               <p className="text-gray-300 mb-8">
-                Thank you for your payment. Your full destiny report is being unlocked now.
+                Thank you for your payment. Your full analysis report is being unlocked now.
               </p>
 
               <div className="bg-white/5 rounded-lg p-6 mb-8 border border-white/10">

@@ -52,7 +52,7 @@ function GenerateReportContent() {
     },
     {
       id: 'calculate',
-      title: 'Calculating Bazi Destiny',
+      title: 'Analyzing Birth Chart',
       description: 'Computing heavenly stems and earthly branches based on birth information',
       status: 'pending',
       icon: <Sparkles className="w-5 h-5" />
@@ -60,7 +60,7 @@ function GenerateReportContent() {
     {
       id: 'generate',
       title: 'Generating Report Content',
-      description: 'Using AI to generate personalized destiny report',
+      description: 'Using AI to generate personalized analysis report',
       status: 'pending',
       icon: <Calendar className="w-5 h-5" />
     },
@@ -154,7 +154,7 @@ function GenerateReportContent() {
       // Create empty report record first
       const reportInsertData = {
         user_id: user.id,
-        name: birthData.reportName || `Destiny Profile for ${birthData.birthDate}`,
+        name: birthData.reportName || `Personal Profile for ${birthData.birthDate}`,
         birth_date: birthData.birthDate,
         birth_time: birthData.birthTime || null,
         timezone: birthData.timeZone,
@@ -207,7 +207,7 @@ function GenerateReportContent() {
   }
 
   const generatePreviewReport = (birthData: BirthData, baziData: any): string => {
-    return `# Your Numerology Overview
+    return `# Your Personal Analysis Overview
 
 ## Birth Information
 - Birth Date: ${birthData.birthDate}
@@ -230,7 +230,7 @@ Your most outstanding talents lie in innovative thinking and communication skill
 ## Career Path
 According to your Five Elements configuration, the most suitable career paths for you are the creative industry and knowledge service industry. Industries such as design, media, education, and consulting that require creativity and communication skills are very suitable for you. You are also suitable for the role of a team think tank, providing strategic advice to the organization. Entrepreneurship is also a good choice, especially in the fields of cultural creativity or technological innovation.
 
-## Relationship Fortune
+## Relationship Insights
 In terms of relationships, you pursue spiritual resonance. You need a partner who can understand your inner world and have deep communication with you. Your way of expressing feelings is subtle and deep, and you prefer to express love with actions rather than words. It is recommended that you pay attention to spiritual compatibility when choosing a partner and look for a life partner who can grow with you.
 
 ---
@@ -243,9 +243,9 @@ The full report includes:
 - Comprehensive relationship analysis and best matches
 - Life mission and key turning points
 - Personalized health and wellness plan
-- And more exclusive numerology guidance for you...
+- And more exclusive personal guidance for you...
 
-Unlock the full report now and start your journey of destiny exploration!`
+Unlock the full report now and start your journey of self-exploration!`
   }
 
   const generateFullReport = (birthData: BirthData, baziData: any): string => {
@@ -256,7 +256,7 @@ Unlock the full report now and start your journey of destiny exploration!`
 ### Detailed Career Planning
 According to your Five Elements configuration, the most suitable career paths for you are the creative industry and knowledge service industry. Industries such as design, media, education, and consulting that require creativity and communication skills are very suitable for you. You are also suitable for the role of a team think tank, providing strategic advice to the organization. Entrepreneurship is also a good choice, especially in the fields of cultural creativity or technological innovation.
 
-### Relationship Fortune Analysis
+### Relationship Insights Analysis
 In terms of relationships, you pursue spiritual resonance. You need a partner who can understand your inner world and have deep communication with you. Your way of expressing feelings is subtle and deep, and you prefer to express love with actions rather than words. It is recommended that you pay attention to spiritual compatibility when choosing a partner and look for a life partner who can grow with you.
 
 ### Health and Wellness Advice
@@ -287,12 +287,12 @@ Your constitution tends to need balanced conditioning. It is recommended to enga
             <div className="flex items-center justify-center gap-2 mb-4">
               <Sparkles className="w-8 h-8 text-purple-400" />
               <h1 className="text-4xl font-bold text-glow bg-gradient-to-r from-purple-300 via-pink-300 to-purple-300 bg-clip-text text-transparent">
-                Generating Your Destiny Report
+                Generating Your Personal Analysis
               </h1>
               <Sparkles className="w-8 h-8 text-purple-400" />
             </div>
             <p className="text-xl text-gray-300">
-              Creating your personalized cosmic destiny analysis report
+              Creating your personalized analysis report
             </p>
           </div>
 

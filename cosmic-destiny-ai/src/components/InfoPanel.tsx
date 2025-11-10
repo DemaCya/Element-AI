@@ -32,17 +32,17 @@ export default function InfoPanel({ activePanel, onClose }: InfoPanelProps) {
       {
         icon: Star,
         title: 'Our Calling',
-        content: 'To unlock the cosmic secrets encoded in the stars at the moment of your birth, guiding you toward a life of profound purpose and clarity.'
+        content: 'To unlock the personal insights encoded in the patterns at the moment of your birth, guiding you toward a life of profound purpose and clarity.'
       },
       {
         icon: Sparkles,
         title: 'The Oracle',
-        content: "Our digital oracle is a fusion of ancient astrological charts and sophisticated AI. It doesn't just calculate; it interprets, revealing the narrative of your life's potential as written in the stars."
+        content: "Our digital tool is a fusion of ancient wisdom charts and sophisticated AI. It doesn't just calculate; it interprets, revealing the narrative of your life's potential."
       },
       {
         icon: Moon,
-        title: 'Your Cosmic Map',
-        content: "We provide you with a personalized cosmic map. Navigate your life's journey with insights into your personality, career, relationships, and destiny. Discover your strengths, understand your challenges, and unlock your true potential."
+        title: 'Your Personal Map',
+        content: "We provide you with a personalized analysis. Navigate your life's journey with insights into your personality, career, relationships, and path. Discover your strengths, understand your challenges, and unlock your true potential."
       }
     ]
   }
@@ -53,12 +53,12 @@ export default function InfoPanel({ activePanel, onClose }: InfoPanelProps) {
       {
         icon: Sun,
         title: 'Ancient Wisdom, Modern Language',
-        content: 'We speak the ancient language of the stars, translated for the modern soul. We honor the sacred traditions of astrology while using AI to make its wisdom clearer and more accessible than ever before.'
+        content: 'We translate ancient wisdom for the modern soul. We honor sacred traditions while using AI to make its insights clearer and more accessible than ever before.'
       },
       {
         icon: Star,
         title: 'You Are the Hero of Your Story',
-        content: "Your birth chart is a map, not a script. We believe the stars illuminate the path, but you hold the power to walk it. Our insights are designed to empower you to be the conscious author of your own destiny."
+        content: "Your birth chart is a map, not a script. We believe our analysis illuminates the path, but you hold the power to walk it. Our insights are designed to empower you to be the conscious author of your own life's story."
       },
       {
         icon: Sparkles,

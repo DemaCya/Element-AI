@@ -158,7 +158,7 @@ function DashboardContent() {
           {/* Header */}
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold text-glow mb-4">
-              Welcome to Your Cosmic Dashboard
+              Welcome to Your Personal Dashboard
             </h1>
             <p className="text-xl text-gray-300">
               Your journey to self-discovery continues here
@@ -221,7 +221,7 @@ function DashboardContent() {
                           <div className="flex items-center gap-2 mb-2">
                             <Calendar className="w-4 h-4 text-purple-400" />
                             <span className="text-white font-medium">
-                              {report.name || `命理报告 - ${new Date(report.birth_date).toLocaleDateString()}`}
+                              {report.name || `Analysis Report - ${new Date(report.birth_date).toLocaleDateString()}`}
                             </span>
                             {report.is_paid && (
                               <span className="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">
@@ -247,7 +247,7 @@ function DashboardContent() {
               <div className="bg-slate-800/50 backdrop-blur-sm rounded-lg p-6 border border-purple-500/20">
                 <h3 className="text-xl font-bold text-white mb-4">Create New Report</h3>
                 <p className="text-gray-400 mb-4">
-                  Generate a new cosmic destiny analysis based on your birth information
+                  Generate a new personal analysis based on your birth information
                 </p>
                 <Button
                   variant="cosmic"
@@ -255,7 +255,7 @@ function DashboardContent() {
                   onClick={() => setShowForm(true)}
                 >
                   <Sparkles className="w-4 h-4 mr-2" />
-                  Chart My Cosmos
+                  Start New Analysis
                 </Button>
               </div>
 

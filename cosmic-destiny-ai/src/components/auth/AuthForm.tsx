@@ -92,8 +92,8 @@ export default function AuthForm({ onSuccess }: AuthFormProps) {
         </h2>
         <p className="text-gray-400">
           {isSignUp
-            ? 'Begin your cosmic journey today'
-            : 'Sign in to access your destiny reports'
+            ? 'Start your journey of self-discovery'
+            : 'Sign in to access your analysis reports'
           }
         </p>
       </div>

@@ -22,21 +22,21 @@ Object.entries(iconFiles).forEach(([name, filePath]) => {
 });
 
 export const metadata: Metadata = {
-  title: 'Star Whisper AI - AI-Powered Chinese Astrology & Fortune Telling',
+  title: 'Star Whisper AI - AI-Powered Personal Insights & Analysis',
   description: 'Discover your future with Star Whisper AI. We provide advanced AI analysis of your Bazi birth chart for personalized insights into your personality, career, relationships, and life path. Get your free preview today.',
   keywords: [
     'Chinese astrology',
     'Bazi analysis',
-    'fortune telling',
+    'personal analysis',
     'AI astrology',
     'birth chart',
-    'destiny analysis',
+    'path analysis',
     'personality insights',
     'career guidance',
     'relationship compatibility',
     'life path',
     'Chinese zodiac',
-    'cosmic destiny'
+    'personal growth'
   ],
   authors: [{ name: 'Star Whisper AI' }],
   creator: 'Star Whisper AI',
@@ -56,13 +56,13 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: process.env.NEXT_PUBLIC_APP_URL,
-    title: 'Star Whisper AI - AI-Powered Chinese Astrology & Fortune Telling',
+    title: 'Star Whisper AI - AI-Powered Personal Insights & Analysis',
     description: 'Discover your future with Star Whisper AI. We provide advanced AI analysis of your Bazi birth chart for personalized insights into your personality, career, relationships, and life path.',
     siteName: 'Star Whisper AI',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Star Whisper AI - AI-Powered Chinese Astrology & Fortune Telling',
+    title: 'Star Whisper AI - AI-Powered Personal Insights & Analysis',
     description: 'Discover your future with Star Whisper AI. We provide advanced AI analysis of your Bazi birth chart for personalized insights into your personality, career, relationships, and life path.',
   },
   alternates: {

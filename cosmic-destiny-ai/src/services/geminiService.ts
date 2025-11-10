@@ -19,7 +19,7 @@ export class GeminiService {
 
   // 生成预览报告（免费版本，500-800字）
   static async generatePreviewReport(birthData: BirthData, baziData: BaziData): Promise<string> {
-    const prompt = `作为一位资深的中国命理学家，请基于以下信息生成一份简短的命理预览报告（500-800字）：
+    const prompt = `作为一位资深的人生规划顾问，请基于以下信息生成一份简短的个人分析预览报告（500-800字）：
 
 ## 出生信息
 - 出生日期：${birthData.birthDate}
@@ -35,7 +35,7 @@ export class GeminiService {
 
 请生成一份预览报告，包含：
 
-# 您的命理概览
+# 您的个人分析概览
 
 ## 核心性格特征
 简要描述其最突出的2-3个性格特点（150字左右）
@@ -46,7 +46,7 @@ export class GeminiService {
 ## 事业方向
 简述最适合的1-2个职业方向（150字左右）
 
-## 感情运势
+## 情感洞察
 简要分析其感情特点和建议（150字左右）
 
 ---
@@ -58,16 +58,16 @@ export class GeminiService {
 - 全面感情分析和最佳配对
 - 人生使命和关键转折点
 - 个性化健康养生方案
-- 以及更多专属于您的命理指导...
+- 以及更多专属于您的个人指导...
 
-立即解锁完整报告，开启您的命运探索之旅！
+立即解锁完整报告，开启您的自我探索之旅！
 
-请用温暖、吸引人的语言撰写，让读者感受到命理的魅力，并产生了解更多的兴趣。`
+请用温暖、吸引人的语言撰写，让读者感受到自我探索的魅力，并产生了解更多的兴趣。`
 
     return await this.generateContent(prompt)
   }
   static async analyzePersonality(birthData: BirthData, baziData: BaziData): Promise<string> {
-    const prompt = `作为一位专业的中国命理学家和心理学家，请基于以下信息进行深度的人格分析：
+    const prompt = `作为一位专业的个人成长顾问和心理学家，请基于以下信息进行深度的人格分析：
 
 出生信息：
 - 出生日期：${birthData.birthDate}
@@ -95,7 +95,7 @@ export class GeminiService {
   }
 
   static async analyzeCareer(birthData: BirthData, baziData: BaziData): Promise<string> {
-    const prompt = `作为一位专业的职业规划师和命理学家，请基于以下信息进行职业发展分析：
+    const prompt = `作为一位专业的职业规划师和个人成长顾问，请基于以下信息进行职业发展分析：
 
 出生信息：
 - 出生日期：${birthData.birthDate}
@@ -123,7 +123,7 @@ export class GeminiService {
   }
 
   static async analyzeRelationships(birthData: BirthData, baziData: BaziData): Promise<string> {
-    const prompt = `作为一位专业的情感咨询师和命理学家，请基于以下信息进行情感关系分析：
+    const prompt = `作为一位专业的情感咨询师和个人成长顾问，请基于以下信息进行情感关系分析：
 
 出生信息：
 - 出生日期：${birthData.birthDate}
@@ -141,7 +141,7 @@ export class GeminiService {
 2. 最佳配对类型和兼容性分析
 3. 沟通风格和表达方式
 4. 情感需求核心和期望
-5. 婚姻运势和长期关系建议
+5. 长期关系分析与建议
 6. 家庭关系处理方式
 7. 友谊和社交模式
 8. 实用的恋爱和关系建议
@@ -152,7 +152,7 @@ export class GeminiService {
   }
 
   static async analyzeLifePath(birthData: BirthData, baziData: BaziData): Promise<string> {
-    const prompt = `作为一位专业的灵性导师和命理学家，请基于以下信息进行人生使命分析：
+    const prompt = `作为一位专业的人生规划顾问和灵性导师，请基于以下信息进行人生使命分析：
 
 出生信息：
 - 出生日期：${birthData.birthDate}
@@ -181,7 +181,7 @@ export class GeminiService {
   }
 
   static async analyzeHealth(birthData: BirthData, baziData: BaziData): Promise<string> {
-    const prompt = `作为一位专业的中医养生专家和命理学家，请基于以下信息进行健康分析：
+    const prompt = `作为一位专业的中医养生专家和健康顾问，请基于以下信息进行健康分析：
 
 出生信息：
 - 出生日期：${birthData.birthDate}
@@ -243,7 +243,7 @@ export class GeminiService {
 
   // 新增：单次API调用生成完整报告
   static async generateSingleComprehensiveReport(birthData: BirthData, baziData: BaziData): Promise<string> {
-    const prompt = `作为一位资深的中国命理学家、心理学家、职业规划师、情感咨询师、灵性导师和中医养生专家，请基于以下信息生成一份全面详细的命理分析报告：
+    const prompt = `作为一位资深的人生规划顾问、心理学家、职业规划师、情感咨询师、灵性导师和健康顾问，请基于以下信息生成一份全面详细的个人成长分析报告：
 
 ## 出生信息
 - 出生日期：${birthData.birthDate}
@@ -257,7 +257,7 @@ export class GeminiService {
 - 日主：${baziData.dayMaster}
 - 五行分布：木${baziData.elements.wood}、火${baziData.elements.fire}、土${baziData.elements.earth}、金${baziData.elements.metal}、水${baziData.elements.water}
 
-请生成一份超过3000字的详细命理分析报告，包含以下所有部分：
+请生成一份超过3000字的详细个人成长分析报告，包含以下所有部分：
 
 # 一、人格特质分析
 ## 核心性格特征
@@ -292,7 +292,7 @@ export class GeminiService {
 ## 最佳配对类型
 基于五行相生相克分析最适合的伴侣类型。
 
-## 婚姻运势
+## 长期关系分析
 分析婚姻状况和长期关系建议。
 
 ## 家庭关系

@@ -508,7 +508,7 @@ export default function BirthForm({ onSubmit, onClose, isLoading }: BirthFormPro
                   <Sparkles className="w-10 h-10 text-white animate-pulse" />
                 </div>
                 <h2 className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent mb-2">
-                  Chart Your Cosmic Destiny
+                  Create Your Personal Analysis
                 </h2>
                 <p className="text-gray-400 text-sm">
                   Step {step} of 2: {step === 1 ? 'Birth Information & Gender' : 'Time Zone Selection'}
@@ -536,7 +536,7 @@ export default function BirthForm({ onSubmit, onClose, isLoading }: BirthFormPro
                       </h3>
                       <Input
                         type="text"
-                        placeholder="e.g. My Destiny Profile, My Mom's Destiny Profile (optional)"
+                        placeholder="e.g. My Personal Profile, My Mom's Profile (optional)"
                         value={formData.reportName || ''}
                         onChange={(e) => updateFormData('reportName', e.target.value)}
                         className="w-full bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-purple-400/50 rounded-xl px-4 py-3"
@@ -623,8 +623,8 @@ export default function BirthForm({ onSubmit, onClose, isLoading }: BirthFormPro
                         <div>
                           <h4 className="text-white font-medium mb-1">Why this information matters</h4>
                           <p className="text-gray-400 text-sm leading-relaxed">
-                            Your birth date, time, and gender are essential for calculating your unique cosmic blueprint. 
-                            The exact birth time helps determine your rising sign and creates a more accurate astrological profile.
+                            Your birth date, time, and gender are essential for calculating your unique personal blueprint. 
+                            The exact birth time helps create a more accurate analysis.
                           </p>
                         </div>
                       </div>
@@ -641,7 +641,7 @@ export default function BirthForm({ onSubmit, onClose, isLoading }: BirthFormPro
                         Select Your Time Zone
                       </h3>
                       <p className="text-gray-400">
-                        This helps us calculate your cosmic profile accurately
+                        This helps us calculate your personal profile accurately
                       </p>
                     </div>
 
@@ -789,7 +789,7 @@ export default function BirthForm({ onSubmit, onClose, isLoading }: BirthFormPro
                           </>
                         ) : (
                           <>
-                            Generate My Cosmic Report
+                            Generate My Analysis Report
                             <Sparkles className="w-5 h-5 ml-2 group-hover:rotate-12 transition-transform duration-200" />
                           </>
                         )}

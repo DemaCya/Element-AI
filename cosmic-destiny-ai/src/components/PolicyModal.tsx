@@ -33,7 +33,7 @@ export default function PolicyModal({ isOpen, onClose, type }: PolicyModalProps)
         heading: '1. Information We Collect',
         content: [
           'We collect information that you provide directly to us, including:',
-          '• Birth date, time, and location for generating your destiny report',
+          '• Birth date, time, and location for generating your personal analysis report',
           '• Account information (email, name) when you create an account',
           '• Payment information processed securely through our payment providers',
           '• Any communications you send to us'
@@ -43,7 +43,7 @@ export default function PolicyModal({ isOpen, onClose, type }: PolicyModalProps)
         heading: '2. How We Use Your Information',
         content: [
           'We use the information we collect to:',
-          '• Generate personalized destiny reports based on your birth data',
+          '• Generate personalized analysis reports based on your birth data',
           '• Process payments and manage your account',
           '• Improve our services and user experience',
           '• Communicate with you about your account and our services',
@@ -136,7 +136,7 @@ export default function PolicyModal({ isOpen, onClose, type }: PolicyModalProps)
       {
         heading: '2. Description of Service',
         content: [
-          'Star Whisper AI provides AI-powered astrological reports based on traditional Chinese Bazi (Four Pillars) calculations.',
+          'Star Whisper AI provides AI-powered analysis reports based on traditional wisdom from Chinese Bazi (Four Pillars) calculations.',
           'Our service generates personalized reports including personality analysis, career guidance, and life path insights.',
           'This service is provided for entertainment and self-reflection purposes only.'
         ]
@@ -185,7 +185,7 @@ export default function PolicyModal({ isOpen, onClose, type }: PolicyModalProps)
         content: [
           'Our service is provided "as is" without warranties of any kind.',
           'We do not guarantee the accuracy, completeness, or usefulness of any information provided.',
-          'Astrological reports are for entertainment purposes only and should not replace professional advice.',
+          'Analysis reports are for entertainment and self-reflection purposes only and should not replace professional advice.',
           'We are not responsible for decisions made based on our reports.'
         ]
       },
